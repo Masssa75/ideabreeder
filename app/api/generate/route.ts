@@ -17,10 +17,21 @@ export async function POST(request: NextRequest) {
 GENES TO COMBINE:
 ${genesText}
 
+IMPORTANT: Generate diverse ideas across ALL industries and business models:
+- Consumer apps (dating, fitness, food, entertainment, travel)
+- Marketplaces (local services, niche verticals)
+- Health & wellness
+- Education & learning
+- Finance & investing
+- Hardware + software combos
+- Social/community platforms
+Do NOT default to B2B SaaS, productivity tools, or workspace apps.
+
 Generate a startup idea that creatively combines these concepts. The idea should be:
 - Specific and actionable (not vague)
 - Something that could realistically be built
 - Novel - not just an obvious combination
+- Surprising industry or audience - avoid the obvious
 
 Respond with ONLY a JSON object (no markdown, no explanation):
 {

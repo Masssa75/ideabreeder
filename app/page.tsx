@@ -1,14 +1,22 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import GenePool from '@/components/GenePool';
 import BreedingView from '@/components/BreedingView';
 import Leaderboard from '@/components/Leaderboard';
 import ActivityLog from '@/components/ActivityLog';
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 interface Gene {
+  id?: string;
   text: string;
   fitness: number;
+  offspring_count?: number;
 }
 
 interface Idea {
@@ -31,21 +39,41 @@ interface Idea {
 }
 
 const SEED_GENES = [
+  // Viral mechanics
   'screenshot-ready output',
-  'public accountability',
-  'solo founders',
-  'weekly ritual',
-  'professional anxiety',
-  'badge embed for virality',
-  'fear of missing out',
-  'social proof display',
   'one-click sharing',
+  'badge embed for virality',
   'leaderboard competition',
-  'AI-powered analysis',
+  'social proof display',
+  // Psychology
+  'fear of missing out',
   'instant gratification',
+  'curiosity gap',
+  'nostalgia trigger',
   'status signaling',
-  'community validation',
-  'gamification mechanics'
+  // Diverse audiences
+  'gen-z consumers',
+  'parents with toddlers',
+  'fitness beginners',
+  'home cooks',
+  'pet owners',
+  'budget travelers',
+  'college students',
+  // Diverse verticals
+  'health and wellness',
+  'dating and relationships',
+  'food and dining',
+  'personal finance',
+  'entertainment and media',
+  // Tech enablers
+  'AI-powered analysis',
+  'voice-first interface',
+  'camera-based input',
+  'location awareness',
+  // Gamification
+  'streak rewards',
+  'mystery box mechanic',
+  'unlockable achievements'
 ];
 
 export default function Home() {
@@ -98,7 +126,39 @@ export default function Home() {
     return selected;
   }, []);
 
-  const updateGeneFitness = useCallback((geneTexts: string[], scoreDelta: number) => {
+  const updateGeneFitness = useCallback(async (geneTexts: string[], scoreDelta: number) => {
+    for (const text of geneTexts) {
+      const normalizedText = text.toLowerCase().trim();
+
+      // Check if gene exists
+      const { data: existing } = await supabase
+        .from('genes')
+        .select('*')
+        .eq('text', normalizedText)
+        .single();
+
+      if (existing) {
+        // Update existing gene
+        await supabase
+          .from('genes')
+          .update({
+            fitness: Math.max(0.5, Math.min(10, existing.fitness + scoreDelta)),
+            offspring_count: (existing.offspring_count || 0) + 1
+          })
+          .eq('id', existing.id);
+      } else {
+        // Insert new gene
+        await supabase
+          .from('genes')
+          .insert({
+            text: normalizedText,
+            fitness: Math.max(0.5, Math.min(10, 5 + scoreDelta)),
+            offspring_count: 1
+          });
+      }
+    }
+
+    // Also update local state for immediate UI feedback
     setGenes(prev => {
       const updated = [...prev];
 
@@ -193,7 +253,28 @@ export default function Home() {
       const newGeneFitness = (scoreData.virus_score - 25) / 50;
       updateGeneFitness(newGenes, newGeneFitness);
 
-      const fullIdea: Idea = {
+      // Save idea to Supabase
+      const { data: savedIdea, error: saveError } = await supabase
+        .from('ideas')
+        .insert({
+          name: idea.name,
+          description: idea.description,
+          hook: idea.hook,
+          virus_score: scoreData.virus_score,
+          generation: generation,
+          scores: scoreData.scores,
+          genes_used: selectedGenes,
+          genes_extracted: newGenes,
+          reasoning: scoreData.reasoning
+        })
+        .select()
+        .single();
+
+      if (saveError) {
+        console.error('Failed to save idea:', saveError);
+      }
+
+      const fullIdea: Idea = savedIdea || {
         id: `idea-${Date.now()}`,
         name: idea.name,
         description: idea.description,
@@ -215,6 +296,15 @@ export default function Home() {
 
       setStatus('complete');
       addLog(`Generation #${generation} complete!`);
+
+      // Update generation in Supabase
+      await supabase
+        .from('evolution_state')
+        .update({
+          current_generation: generation + 1,
+          last_run_at: new Date().toISOString()
+        })
+        .eq('id', 1);
 
       await new Promise(r => setTimeout(r, 2000));
 
@@ -242,61 +332,131 @@ export default function Home() {
     }
   }, [generation, genes, selectGenes, updateGeneFitness, addLog]);
 
-  const toggleEvolution = () => {
+  const toggleEvolution = async () => {
     if (isRunning) {
       isRunningRef.current = false;
       setIsRunning(false);
       addLog('Evolution paused');
+
+      // Update Supabase state
+      await supabase
+        .from('evolution_state')
+        .update({ is_running: false, status: 'idle' })
+        .eq('id', 1);
     } else {
       isRunningRef.current = true;
       setIsRunning(true);
       addLog('Evolution started');
+
+      // Update Supabase state
+      await supabase
+        .from('evolution_state')
+        .update({ is_running: true, status: 'running' })
+        .eq('id', 1);
+
       runGeneration();
     }
   };
 
-  // Load from localStorage on mount
+  // Load from Supabase on mount
   useEffect(() => {
-    const savedGenes = localStorage.getItem('ideabreeder_genes');
-    const savedIdeas = localStorage.getItem('ideabreeder_ideas');
-    const savedGeneration = localStorage.getItem('ideabreeder_generation');
+    async function loadFromSupabase() {
+      try {
+        // Load genes
+        const { data: genesData, error: genesError } = await supabase
+          .from('genes')
+          .select('*')
+          .order('fitness', { ascending: false })
+          .limit(100);
 
-    if (savedGenes) {
-      setGenes(JSON.parse(savedGenes));
-      addLog('Loaded genes from storage');
-    } else {
-      setGenes(SEED_GENES.map(text => ({ text, fitness: 5 })));
-      addLog('Initialized with seed genes');
+        if (genesError) throw genesError;
+
+        if (genesData && genesData.length > 0) {
+          setGenes(genesData);
+          addLog(`Loaded ${genesData.length} genes from database`);
+        } else {
+          setGenes(SEED_GENES.map(text => ({ text, fitness: 5 })));
+          addLog('Initialized with seed genes');
+        }
+
+        // Load top ideas
+        const { data: ideasData, error: ideasError } = await supabase
+          .from('ideas')
+          .select('*')
+          .order('virus_score', { ascending: false })
+          .limit(10);
+
+        if (ideasError) throw ideasError;
+
+        if (ideasData && ideasData.length > 0) {
+          setTopIdeas(ideasData);
+          addLog(`Loaded ${ideasData.length} top ideas`);
+        }
+
+        // Load evolution state
+        const { data: stateData, error: stateError } = await supabase
+          .from('evolution_state')
+          .select('*')
+          .eq('id', 1)
+          .single();
+
+        if (stateError) throw stateError;
+
+        if (stateData) {
+          setGeneration(stateData.current_generation || 1);
+          if (stateData.is_running) {
+            isRunningRef.current = true;
+            setIsRunning(true);
+            addLog('Resuming evolution from database');
+            setTimeout(() => runGeneration(), 1000);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load from Supabase:', error);
+        addLog('Using local fallback');
+        setGenes(SEED_GENES.map(text => ({ text, fitness: 5 })));
+      }
     }
 
-    if (savedIdeas) {
-      setTopIdeas(JSON.parse(savedIdeas));
-      addLog('Loaded ideas from storage');
-    }
-
-    if (savedGeneration) {
-      setGeneration(parseInt(savedGeneration, 10));
-    }
+    loadFromSupabase();
   }, [addLog]);
 
-  // Save genes to localStorage when they change
+  // Subscribe to realtime updates
   useEffect(() => {
-    if (genes.length > 0) {
-      localStorage.setItem('ideabreeder_genes', JSON.stringify(genes));
-    }
-  }, [genes]);
+    const channel = supabase
+      .channel('db-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setTopIdeas(prev => {
+            const exists = prev.some(i => i.id === payload.new.id);
+            if (exists) return prev;
+            return [...prev, payload.new as Idea]
+              .sort((a, b) => b.virus_score - a.virus_score)
+              .slice(0, 10);
+          });
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'genes' }, () => {
+        // Refresh genes on any change
+        supabase
+          .from('genes')
+          .select('*')
+          .order('fitness', { ascending: false })
+          .limit(100)
+          .then(({ data }) => {
+            if (data) setGenes(data);
+          });
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'evolution_state' }, (payload) => {
+        const newState = payload.new as { current_generation: number; is_running: boolean };
+        setGeneration(newState.current_generation);
+      })
+      .subscribe();
 
-  // Save ideas to localStorage when they change
-  useEffect(() => {
-    if (topIdeas.length > 0) {
-      localStorage.setItem('ideabreeder_ideas', JSON.stringify(topIdeas));
-    }
-  }, [topIdeas]);
-
-  // Save generation to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('ideabreeder_generation', generation.toString());
-  }, [generation]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return (
     <main className="min-h-screen p-4 md:p-8">
