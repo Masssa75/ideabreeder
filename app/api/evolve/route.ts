@@ -58,21 +58,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Not enough genes' }, { status: 500 });
     }
 
+    // 1b. Get recent ideas for context
+    const { data: recentIdeas } = await supabase
+      .from('ideas')
+      .select('name')
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    const context = {
+      generation: state.current_generation,
+      genePoolSize: genes.length,
+      recentNames: recentIdeas?.map(i => i.name) || []
+    };
+
     // 2. Select genes by fitness
     const selectedGenes = selectGenesByFitness(genes, 3);
     console.log('Selected genes:', selectedGenes);
 
-    // 3. Generate idea
-    const idea = await generateIdea(selectedGenes);
+    // 3. Generate idea with context
+    const idea = await generateIdea(selectedGenes, context);
     console.log('Generated:', idea.name);
 
-    // 4. Score idea
+    // 4. Score idea (new USEFUL framework - 6 dimensions, max 60)
     const { scores, reasoning } = await scoreIdea(idea);
-    const virusScore = scores.virality + scores.immediacy + scores.recurrence + scores.urgency + scores.simplicity;
-    console.log('Scored:', virusScore);
+    const totalScore = scores.utility + scores.simplicity + scores.economics + scores.frequency + scores.uniqueness + scores.leverage;
+    console.log('Scored:', totalScore, '/60');
 
-    // 5. Extract new genes
-    const extractedGenes = await extractGenes(idea);
+    // 5. Extract new genes with scores context
+    const extractedGenes = await extractGenes(idea, scores);
     console.log('Extracted:', extractedGenes);
 
     // 6. Save idea to database
@@ -80,7 +93,7 @@ export async function POST(request: NextRequest) {
       name: idea.name,
       description: idea.description,
       hook: idea.hook,
-      virus_score: virusScore,
+      virus_score: totalScore, // keeping field name for compatibility
       scores,
       genes_used: selectedGenes,
       genes_extracted: extractedGenes,
@@ -90,8 +103,8 @@ export async function POST(request: NextRequest) {
 
     if (ideaError) console.error('Failed to save idea:', ideaError);
 
-    // 7. Update gene fitness
-    const fitnessDelta = (virusScore - 25) / 25;
+    // 7. Update gene fitness (normalized to -1 to +1 range, 30 is average for 6 dims)
+    const fitnessDelta = (totalScore - 30) / 30;
     for (const geneText of selectedGenes) {
       await updateGeneFitness(geneText, fitnessDelta);
     }
@@ -114,7 +127,8 @@ export async function POST(request: NextRequest) {
       success: true,
       generation: state.current_generation,
       idea: idea.name,
-      virus_score: virusScore,
+      score: totalScore,
+      max_score: 60,
       genes_used: selectedGenes,
       genes_extracted: extractedGenes,
     });
@@ -147,35 +161,45 @@ function selectGenesByFitness(genes: Gene[], count: number): string[] {
   return selected;
 }
 
-async function generateIdea(genes: string[]) {
+async function generateIdea(genes: string[], context?: { generation: number; genePoolSize: number; recentNames?: string[] }) {
   const genesText = genes.map(g => `"${g}"`).join(', ');
 
-  const prompt = `You are a startup idea generator. Given these concept fragments (genes), combine them creatively to generate ONE novel startup idea.
+  let contextSection = '';
+  if (context) {
+    contextSection = `
+CURRENT STATE:
+- Generation: ${context.generation}
+- Gene pool size: ${context.genePoolSize} genes
+${context.recentNames?.length ? `- Recent ideas (avoid similar): ${context.recentNames.slice(0, 5).join(', ')}` : ''}
+`;
+  }
+
+  const prompt = `You are part of an evolutionary engine that breeds startup ideas.
+
+HOW THIS WORKS:
+- You receive "genes" (concept fragments) selected from a pool based on fitness scores
+- Your output gets scored on how well it solves real problems
+- High-scoring ideas boost the fitness of genes used, low-scoring ideas reduce it
+- New genes get extracted from your ideas and added to the pool
+- Over generations, the gene pool evolves toward better ideas
+
+YOUR OBJECTIVE:
+Help this engine get smarter. Don't just generate a "good sounding" idea - generate one that genuinely solves a painful problem for real people. The system is learning from your outputs.
 
 GENES TO COMBINE:
 ${genesText}
+${contextSection}
+GUIDELINES:
+- Solve real problems people actually have
+- Be specific about who this is for and why they'd pay
+- If you notice the genes are narrow, interpret them creatively to explore new territory
+- Avoid repeating patterns from recent ideas
 
-IMPORTANT: Generate diverse ideas across ALL industries and business models:
-- Consumer apps (dating, fitness, food, entertainment, travel)
-- Marketplaces (local services, niche verticals)
-- Health & wellness
-- Education & learning
-- Finance & investing
-- Hardware + software combos
-- Social/community platforms
-Do NOT default to B2B SaaS, productivity tools, or workspace apps.
-
-Generate a startup idea that creatively combines these concepts. The idea should be:
-- Specific and actionable (not vague)
-- Something that could realistically be built
-- Novel - not just an obvious combination
-- Surprising industry or audience - avoid the obvious
-
-Respond with ONLY a JSON object (no markdown, no explanation):
+Respond with ONLY valid JSON:
 {
   "name": "Short catchy name (2-4 words)",
-  "description": "One paragraph describing the startup idea, what it does, who it's for, and how it makes money. Be specific.",
-  "hook": "One sentence pitch that would make someone stop scrolling"
+  "description": "What it does, who it's for, why they need it, how it makes money.",
+  "hook": "One sentence that captures the core value"
 }`;
 
   const response = await fetch('https://api.moonshot.ai/v1/chat/completions', {
@@ -202,23 +226,37 @@ Respond with ONLY a JSON object (no markdown, no explanation):
 }
 
 async function scoreIdea(idea: { name: string; description: string; hook: string }) {
-  const prompt = `Score this startup idea using the VIRUS framework (0-10 each):
+  const prompt = `You are the scoring engine for an evolutionary startup idea breeder.
 
-NAME: ${idea.name}
-DESCRIPTION: ${idea.description}
-HOOK: ${idea.hook}
+HOW THIS WORKS:
+- Ideas are generated from a gene pool of concept fragments
+- Your scores determine which genes survive and propagate
+- High scores boost the fitness of genes used in this idea
+- Low scores reduce their fitness, making them less likely to be selected
+- The system evolves based on your judgment
 
-VIRUS Framework:
-- Virality (0-10): How likely are users to share this? Built-in sharing mechanics?
-- Immediacy (0-10): How fast can someone get value? Instant gratification?
-- Recurrence (0-10): Will users come back daily/weekly? Habit-forming?
-- Urgency (0-10): Why would someone sign up TODAY? Time pressure?
-- Simplicity (0-10): Can you explain it in one sentence? Easy to understand?
+YOUR RESPONSIBILITY:
+Score honestly. The evolution depends on accurate feedback.
 
-Respond with ONLY a JSON object:
+IDEA TO EVALUATE:
+Name: ${idea.name}
+Description: ${idea.description}
+Hook: ${idea.hook}
+
+SCORE EACH DIMENSION (0-10):
+U - UTILITY: Does this solve a real, painful problem?
+S - SIMPLICITY: Can a solo dev build an MVP quickly?
+E - ECONOMICS: Is there a clear path to revenue?
+F - FREQUENCY: How often would people use this?
+U - UNIQUENESS: Is this a fresh approach?
+L - LEVERAGE: Does this use AI/new tech meaningfully?
+
+Be calibrated. Average ideas score 4-6. Only exceptional dimensions get 8+.
+
+Respond with ONLY valid JSON:
 {
-  "scores": { "virality": X, "immediacy": X, "recurrence": X, "urgency": X, "simplicity": X },
-  "reasoning": "Brief 1-2 sentence analysis of strengths and weaknesses"
+  "scores": { "utility": X, "simplicity": X, "economics": X, "frequency": X, "uniqueness": X, "leverage": X },
+  "reasoning": "What makes this strong or weak?"
 }`;
 
   const response = await fetch('https://api.moonshot.ai/v1/chat/completions', {
@@ -244,20 +282,35 @@ Respond with ONLY a JSON object:
   return JSON.parse(cleanContent);
 }
 
-async function extractGenes(idea: { name: string; description: string; hook: string }) {
-  const prompt = `Extract 3-5 reusable concept fragments (genes) from this startup idea that could be combined with other concepts to create new ideas.
+async function extractGenes(idea: { name: string; description: string; hook: string }, scores: Record<string, number>) {
+  const prompt = `You are the gene extractor for an evolutionary startup idea breeder.
 
-IDEA: ${idea.name}
-${idea.description}
+HOW THIS WORKS:
+- Ideas are generated by combining "genes" (concept fragments) from a pool
+- Your job is to extract new genes from this idea to add to the pool
+- Good genes are abstract enough to recombine with other concepts
+- The genes you extract will be used to generate future ideas
 
-Extract atomic, reusable concepts like:
-- Business mechanics (e.g., "auction-based pricing", "peer verification")
-- User behaviors (e.g., "daily check-in", "photo-based input")
-- Psychological triggers (e.g., "scarcity timer", "social proof")
-- Target niches (e.g., "new parents", "remote workers")
+THE IDEA:
+Name: ${idea.name}
+Description: ${idea.description}
+Hook: ${idea.hook}
 
-Respond with ONLY a JSON array of 3-5 strings:
-["concept one", "concept two", "concept three"]`;
+SCORES:
+Utility: ${scores.utility}/10, Simplicity: ${scores.simplicity}/10, Economics: ${scores.economics}/10
+Frequency: ${scores.frequency}/10, Uniqueness: ${scores.uniqueness}/10, Leverage: ${scores.leverage}/10
+
+YOUR TASK:
+Extract 3-5 reusable concept fragments. Think about:
+- What PROBLEM does this solve?
+- What AUDIENCE is this for?
+- What MECHANISM makes it work?
+- What makes it DIFFERENT?
+
+Good genes: "automates tedious paperwork", "busy parents", "AI reads documents", "replaces expensive professionals"
+
+Respond with ONLY a JSON array:
+["gene 1", "gene 2", "gene 3"]`;
 
   const response = await fetch('https://api.moonshot.ai/v1/chat/completions', {
     method: 'POST',

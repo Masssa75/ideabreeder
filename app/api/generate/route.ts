@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY;
 
+interface EvolutionContext {
+  generation: number;
+  genePoolSize: number;
+  topPatterns?: string[];
+  underexploredGenes?: string[];
+  recentNames?: string[];
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { genes } = await request.json();
+    const { genes, context } = await request.json() as { genes: string[]; context?: EvolutionContext };
 
     if (!genes || genes.length === 0) {
       return NextResponse.json({ error: 'No genes provided' }, { status: 400 });
@@ -12,32 +20,44 @@ export async function POST(request: NextRequest) {
 
     const genesText = genes.map((g: string) => `"${g}"`).join(', ');
 
-    const prompt = `You are a startup idea generator. Given these concept fragments (genes), combine them creatively to generate ONE novel startup idea.
+    // Build context section if available
+    let contextSection = '';
+    if (context) {
+      contextSection = `
+CURRENT STATE:
+- Generation: ${context.generation}
+- Gene pool size: ${context.genePoolSize} genes
+${context.recentNames?.length ? `- Recent ideas: ${context.recentNames.slice(0, 5).join(', ')}` : ''}
+${context.underexploredGenes?.length ? `- Underexplored genes worth testing: ${context.underexploredGenes.join(', ')}` : ''}
+`;
+    }
+
+    const prompt = `You are part of an evolutionary engine that breeds startup ideas.
+
+HOW THIS WORKS:
+- You receive "genes" (concept fragments) selected from a pool based on fitness scores
+- Your output gets scored on how well it solves real problems
+- High-scoring ideas boost the fitness of genes used, low-scoring ideas reduce it
+- New genes get extracted from your ideas and added to the pool
+- Over generations, the gene pool evolves toward better ideas
+
+YOUR OBJECTIVE:
+Help this engine get smarter. Don't just generate a "good sounding" idea - generate one that genuinely solves a painful problem for real people. The system is learning from your outputs.
 
 GENES TO COMBINE:
 ${genesText}
+${contextSection}
+GUIDELINES:
+- Solve real problems people actually have
+- Be specific about who this is for and why they'd pay
+- If you notice the genes are narrow, interpret them creatively to explore new territory
+- Avoid repeating patterns from recent ideas
 
-IMPORTANT: Generate diverse ideas across ALL industries and business models:
-- Consumer apps (dating, fitness, food, entertainment, travel)
-- Marketplaces (local services, niche verticals)
-- Health & wellness
-- Education & learning
-- Finance & investing
-- Hardware + software combos
-- Social/community platforms
-Do NOT default to B2B SaaS, productivity tools, or workspace apps.
-
-Generate a startup idea that creatively combines these concepts. The idea should be:
-- Specific and actionable (not vague)
-- Something that could realistically be built
-- Novel - not just an obvious combination
-- Surprising industry or audience - avoid the obvious
-
-Respond with ONLY a JSON object (no markdown, no explanation):
+Respond with ONLY valid JSON:
 {
   "name": "Short catchy name (2-4 words)",
-  "description": "One paragraph describing the startup idea, what it does, who it's for, and how it makes money. Be specific.",
-  "hook": "One sentence pitch that would make someone stop scrolling"
+  "description": "What it does, who it's for, why they need it, how it makes money.",
+  "hook": "One sentence that captures the core value"
 }`;
 
     const response = await fetch('https://api.moonshot.ai/v1/chat/completions', {

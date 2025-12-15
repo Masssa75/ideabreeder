@@ -8,11 +8,17 @@ interface BreedingViewProps {
     hook: string;
   } | null;
   scores: {
-    virality: number;
-    immediacy: number;
-    recurrence: number;
-    urgency: number;
-    simplicity: number;
+    utility?: number;
+    simplicity?: number;
+    economics?: number;
+    frequency?: number;
+    uniqueness?: number;
+    leverage?: number;
+    // Legacy VIRUS fields for backwards compatibility
+    virality?: number;
+    immediacy?: number;
+    recurrence?: number;
+    urgency?: number;
   } | null;
   virusScore: number | null;
   genesUsed: string[];
@@ -46,7 +52,7 @@ export default function BreedingView({
     switch (status) {
       case 'selecting_genes': return 'Selecting genes...';
       case 'breeding': return 'Breeding new idea...';
-      case 'scoring': return 'Scoring with VIRUS framework...';
+      case 'scoring': return 'Scoring idea...';
       case 'extracting': return 'Extracting new genes...';
       case 'complete': return 'Generation complete!';
       default: return 'Idle';
@@ -97,30 +103,31 @@ export default function BreedingView({
         </div>
       )}
 
-      {/* VIRUS Scores */}
+      {/* USEFUL Scores */}
       {scores && (
         <div className="mb-4">
-          <div className="grid grid-cols-5 gap-2 mb-2">
+          <div className="grid grid-cols-6 gap-2 mb-2">
             {[
-              { key: 'virality', label: 'V', title: 'Virality' },
-              { key: 'immediacy', label: 'I', title: 'Immediacy' },
-              { key: 'recurrence', label: 'R', title: 'Recurrence' },
-              { key: 'urgency', label: 'U', title: 'Urgency' },
-              { key: 'simplicity', label: 'S', title: 'Simplicity' }
+              { key: 'utility', label: 'U', title: 'Utility - Does it solve a real problem?' },
+              { key: 'simplicity', label: 'S', title: 'Simplicity - Can it be built quickly?' },
+              { key: 'economics', label: 'E', title: 'Economics - Clear path to revenue?' },
+              { key: 'frequency', label: 'F', title: 'Frequency - How often would people use it?' },
+              { key: 'uniqueness', label: 'U', title: 'Uniqueness - Is it a fresh approach?' },
+              { key: 'leverage', label: 'L', title: 'Leverage - Does it use AI/new tech well?' }
             ].map(({ key, label, title }) => (
               <div key={key} className="text-center">
                 <div className="text-xs text-white/50 mb-1" title={title}>{label}</div>
-                <div className={`text-2xl font-bold ${getScoreColor(scores[key as keyof typeof scores])}`}>
-                  {scores[key as keyof typeof scores]}
+                <div className={`text-xl font-bold ${getScoreColor(scores[key as keyof typeof scores] || 0)}`}>
+                  {scores[key as keyof typeof scores] ?? '-'}
                 </div>
               </div>
             ))}
           </div>
           {virusScore !== null && (
             <div className="text-center mt-2 pt-2 border-t border-white/10">
-              <span className="text-white/50 text-sm">VIRUS Score: </span>
-              <span className={`text-2xl font-bold ${getScoreColor(virusScore / 5)}`}>
-                {virusScore}/50
+              <span className="text-white/50 text-sm">Score: </span>
+              <span className={`text-2xl font-bold ${getScoreColor(virusScore / 6)}`}>
+                {virusScore}/60
               </span>
             </div>
           )}

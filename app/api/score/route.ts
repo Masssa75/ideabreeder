@@ -10,31 +10,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No idea provided' }, { status: 400 });
     }
 
-    const prompt = `You are a ruthless startup evaluator. Score this startup idea on the VIRUS framework.
+    const prompt = `You are the scoring engine for an evolutionary startup idea breeder.
 
-STARTUP IDEA:
+HOW THIS WORKS:
+- Ideas are generated from a gene pool of concept fragments
+- Your scores determine which genes survive and propagate
+- High scores boost the fitness of genes used in this idea
+- Low scores reduce their fitness, making them less likely to be selected
+- The system evolves based on your judgment
+
+YOUR RESPONSIBILITY:
+Score honestly. The evolution depends on accurate feedback. Don't inflate scores to be nice - that would corrupt the gene pool. Don't be harsh just to seem critical - that would kill good ideas.
+
+IDEA TO EVALUATE:
 Name: ${idea.name}
 Description: ${idea.description}
 Hook: ${idea.hook}
 
-Score each dimension from 0-10:
+SCORE EACH DIMENSION (0-10):
 
-V - VIRALITY: Does using the product naturally create shareable content? Is there a built-in loop where users spread it?
-I - IMMEDIACY: How fast can this generate revenue? Days, weeks, or months to first dollar?
-R - RECURRENCE: How often would users engage? Daily, weekly, monthly, or one-time?
-U - URGENCY: How painful is the problem? Hair-on-fire, annoying, or nice-to-have?
-S - SIMPLICITY: How fast can a solo developer build an MVP? Weekend, weeks, or months?
+U - UTILITY: Does this solve a real, painful problem? Would people genuinely need this?
+S - SIMPLICITY: Can a solo dev build an MVP quickly? Is the core concept clear?
+E - ECONOMICS: Is there a clear path to revenue? Would people pay for this?
+F - FREQUENCY: How often would people use this? Daily, weekly, one-time?
+U - UNIQUENESS: Is this a fresh approach or a rehash of existing solutions?
+L - LEVERAGE: Does this take advantage of new technology (AI, etc.) in a meaningful way?
 
-Be critical and realistic. Most ideas should score 4-7 on each dimension. Only exceptional ideas get 8+.
+Be calibrated. Average ideas should score 4-6. Only truly exceptional dimensions get 8+.
 
-Respond with ONLY a JSON object (no markdown):
+Respond with ONLY valid JSON:
 {
-  "virality": <0-10>,
-  "immediacy": <0-10>,
-  "recurrence": <0-10>,
-  "urgency": <0-10>,
+  "utility": <0-10>,
   "simplicity": <0-10>,
-  "reasoning": "Brief explanation of the scores"
+  "economics": <0-10>,
+  "frequency": <0-10>,
+  "uniqueness": <0-10>,
+  "leverage": <0-10>,
+  "reasoning": "What makes this idea strong or weak? What would improve it?"
 }`;
 
     const response = await fetch('https://api.moonshot.ai/v1/chat/completions', {
@@ -72,17 +84,18 @@ Respond with ONLY a JSON object (no markdown):
       return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
     }
 
-    const virusScore = scores.virality + scores.immediacy + scores.recurrence + scores.urgency + scores.simplicity;
+    const totalScore = scores.utility + scores.simplicity + scores.economics + scores.frequency + scores.uniqueness + scores.leverage;
 
     return NextResponse.json({
       scores: {
-        virality: scores.virality,
-        immediacy: scores.immediacy,
-        recurrence: scores.recurrence,
-        urgency: scores.urgency,
-        simplicity: scores.simplicity
+        utility: scores.utility,
+        simplicity: scores.simplicity,
+        economics: scores.economics,
+        frequency: scores.frequency,
+        uniqueness: scores.uniqueness,
+        leverage: scores.leverage
       },
-      virus_score: virusScore,
+      virus_score: totalScore, // keeping field name for compatibility
       reasoning: scores.reasoning
     });
 
