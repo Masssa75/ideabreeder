@@ -40,41 +40,40 @@ interface Idea {
 }
 
 const SEED_GENES = [
-  // Viral mechanics
-  'screenshot-ready output',
-  'one-click sharing',
-  'badge embed for virality',
-  'leaderboard competition',
-  'social proof display',
-  // Psychology
-  'fear of missing out',
-  'instant gratification',
-  'curiosity gap',
-  'nostalgia trigger',
-  'status signaling',
-  // Diverse audiences
-  'gen-z consumers',
-  'parents with toddlers',
-  'fitness beginners',
-  'home cooks',
-  'pet owners',
-  'budget travelers',
-  'college students',
-  // Diverse verticals
-  'health and wellness',
-  'dating and relationships',
-  'food and dining',
-  'personal finance',
-  'entertainment and media',
-  // Tech enablers
-  'AI-powered analysis',
-  'voice-first interface',
-  'camera-based input',
-  'location awareness',
-  // Gamification
-  'streak rewards',
-  'mystery box mechanic',
-  'unlockable achievements'
+  // Data + API patterns
+  'free public API integration',
+  'government open data',
+  'aggregates fragmented information',
+  'processes data too tedious for humans',
+  'real-time data monitoring',
+  'historical data analysis',
+  // AI leverage
+  'AI analyzes large datasets',
+  'AI extracts insights from documents',
+  'AI automates expert judgment',
+  'natural language interface to complex data',
+  // Problem patterns
+  'replaces expensive professionals',
+  'automates tedious paperwork',
+  'saves hours of manual research',
+  'prevents costly mistakes',
+  // Audiences with money
+  'small business owners',
+  'freelancers and contractors',
+  'real estate investors',
+  'ecommerce sellers',
+  'content creators',
+  'healthcare providers',
+  // High-value verticals
+  'legal and compliance',
+  'financial planning',
+  'hiring and recruiting',
+  'supply chain',
+  'local services',
+  // Frequency drivers
+  'daily workflow tool',
+  'recurring decision support',
+  'ongoing monitoring and alerts'
 ];
 
 export default function Home() {
