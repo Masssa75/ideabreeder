@@ -1,7 +1,8 @@
 {
   "/api/extract/route": "app/api/extract/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/score/route": "app/api/score/route.js",
+  "/api/evolve/route": "app/api/evolve/route.js",
   "/api/generate/route": "app/api/generate/route.js",
+  "/api/score/route": "app/api/score/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js"
 }

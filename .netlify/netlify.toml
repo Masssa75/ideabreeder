@@ -1,21 +1,14 @@
+functionsDirectory = "/Users/marcschwyn/Desktop/projects/Claude/ideabreeder/netlify/functions"
+functionsDirectoryOrigin = "default"
 headersOrigin = "inline"
 redirectsOrigin = "inline"
-
-[functions]
-
-[functions."*"]
-
-[[plugins]]
-origin = "config"
-package = "@netlify/plugin-nextjs"
-
-[plugins.inputs]
 
 [build]
 publish = "/Users/marcschwyn/Desktop/projects/Claude/ideabreeder/.next"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "npm run build"
+functions = "/Users/marcschwyn/Desktop/projects/Claude/ideabreeder/netlify/functions"
 
 [build.environment]
 NODE_VERSION = "20"
@@ -31,6 +24,16 @@ NODE_VERSION = "20"
 [build.processing.js]
 
 [build.services]
+
+[functions]
+
+[functions."*"]
+
+[[plugins]]
+origin = "config"
+package = "@netlify/plugin-nextjs"
+
+[plugins.inputs]
 
 [[headers]]
 for = "/_next/static/*"

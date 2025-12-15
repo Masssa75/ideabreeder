@@ -71,12 +71,12 @@ export async function POST(request: NextRequest) {
       recentNames: recentIdeas?.map(i => i.name) || []
     };
 
-    // 2. Select genes - use random every 3rd generation for exploration
-    const useExploration = state.current_generation % 3 === 0;
-    const selectedGenes = useExploration
-      ? selectGenesRandomly(genes, 3)
-      : selectGenesByFitness(genes, 3);
-    console.log(`Selected genes (${useExploration ? 'EXPLORATION' : 'fitness'}):`, selectedGenes);
+    // 2. Select genes - random by default, fitness-weighted only every 5th generation
+    const useFitnessSelection = state.current_generation % 5 === 0;
+    const selectedGenes = useFitnessSelection
+      ? selectGenesByFitness(genes, 3)
+      : selectGenesRandomly(genes, 3);
+    console.log(`Selected genes (${useFitnessSelection ? 'FITNESS' : 'random'}):`, selectedGenes);
 
     // 2b. Do web research if Tavily is configured
     const webResearch = await searchForContext(selectedGenes);
