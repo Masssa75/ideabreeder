@@ -179,7 +179,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 
 ## Overview
 
-**DataGold** is a "Did You Know?" style directory of amazing data APIs. It presents APIs as surprising discoveries rather than dry documentation.
+**DataGold** is a "Did You Know?" style directory of amazing data APIs. It presents APIs as surprising discoveries rather than dry documentation. The goal is to help Marc (and others) discover APIs that could power viral apps for specific niches.
 
 **Live URL:** https://ideabreeder.netlify.app/datagold
 **Route:** `/datagold`
@@ -190,31 +190,74 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 - **Yellow highlights** - Key phrases marked with `**bold**` render as yellow text
 - **Minimal chrome** - Let the content breathe
 
+### Marc's Context
+Marc lives in **Phuket, Thailand** and works in **education**. When discovering new APIs, consider:
+- APIs with Thailand/Southeast Asia data
+- Education-related data sources
+- Tourism data (Phuket is a major tourist destination)
+- Regional government open data portals
+- APIs that could power viral apps for local communities
+
+## DataGold Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        DataGold System                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
+│  │  Discovery  │────▶│   Queue     │────▶│  Ingestion  │       │
+│  │   Script    │     │   Table     │     │  (Kimi K2)  │       │
+│  └─────────────┘     └─────────────┘     └─────────────┘       │
+│        │                    │                    │              │
+│        │              (pg_cron)                  │              │
+│        │            5 APIs / 5 min               ▼              │
+│        │                    │            ┌─────────────┐       │
+│        └────────────────────┴───────────▶│  APIs Table │       │
+│                                          └─────────────┘       │
+│                                                 │               │
+│                                                 ▼               │
+│                                          ┌─────────────┐       │
+│                                          │  Frontend   │       │
+│                                          │  /datagold  │       │
+│                                          └─────────────┘       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ## DataGold Files
 
 ```
 app/
-├── datagold/page.tsx      # Discovery + Browse UI
-└── api/apis/route.ts      # API endpoint (random, list, filter)
+├── datagold/page.tsx         # Discovery + Browse UI with tabs
+└── api/apis/route.ts         # API endpoint (random, list, filter)
 
 scripts/
-├── ingest-api.ts          # Single API ingestion via Kimi K2
-├── batch-ingest.ts        # Batch process 75+ curated APIs
-└── experiment-hooks.ts    # Test different hook prompts
+├── discover-apis.ts          # ⭐ Discover APIs for a topic/location
+├── ingest-api.ts             # Ingest specific APIs by name
+├── queue-status.ts           # Check ingestion queue status
+├── check-capabilities.ts     # See which APIs have capabilities
+├── normalize-categories.ts   # Normalize category names
+└── reset-queue.ts            # Reset completed items for re-ingestion
+
+supabase/
+├── functions/ingest-api/     # Edge function for background processing
+└── migrations/               # Database schema changes
 
 lib/
-├── types.ts               # Api, ApiInsert, ApiTechnical types
-└── supabase.ts            # API helper functions
+├── types.ts                  # Api, ApiInsert, ApiTechnical types
+└── supabase.ts               # Database helpers
 ```
 
 ## DataGold Database Schema
 
 ```sql
+-- Main APIs table
 CREATE TABLE apis (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL UNIQUE,
   hook text NOT NULL,              -- "Did You Know?" fact with **bold** markers
   description text,
+  capabilities text[] DEFAULT '{}', -- 8-15 specific things you can DO with this API
   bullets text[] DEFAULT '{}',     -- 4-6 numbered facts
   what_it_contains text[],         -- Data types for search
   who_uses_this text[],            -- Target audience
@@ -222,9 +265,58 @@ CREATE TABLE apis (
   free boolean DEFAULT true,
   url text,
   category text,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now()
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
 );
+
+-- Ingestion queue (processed by cron job)
+CREATE TABLE api_ingestion_queue (
+  id serial PRIMARY KEY,
+  api_name text NOT NULL,
+  status text DEFAULT 'pending',   -- pending, processing, completed, failed
+  source text DEFAULT 'manual',    -- manual, discovery:<topic>, curated
+  result_hook text,
+  last_error text,
+  processed_at timestamptz,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Cron job: processes 5 APIs every 5 minutes
+-- Calls: POST https://xxx.supabase.co/functions/v1/ingest-api
+```
+
+## How to Discover New APIs (IMPORTANT)
+
+### For AI Instances (Claude, Kimi, etc.)
+
+When Marc asks you to find APIs for a specific topic, use the discovery script:
+
+```bash
+# Discover APIs for a topic
+npx tsx scripts/discover-apis.ts "Phuket tourism"
+npx tsx scripts/discover-apis.ts "Thailand education data"
+npx tsx scripts/discover-apis.ts "Southeast Asia weather"
+npx tsx scripts/discover-apis.ts "Thai government open data"
+npx tsx scripts/discover-apis.ts "marine conservation data"
+```
+
+The script will:
+1. Use Kimi K2 with web search to find relevant APIs
+2. Return 10-15 API suggestions with relevance and app ideas
+3. Add new APIs to the ingestion queue
+4. The cron job will process them automatically (5 every 5 minutes)
+
+### For Manual Ingestion
+
+```bash
+# Ingest specific APIs immediately
+npx tsx scripts/ingest-api.ts "Thai Meteorological API" "Thailand Open Government Data"
+
+# Check queue status
+npx tsx scripts/queue-status.ts
+
+# Check which APIs have capabilities
+npx tsx scripts/check-capabilities.ts
 ```
 
 ## Hook Format (CRITICAL)
@@ -248,59 +340,75 @@ Rules:
 - Mark 2-3 key phrases with `**bold**` for yellow highlighting
 - Keep under 30 words
 
-## DataGold Commands
+## Capabilities Field
 
-```bash
-# Ingest single API (uses Kimi K2 with web search)
-npx tsx scripts/ingest-api.ts "GitHub REST API"
+Each API stores 8-15 specific capabilities - things you can DO with the API:
+- "Get current weather conditions for any city"
+- "Access historical data from 1979 to present"
+- "Search by geographic coordinates"
 
-# Ingest multiple
-npx tsx scripts/ingest-api.ts "NASA API" "Spotify API" "USPTO API"
+This is the source of truth for what each API offers, enabling AI chatbots to analyze APIs for business opportunities.
 
-# Batch ingest (75+ curated APIs)
-npx tsx scripts/batch-ingest.ts           # All APIs
-npx tsx scripts/batch-ingest.ts --batch 0 # First 10
-npx tsx scripts/batch-ingest.ts --batch 1 # APIs 11-20
+## UI Features
 
-# Test hook prompts
-npx tsx scripts/experiment-hooks.ts
-```
+### Discovery Mode (`/datagold`)
+- Full-screen "Did You Know?" cards
+- Yellow highlights on key phrases
+- Space/arrow to get next random API
+- Source link with free/paid indicator
 
-## DataGold Environment Setup
+### Browse Mode
+- Search across all fields
+- Category filter chips
+- Expandable rows with tabs:
+  - **Capabilities** - What you can do with the API
+  - **Facts** - Key statistics and data types
+  - **Technical** - Auth, rate limits, pricing
+  - **Audience** - Who uses this API
 
-Scripts require dotenv to load env vars:
-```bash
-# Create symlink (one-time setup)
-ln -sf .env.local .env
-```
+## Categories (Normalized)
 
-Required env vars:
-- `MOONSHOT_API_KEY` - For Kimi K2 API
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-
-## DataGold API Endpoints
-
-```bash
-# Get random API (for Discovery mode)
-curl "http://localhost:3004/api/apis?random=true"
-
-# List all APIs
-curl "http://localhost:3004/api/apis"
-
-# Filter by category
-curl "http://localhost:3004/api/apis?category=weather"
-
-# Search
-curl "http://localhost:3004/api/apis?search=earthquake"
-```
+APIs are categorized into these 15 categories:
+- Government, Finance, Science, Space, Health
+- Geography, Developer Tools, Social/News, Media
+- AI/ML, Weather, Communication, Business, Fun, Food
 
 ## DataGold Current State (Dec 15, 2025)
 
-- **6 APIs ingested** with new hook format
-- **Discovery mode**: Full-screen "Did You Know?" cards
-- **Browse mode**: Searchable list with category filters
-- **Next**: Expandable rows to show bullets/technical details
+- **~50+ APIs** in database with capabilities
+- **Cron job** running: 5 APIs processed every 5 minutes
+- **Discovery script** ready for topic-based API discovery
+- **Browse mode** with expandable rows and tabs
+- **Capabilities field** for AI analysis
+
+## Quick Commands Reference
+
+```bash
+# Discover APIs for a niche
+npx tsx scripts/discover-apis.ts "your topic here"
+
+# Ingest specific APIs
+npx tsx scripts/ingest-api.ts "API Name 1" "API Name 2"
+
+# Check queue status
+npx tsx scripts/queue-status.ts
+
+# Check capabilities coverage
+npx tsx scripts/check-capabilities.ts
+
+# Normalize categories after batch ingestion
+npx tsx scripts/normalize-categories.ts
+```
+
+## Environment Variables
+
+Required in `.env.local`:
+```
+MOONSHOT_API_KEY=sk-...           # Kimi K2 API key
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+```
 
 ---
 
