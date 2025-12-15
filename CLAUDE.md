@@ -173,6 +173,137 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 - **Last Updated:** 2025-12-15
 - **Status:** Active - Evolution running with web search enabled
 
+---
+
+# DataGold - API Discovery Directory
+
+## Overview
+
+**DataGold** is a "Did You Know?" style directory of amazing data APIs. It presents APIs as surprising discoveries rather than dry documentation.
+
+**Live URL:** https://ideabreeder.netlify.app/datagold
+**Route:** `/datagold`
+
+### Design Philosophy
+- **Discovery over documentation** - Hooks should make developers say "holy shit, I had no idea"
+- **Large typography** - One fact fills the screen
+- **Yellow highlights** - Key phrases marked with `**bold**` render as yellow text
+- **Minimal chrome** - Let the content breathe
+
+## DataGold Files
+
+```
+app/
+├── datagold/page.tsx      # Discovery + Browse UI
+└── api/apis/route.ts      # API endpoint (random, list, filter)
+
+scripts/
+├── ingest-api.ts          # Single API ingestion via Kimi K2
+├── batch-ingest.ts        # Batch process 75+ curated APIs
+└── experiment-hooks.ts    # Test different hook prompts
+
+lib/
+├── types.ts               # Api, ApiInsert, ApiTechnical types
+└── supabase.ts            # API helper functions
+```
+
+## DataGold Database Schema
+
+```sql
+CREATE TABLE apis (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL UNIQUE,
+  hook text NOT NULL,              -- "Did You Know?" fact with **bold** markers
+  description text,
+  bullets text[] DEFAULT '{}',     -- 4-6 numbered facts
+  what_it_contains text[],         -- Data types for search
+  who_uses_this text[],            -- Target audience
+  technical jsonb DEFAULT '{}',    -- {auth, rate_limit, formats, pricing}
+  free boolean DEFAULT true,
+  url text,
+  category text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now()
+);
+```
+
+## Hook Format (CRITICAL)
+
+Hooks must follow the "Did You Know?" style:
+
+**Good:**
+```
+"There's a live map of **every ocean vessel** on Earth — cargo ships, oil tankers, cruise liners. **400,000+ ships** tracked in **real-time** via satellite."
+```
+
+**Bad:**
+```
+"100M+ developers, 330M+ repositories, 4B+ annual contributions — all queryable"
+```
+
+Rules:
+- Start with "There's a..." or "You can access..." or "Every..."
+- Include 1-2 mind-blowing numbers
+- Frame as discovery, not documentation
+- Mark 2-3 key phrases with `**bold**` for yellow highlighting
+- Keep under 30 words
+
+## DataGold Commands
+
+```bash
+# Ingest single API (uses Kimi K2 with web search)
+npx tsx scripts/ingest-api.ts "GitHub REST API"
+
+# Ingest multiple
+npx tsx scripts/ingest-api.ts "NASA API" "Spotify API" "USPTO API"
+
+# Batch ingest (75+ curated APIs)
+npx tsx scripts/batch-ingest.ts           # All APIs
+npx tsx scripts/batch-ingest.ts --batch 0 # First 10
+npx tsx scripts/batch-ingest.ts --batch 1 # APIs 11-20
+
+# Test hook prompts
+npx tsx scripts/experiment-hooks.ts
+```
+
+## DataGold Environment Setup
+
+Scripts require dotenv to load env vars:
+```bash
+# Create symlink (one-time setup)
+ln -sf .env.local .env
+```
+
+Required env vars:
+- `MOONSHOT_API_KEY` - For Kimi K2 API
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+## DataGold API Endpoints
+
+```bash
+# Get random API (for Discovery mode)
+curl "http://localhost:3004/api/apis?random=true"
+
+# List all APIs
+curl "http://localhost:3004/api/apis"
+
+# Filter by category
+curl "http://localhost:3004/api/apis?category=weather"
+
+# Search
+curl "http://localhost:3004/api/apis?search=earthquake"
+```
+
+## DataGold Current State (Dec 15, 2025)
+
+- **6 APIs ingested** with new hook format
+- **Discovery mode**: Full-screen "Did You Know?" cards
+- **Browse mode**: Searchable list with category filters
+- **Next**: Expandable rows to show bullets/technical details
+
+---
+
 ## Session Logs
 
 See `logs/` folder for detailed session history.
