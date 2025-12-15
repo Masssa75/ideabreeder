@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataGold - API Directory v2 (Card Discovery)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    .header {
+      padding: 50px 20px 30px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
+    .tagline {
+      color: #666;
+      font-size: 1.2rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .search-section {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .search-wrapper {
+      position: relative;
+    }
+    .search-box {
+      width: 100%;
+      padding: 20px 25px 20px 55px;
+      font-size: 1.1rem;
+      border: 2px solid #2a2a4a;
+      border-radius: 16px;
+      background: rgba(20, 20, 35, 0.8);
+      color: #fff;
+      backdrop-filter: blur(10px);
+    }
+    .search-box:focus { outline: none; border-color: #667eea; }
+    .search-icon {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .quick-btn {
+      padding: 12px 24px;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .quick-btn.primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+    .quick-btn.primary:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3); }
+    .quick-btn.secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid #333;
+    }
+    .quick-btn.secondary:hover { background: rgba(255,255,255,0.15); }
+
+    .section-title {
+      max-width: 1400px;
+      margin: 50px auto 25px;
+      padding: 0 20px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title .emoji { font-size: 1.8rem; }
+
+    .cards-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(25, 25, 40, 0.6);
+      border: 1px solid #2a2a4a;
+      border-radius: 20px;
+      padding: 25px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #667eea;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .card.featured {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(25, 25, 40, 0.6) 100%);
+    }
+    .card.featured::before {
+      content: "Hidden Gem";
+      position: absolute;
+      top: 15px;
+      right: -30px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      padding: 5px 40px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      transform: rotate(45deg);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .card-icon.gov { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .card-icon.weather { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .card-icon.legal { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .card-icon.health { background: linear-gradient(135deg, #10b981, #059669); }
+    .card-icon.finance { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+    .card-provider {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .card-description {
+      color: #999;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .card-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat {
+      text-align: center;
+      padding: 10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+    }
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .stat-value.high { color: #4ade80; }
+    .stat-value.medium { color: #fbbf24; }
+    .stat-value.low { color: #f87171; }
+    .stat-label {
+      font-size: 0.7rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .tag {
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .tag.cat { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+    .tag.free { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+    .tag.api { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+
+    .card-footer {
+      display: flex;
+      gap: 10px;
+    }
+    .card-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .card-btn.primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+    .card-btn.secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    .card-btn:hover { transform: scale(1.02); }
+
+    .idea-preview {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px dashed #667eea;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+    .idea-preview-label {
+      font-size: 0.7rem;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+    .idea-preview-text {
+      font-size: 0.85rem;
+      color: #ccc;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">DataGold</div>
+    <div class="tagline">Find the perfect API or dataset for your next big idea</div>
+  </div>
+
+  <div class="search-section">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-box" placeholder="What are you building? (e.g., 'climate risk app', 'food safety')">
+    </div>
+    <div class="quick-actions">
+      <button class="quick-btn primary">🎲 Surprise Me</button>
+      <button class="quick-btn secondary">💎 Hidden Gems Only</button>
+      <button class="quick-btn secondary">🆓 Free APIs</button>
+      <button class="quick-btn secondary">🏛️ Government Data</button>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <span class="emoji">💎</span> Hidden Gems — High Value, Low Competition
+  </div>
+
+  <div class="cards-grid">
+    <div class="card featured">
+      <div class="card-header">
+        <div class="card-icon gov">🏛️</div>
+        <div>
+          <div class="card-title">EPA Toxics Release Inventory</div>
+          <div class="card-provider">Environmental Protection Agency</div>
+        </div>
+      </div>
+      <div class="card-description">
+        600+ toxic chemicals tracked across 21,000+ facilities with precise coordinates and 20+ years of historical data.
+      </div>
+      <div class="card-stats">
+        <div class="stat">
+          <div class="stat-value high">95</div>
+          <div class="stat-label">Data Richness</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value high">92</div>
+          <div class="stat-label">Gem Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value high">Low</div>
+          <div class="stat-label">Competition</div>
+        </div>
+      </div>
+      <div class="idea-preview">
+        <div class="idea-preview-label">💡 Product Idea</div>
+        <div class="idea-preview-text">"ToxicScore" - Real estate valuation tool factoring in nearby industrial pollution risk</div>
+      </div>
+      <div class="card-tags">
+        <span class="tag cat">Government</span>
+        <span class="tag cat">Environmental</span>
+        <span class="tag free">Free</span>
+        <span class="tag api">REST API</span>
+      </div>
+      <div class="card-footer">
+        <button class="card-btn primary">Explore API</button>
+        <button class="card-btn secondary">Generate Ideas</button>
+      </div>
+    </div>
+
+    <div class="card featured">
+      <div class="card-header">
+        <div class="card-icon weather">🌪️</div>
+        <div>
+          <div class="card-title">NOAA Storm Events Database</div>
+          <div class="card-provider">National Oceanic & Atmospheric Admin</div>
+        </div>
+      </div>
+      <div class="card-description">
+        70+ years of severe weather events with damage estimates, coordinates, and casualty data. 1.7M+ documented events.
+      </div>
+      <div class="card-stats">
+        <div class="stat">
+          <div class="stat-value high">98</div>
+          <div class="stat-label">Data Richness</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value high">88</div>
+          <div class="stat-label">Gem Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value high">Low</div>
+          <div class="stat-label">Competition</div>
+        </div>
+      </div>
+      <div class="idea-preview">
+        <div class="idea-preview-label">💡 Product Idea</div>
+        <div class="idea-preview-text">"ClimateRisk AI" - Property-specific climate risk scores for real estate & insurance</div>
+      </div>
+      <div class="card-tags">
+        <span class="tag cat">Weather</span>
+        <span class="tag cat">Government</span>
+        <span class="tag free">Free</span>
+      </div>
+      <div class="card-footer">
+        <button class="card-btn primary">Explore API</button>
+        <button class="card-btn secondary">Generate Ideas</button>
+      </div>
+    </div>
+
+    <div class="card featured">
+      <div class="card-header">
+        <div class="card-icon legal">⚖️</div>
+        <div>
+          <div class="card-title">PACER/RECAP Court Records</div>
+          <div class="card-provider">Federal Court System + Free Law Project</div>
+        </div>
+      </div>
+      <div class="card-description">
+        Federal court filings including bankruptcy, civil suits, and criminal records. RECAP provides free access to millions of documents.
+      </div>
+      <div class="card-stats">
+        <div class="stat">
+          <div class="stat-value high">90</div>
+          <div class="stat-label">Data Richness</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value high">85</div>
+          <div class="stat-label">Gem Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value high">Low</div>
+          <div class="stat-label">Competition</div>
+        </div>
+      </div>
+      <div class="idea-preview">
+        <div class="idea-preview-label">💡 Product Idea</div>
+        <div class="idea-preview-text">"SupplierShield" - Early warning system for supplier bankruptcy using court filings</div>
+      </div>
+      <div class="card-tags">
+        <span class="tag cat">Legal</span>
+        <span class="tag cat">Government</span>
+        <span class="tag free">Free Tier</span>
+      </div>
+      <div class="card-footer">
+        <button class="card-btn primary">Explore API</button>
+        <button class="card-btn secondary">Generate Ideas</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <span class="emoji">🔥</span> Popular & Reliable — Battle-Tested APIs
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon weather">☀️</div>
+        <div>
+          <div class="card-title">OpenWeatherMap API</div>
+          <div class="card-provider">OpenWeather Ltd</div>
+        </div>
+      </div>
+      <div class="card-description">
+        Current weather, forecasts, and historical data. Free tier: 1,000 calls/day. Excellent documentation.
+      </div>
+      <div class="card-stats">
+        <div class="stat">
+          <div class="stat-value medium">75</div>
+          <div class="stat-label">Data Richness</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value low">25</div>
+          <div class="stat-label">Gem Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value low">High</div>
+          <div class="stat-label">Competition</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag cat">Weather</span>
+        <span class="tag free">Freemium</span>
+        <span class="tag api">REST API</span>
+      </div>
+      <div class="card-footer">
+        <button class="card-btn primary">Explore API</button>
+        <button class="card-btn secondary">Generate Ideas</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon finance">💳</div>
+        <div>
+          <div class="card-title">Plaid API</div>
+          <div class="card-provider">Plaid Inc</div>
+        </div>
+      </div>
+      <div class="card-description">
+        Connect to 12,000+ financial institutions. Access transactions, balances, and identity data securely.
+      </div>
+      <div class="card-stats">
+        <div class="stat">
+          <div class="stat-value high">92</div>
+          <div class="stat-label">Data Richness</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value low">20</div>
+          <div class="stat-label">Gem Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value low">High</div>
+          <div class="stat-label">Competition</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag cat">Finance</span>
+        <span class="tag api">REST API</span>
+      </div>
+      <div class="card-footer">
+        <button class="card-btn primary">Explore API</button>
+        <button class="card-btn secondary">Generate Ideas</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon health">🏥</div>
+        <div>
+          <div class="card-title">USDA Food Recall API</div>
+          <div class="card-provider">US Dept of Agriculture</div>
+        </div>
+      </div>
+      <div class="card-description">
+        Real-time food safety recalls and public health alerts with product details and distribution chains.
+      </div>
+      <div class="card-stats">
+        <div class="stat">
+          <div class="stat-value medium">65</div>
+          <div class="stat-label">Data Richness</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value medium">68</div>
+          <div class="stat-label">Gem Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value medium">Med</div>
+          <div class="stat-label">Competition</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="tag cat">Health</span>
+        <span class="tag cat">Government</span>
+        <span class="tag free">Free</span>
+      </div>
+      <div class="card-footer">
+        <button class="card-btn primary">Explore API</button>
+        <button class="card-btn secondary">Generate Ideas</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 60px"></div>
+</body>
+</html>

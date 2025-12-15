@@ -40,3 +40,40 @@ export interface EvolutionState {
   topIdeas: Idea[];
   log: string[];
 }
+
+// DataGold API types
+export interface ApiTechnical {
+  auth: string;
+  rate_limit: string;
+  formats: string[];
+  pricing?: string;
+}
+
+export interface Api {
+  id: string;
+  title: string;
+  hook: string;
+  description: string;
+  bullets: string[];
+  what_it_contains: string[];
+  who_uses_this: string[];
+  technical: ApiTechnical;
+  free: boolean;
+  url: string;
+  category: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiInsert {
+  title: string;
+  hook: string;
+  description: string;
+  bullets: string[];
+  what_it_contains: string[];
+  who_uses_this: string[];
+  technical: ApiTechnical;
+  free: boolean;
+  url: string;
+  category: string;
+}

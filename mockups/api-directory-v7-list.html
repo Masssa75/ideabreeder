@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataGold - Browse</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      padding: 30px 40px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mode-toggle {
+      display: flex;
+      background: #111;
+      border-radius: 8px;
+      padding: 4px;
+    }
+    .mode-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: #555;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .mode-btn.active {
+      background: #222;
+      color: #fff;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      padding: 12px 18px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: #444;
+    }
+    .search-box::placeholder {
+      color: #444;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-btn {
+      padding: 10px 18px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      color: #666;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover {
+      border-color: #444;
+      color: #fff;
+    }
+    .filter-btn.active {
+      background: #fbbf24;
+      border-color: #fbbf24;
+      color: #000;
+    }
+
+    .sort-select {
+      padding: 10px 18px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      color: #888;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Results count */
+    .results-info {
+      color: #444;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+    .results-info strong {
+      color: #888;
+    }
+
+    /* List */
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 40px;
+      padding: 20px 25px;
+      background: #0a0a0a;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      align-items: center;
+    }
+    .item:hover {
+      background: #111;
+    }
+
+    .item-main {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .item-hook {
+      font-size: 1.15rem;
+      color: #fff;
+      line-height: 1.4;
+    }
+    .item-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .item-category {
+      font-size: 0.75rem;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .item-bullets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 25px;
+    }
+    .item-bullet {
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .item-bullet .hl {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 10px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .item:hover .item-actions {
+      opacity: 1;
+    }
+    .item-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .item-btn.primary {
+      background: #fff;
+      color: #000;
+    }
+    .item-btn.ghost {
+      background: transparent;
+      color: #666;
+      border: 1px solid #333;
+    }
+    .item-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      background: #1a1a1a;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: #666;
+      margin-right: 5px;
+    }
+    .tag.free {
+      background: rgba(74, 222, 128, 0.15);
+      color: #4ade80;
+    }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">💎 DataGold</div>
+    <div class="mode-toggle">
+      <button class="mode-btn" onclick="window.location='api-directory-v6-bullets.html'">Discover</button>
+      <button class="mode-btn active">Browse</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input type="text" class="search-box" id="search" placeholder="Search APIs..." oninput="filterList()">
+
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+      <button class="filter-btn" data-filter="government" onclick="setFilter('government')">Government</button>
+      <button class="filter-btn" data-filter="finance" onclick="setFilter('finance')">Finance</button>
+      <button class="filter-btn" data-filter="geo" onclick="setFilter('geo')">Geo/Maps</button>
+      <button class="filter-btn" data-filter="health" onclick="setFilter('health')">Health</button>
+    </div>
+
+    <select class="sort-select" id="sort" onchange="sortList()">
+      <option value="wow">Sort: Most Unbelievable</option>
+      <option value="name">Sort: A-Z</option>
+      <option value="category">Sort: Category</option>
+    </select>
+  </div>
+
+  <div class="results-info" id="results-info">
+    Showing <strong>10</strong> data sources
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <script>
+    const data = [
+      {
+        title: "NOAA Storm Events",
+        hook: "Every tornado, flood, and hurricane in America since 1950 — with damage costs.",
+        category: "government",
+        bullets: ["70 years", "1.7M events", "Exact coordinates", "Damage costs"],
+        wow: 95,
+        free: true
+      },
+      {
+        title: "EPA Toxics Release Inventory",
+        hook: "Which factories are poisoning the air near any address in America.",
+        category: "government",
+        bullets: ["21,000 factories", "600+ chemicals", "Exact locations", "20 years of data"],
+        wow: 92,
+        free: true
+      },
+      {
+        title: "Federal Court Records (PACER)",
+        hook: "See which companies are going bankrupt — weeks before it's news.",
+        category: "government",
+        bullets: ["Every bankruptcy", "Weeks before news", "Searchable", "RECAP free tier"],
+        wow: 90,
+        free: true
+      },
+      {
+        title: "NASA Landsat Imagery",
+        hook: "Satellite photos of any spot on Earth, every day since 1972.",
+        category: "geo",
+        bullets: ["Entire planet daily", "Back to 1972", "30m resolution", "Completely free"],
+        wow: 94,
+        free: true
+      },
+      {
+        title: "SEC Insider Trading",
+        hook: "Every stock trade by every CEO — before the market finds out.",
+        category: "finance",
+        bullets: ["Every exec trade", "Before market knows", "By person/company", "Updated daily"],
+        wow: 96,
+        free: true
+      },
+      {
+        title: "Global Ship Tracking (AIS)",
+        hook: "Live position of every cargo ship in the ocean, right now.",
+        category: "geo",
+        bullets: ["400,000+ vessels", "Live positions", "Cargo types", "Global coverage"],
+        wow: 91,
+        free: false
+      },
+      {
+        title: "ClinicalTrials.gov",
+        hook: "Every experimental drug being tested in the world, and the results.",
+        category: "health",
+        bullets: ["Every drug trial", "Global coverage", "Results published", "Fully searchable"],
+        wow: 85,
+        free: true
+      },
+      {
+        title: "Census Block Data",
+        hook: "The income, education, and commute time of every neighborhood in America.",
+        category: "government",
+        bullets: ["Income by block", "Education levels", "Commute times", "Updated yearly"],
+        wow: 82,
+        free: true
+      },
+      {
+        title: "OpenSky Flight Data",
+        hook: "Live position of every plane in the sky, updated every second.",
+        category: "geo",
+        bullets: ["Every US flight", "Live positions", "Historical data", "Free API"],
+        wow: 88,
+        free: true
+      },
+      {
+        title: "FDA Food Recalls",
+        hook: "Real-time alerts when food at your grocery store is contaminated.",
+        category: "health",
+        bullets: ["Real-time alerts", "Store locations", "Risk levels", "Instant API"],
+        wow: 80,
+        free: true
+      },
+      {
+        title: "USGS Earthquake Data",
+        hook: "Every earthquake on the planet, live, with magnitude and depth.",
+        category: "geo",
+        bullets: ["Every earthquake", "Real-time feed", "Global coverage", "Magnitude + depth"],
+        wow: 86,
+        free: true
+      },
+      {
+        title: "Federal Reserve Economic Data",
+        hook: "800,000 economic time series going back to 1900. Interest rates, jobs, everything.",
+        category: "finance",
+        bullets: ["800,000+ series", "Interest rates", "Employment data", "Back to 1900s"],
+        wow: 84,
+        free: true
+      },
+      {
+        title: "USPTO Patent Database",
+        hook: "Every patent ever filed in America — searchable back to 1790.",
+        category: "government",
+        bullets: ["Every US patent", "Full text search", "Back to 1790", "Free bulk download"],
+        wow: 83,
+        free: true
+      },
+      {
+        title: "Medicare Provider Data",
+        hook: "What every doctor in America charges, and what Medicare actually pays them.",
+        category: "health",
+        bullets: ["Every doctor", "What they charge", "How much Medicare pays", "Searchable"],
+        wow: 89,
+        free: true
+      }
+    ];
+
+    let currentFilter = 'all';
+    let currentSort = 'wow';
+
+    function renderList(items) {
+      const list = document.getElementById('list');
+      const info = document.getElementById('results-info');
+
+      if (items.length === 0) {
+        list.innerHTML = '<div class="empty">No results found</div>';
+        info.innerHTML = 'Showing <strong>0</strong> data sources';
+        return;
+      }
+
+      info.innerHTML = `Showing <strong>${items.length}</strong> data sources`;
+
+      list.innerHTML = items.map(item => `
+        <div class="item" onclick="openDetail('${item.title}')">
+          <div class="item-main">
+            <div class="item-title">${item.title}</div>
+            <div class="item-hook">${item.hook}</div>
+            <div class="item-meta">
+              <span class="item-category">${item.category}</span>
+              ${item.free ? '<span class="tag free">Free</span>' : ''}
+            </div>
+          </div>
+          <div class="item-bullets">
+            ${item.bullets.map(b => `<span class="item-bullet"><span class="hl">${b.split(' ')[0]}</span> ${b.split(' ').slice(1).join(' ')}</span>`).join('')}
+          </div>
+          <div class="item-actions">
+            <button class="item-btn primary">View →</button>
+            <button class="item-btn ghost">Save</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterList() {
+      const search = document.getElementById('search').value.toLowerCase();
+      let filtered = data;
+
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(item => item.category === currentFilter);
+      }
+
+      if (search) {
+        filtered = filtered.filter(item =>
+          item.title.toLowerCase().includes(search) ||
+          item.bullets.some(b => b.toLowerCase().includes(search))
+        );
+      }
+
+      sortAndRender(filtered);
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      filterList();
+    }
+
+    function sortList() {
+      currentSort = document.getElementById('sort').value;
+      filterList();
+    }
+
+    function sortAndRender(items) {
+      const sorted = [...items].sort((a, b) => {
+        if (currentSort === 'wow') return b.wow - a.wow;
+        if (currentSort === 'name') return a.title.localeCompare(b.title);
+        if (currentSort === 'category') return a.category.localeCompare(b.category);
+        return 0;
+      });
+      renderList(sorted);
+    }
+
+    function openDetail(title) {
+      alert(`Opening: ${title}`);
+    }
+
+    // Initial render
+    sortAndRender(data);
+  </script>
+</body>
+</html>

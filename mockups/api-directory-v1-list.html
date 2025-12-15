@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataGold - API Directory v1 (List View)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      padding: 40px 20px;
+      text-align: center;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .tagline {
+      color: #888;
+      font-size: 1.1rem;
+    }
+    .search-container {
+      max-width: 800px;
+      margin: -25px auto 0;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+    .search-box {
+      width: 100%;
+      padding: 18px 25px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 12px;
+      background: #1e1e2e;
+      color: #fff;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .search-box::placeholder { color: #666; }
+    .search-box:focus { outline: 2px solid #f093fb; }
+
+    .filters {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #333;
+      background: transparent;
+      color: #888;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: #f093fb; color: #f093fb; }
+    .filter-btn.active { background: #f093fb; color: #000; border-color: #f093fb; }
+
+    .results-header {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .results-count { color: #666; }
+    .sort-select {
+      background: #1e1e2e;
+      color: #fff;
+      border: 1px solid #333;
+      padding: 8px 15px;
+      border-radius: 8px;
+    }
+
+    .api-list {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+    .api-item {
+      background: #12121a;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 20px 25px;
+      margin-bottom: 15px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      transition: all 0.2s;
+    }
+    .api-item:hover {
+      border-color: #333;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .api-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .api-description {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .api-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .tag.category { background: #2a2a4a; color: #a0a0ff; }
+    .tag.free { background: #1a3a2a; color: #4ade80; }
+    .tag.gem { background: #3a2a1a; color: #fbbf24; }
+
+    .api-scores {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 150px;
+    }
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    .score-label { color: #666; }
+    .score-bar {
+      width: 60px;
+      height: 6px;
+      background: #222;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .score-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .score-fill.high { background: linear-gradient(90deg, #4ade80, #22c55e); }
+    .score-fill.medium { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .score-fill.low { background: linear-gradient(90deg, #f87171, #ef4444); }
+
+    .hidden-gem-badge {
+      position: absolute;
+      top: -8px;
+      right: 20px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .api-item { position: relative; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">DataGold</div>
+    <div class="tagline">Discover underutilized APIs & datasets for your next startup</div>
+  </div>
+
+  <div class="search-container">
+    <input type="text" class="search-box" placeholder="Search 2,400+ APIs and datasets... (e.g., 'weather data', 'government', 'free')">
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Government</button>
+    <button class="filter-btn">Finance</button>
+    <button class="filter-btn">Weather</button>
+    <button class="filter-btn">Health</button>
+    <button class="filter-btn">Geo/Maps</button>
+    <button class="filter-btn">Social</button>
+    <button class="filter-btn">E-commerce</button>
+    <button class="filter-btn">Free Only</button>
+    <button class="filter-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none;">Hidden Gems</button>
+  </div>
+
+  <div class="results-header">
+    <span class="results-count">Showing 2,847 APIs & datasets</span>
+    <select class="sort-select">
+      <option>Sort by: Hidden Gem Score</option>
+      <option>Sort by: Data Richness</option>
+      <option>Sort by: Ease of Use</option>
+      <option>Sort by: Recently Added</option>
+    </select>
+  </div>
+
+  <div class="api-list">
+    <div class="api-item">
+      <div class="hidden-gem-badge">Hidden Gem</div>
+      <div class="api-content">
+        <div class="api-name">EPA Toxics Release Inventory API</div>
+        <div class="api-description">Detailed data on 600+ toxic chemicals released by 21,000+ industrial facilities. Includes coordinates, release amounts, and 20+ years of trends. Great for real estate, insurance, or environmental apps.</div>
+        <div class="api-tags">
+          <span class="tag category">Government</span>
+          <span class="tag category">Environmental</span>
+          <span class="tag free">Free</span>
+          <span class="tag gem">Underutilized</span>
+        </div>
+      </div>
+      <div class="api-scores">
+        <div class="score-row">
+          <span class="score-label">Data Richness</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Ease of Use</span>
+          <div class="score-bar"><div class="score-fill medium" style="width: 60%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Competition</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 15%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Gem Score</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 92%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-item">
+      <div class="hidden-gem-badge">Hidden Gem</div>
+      <div class="api-content">
+        <div class="api-name">NOAA Storm Events Database</div>
+        <div class="api-description">70+ years of severe weather events with damage estimates, coordinates, and fatalities. 1.7M+ events including tornadoes, floods, hail. Perfect for climate risk, insurance, or real estate applications.</div>
+        <div class="api-tags">
+          <span class="tag category">Government</span>
+          <span class="tag category">Weather</span>
+          <span class="tag free">Free</span>
+          <span class="tag gem">Underutilized</span>
+        </div>
+      </div>
+      <div class="api-scores">
+        <div class="score-row">
+          <span class="score-label">Data Richness</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 98%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Ease of Use</span>
+          <div class="score-bar"><div class="score-fill medium" style="width: 70%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Competition</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 25%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Gem Score</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 88%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-item">
+      <div class="api-content">
+        <div class="api-name">USDA Food Recall API</div>
+        <div class="api-description">Real-time food safety recalls and public health alerts. Product details, contamination types, distribution chains. Build consumer safety apps or restaurant supply chain tools.</div>
+        <div class="api-tags">
+          <span class="tag category">Government</span>
+          <span class="tag category">Food & Health</span>
+          <span class="tag free">Free</span>
+        </div>
+      </div>
+      <div class="api-scores">
+        <div class="score-row">
+          <span class="score-label">Data Richness</span>
+          <div class="score-bar"><div class="score-fill medium" style="width: 65%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Ease of Use</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Competition</span>
+          <div class="score-bar"><div class="score-fill medium" style="width: 40%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Gem Score</span>
+          <div class="score-bar"><div class="score-fill medium" style="width: 68%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-item">
+      <div class="api-content">
+        <div class="api-name">OpenWeatherMap API</div>
+        <div class="api-description">Current weather, forecasts, and historical data for any location. Free tier includes 1,000 calls/day. Well-documented, easy to integrate.</div>
+        <div class="api-tags">
+          <span class="tag category">Weather</span>
+          <span class="tag free">Freemium</span>
+        </div>
+      </div>
+      <div class="api-scores">
+        <div class="score-row">
+          <span class="score-label">Data Richness</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 80%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Ease of Use</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 95%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Competition</span>
+          <div class="score-bar"><div class="score-fill low" style="width: 85%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Gem Score</span>
+          <div class="score-bar"><div class="score-fill low" style="width: 25%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-item">
+      <div class="hidden-gem-badge">Hidden Gem</div>
+      <div class="api-content">
+        <div class="api-name">PACER/RECAP Court Records API</div>
+        <div class="api-description">Federal court filings including bankruptcy cases, civil lawsuits, and criminal records. Free tier via RECAP project. Build legal intelligence, B2B risk assessment, or due diligence tools.</div>
+        <div class="api-tags">
+          <span class="tag category">Legal</span>
+          <span class="tag category">Government</span>
+          <span class="tag free">Free Tier</span>
+          <span class="tag gem">Underutilized</span>
+        </div>
+      </div>
+      <div class="api-scores">
+        <div class="score-row">
+          <span class="score-label">Data Richness</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 90%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Ease of Use</span>
+          <div class="score-bar"><div class="score-fill low" style="width: 35%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Competition</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 20%"></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Gem Score</span>
+          <div class="score-bar"><div class="score-fill high" style="width: 85%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

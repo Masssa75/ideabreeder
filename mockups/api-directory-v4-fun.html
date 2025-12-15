@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataGold - Discover Your Next API</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      font-size: 2rem;
+    }
+
+    .saved-count {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .saved-count:hover { background: rgba(255,255,255,0.15); }
+
+    .main-content {
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .headline {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      line-height: 1.2;
+    }
+    .subheadline {
+      color: #888;
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+    }
+
+    /* The Card */
+    .card-container {
+      perspective: 1000px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: linear-gradient(145deg, #2a2a4a 0%, #1a1a2e 100%);
+      border-radius: 24px;
+      padding: 35px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: grab;
+    }
+    .card:hover {
+      transform: translateY(-5px) rotateX(2deg);
+      box-shadow: 0 35px 100px rgba(0,0,0,0.6);
+    }
+    .card.swiping-right {
+      transform: translateX(200px) rotate(20deg);
+      opacity: 0;
+    }
+    .card.swiping-left {
+      transform: translateX(-200px) rotate(-20deg);
+      opacity: 0;
+    }
+
+    .gem-tag {
+      position: absolute;
+      top: -12px;
+      right: 30px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .card-provider {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .card-description {
+      color: #aaa;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .card-idea {
+      background: rgba(102, 126, 234, 0.15);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+    .card-idea-label {
+      font-size: 0.75rem;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .card-idea-text {
+      color: #ccc;
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+
+    .card-stats {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #4ade80;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .action-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 1.8rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .action-btn:hover {
+      transform: scale(1.15);
+    }
+    .action-btn.skip {
+      background: rgba(248, 113, 113, 0.2);
+      color: #f87171;
+    }
+    .action-btn.skip:hover { background: rgba(248, 113, 113, 0.3); }
+    .action-btn.save {
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ade80;
+    }
+    .action-btn.save:hover { background: rgba(74, 222, 128, 0.3); }
+    .action-btn.random {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
+    }
+    .action-btn.random:hover {
+      transform: scale(1.15) rotate(180deg);
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .hint {
+      color: #555;
+      font-size: 0.85rem;
+    }
+    .keyboard-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 15px;
+    }
+    .key {
+      background: rgba(255,255,255,0.1);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: monospace;
+    }
+
+    /* Confetti animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .card-icon {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #4ade80;
+      color: #000;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <span class="logo-icon">💎</span>
+    <span>DataGold</span>
+  </div>
+
+  <div class="saved-count">
+    ⭐ 3 saved
+  </div>
+
+  <div class="main-content">
+    <h1 class="headline">Find your next<br>secret weapon</h1>
+    <p class="subheadline">Swipe through hidden gem APIs. Build something cool.</p>
+
+    <div class="card-container">
+      <div class="card" id="card">
+        <div class="gem-tag">💎 Hidden Gem</div>
+        <div class="card-icon">🌪️</div>
+        <div class="card-title">NOAA Storm Events</div>
+        <div class="card-provider">National Weather Service • Free</div>
+        <div class="card-description">
+          70 years of severe weather data. Tornadoes, floods, hail — with exact coordinates and damage estimates. 1.7 million events.
+        </div>
+        <div class="card-idea">
+          <div class="card-idea-label">💡 Build This</div>
+          <div class="card-idea-text">"ClimateScore" — Property-level climate risk scores for real estate buyers</div>
+        </div>
+        <div class="card-stats">
+          <div class="stat">
+            <div class="stat-value">98</div>
+            <div class="stat-label">Data Richness</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">88</div>
+            <div class="stat-label">Gem Score</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">Low</div>
+            <div class="stat-label">Competition</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn skip" onclick="skip()" title="Skip">✕</button>
+      <button class="action-btn random" onclick="shuffle()" title="Shuffle">🎲</button>
+      <button class="action-btn save" onclick="save()" title="Save">♥</button>
+    </div>
+
+    <div class="hint">
+      <div class="keyboard-hint">
+        <span class="key">←</span> skip
+        <span class="key">space</span> shuffle
+        <span class="key">→</span> save
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">✓ Saved to your collection!</div>
+
+  <script>
+    const apis = [
+      {
+        icon: "🌪️",
+        title: "NOAA Storm Events",
+        provider: "National Weather Service • Free",
+        description: "70 years of severe weather data. Tornadoes, floods, hail — with exact coordinates and damage estimates. 1.7 million events.",
+        idea: "\"ClimateScore\" — Property-level climate risk scores for real estate buyers",
+        richness: 98,
+        gem: 88,
+        competition: "Low"
+      },
+      {
+        icon: "🏭",
+        title: "EPA Toxics Release",
+        provider: "Environmental Protection Agency • Free",
+        description: "Which factories are releasing what chemicals, and where. 21,000 facilities, 600+ chemicals, 20 years of data.",
+        idea: "\"ToxicCheck\" — See pollution risk before you buy a home",
+        richness: 95,
+        gem: 92,
+        competition: "Low"
+      },
+      {
+        icon: "⚖️",
+        title: "Federal Court Records",
+        provider: "PACER + RECAP Project • Free tier",
+        description: "Bankruptcy filings, lawsuits, and legal records. Know when companies are in trouble before it's public news.",
+        idea: "\"SupplierShield\" — Get alerts before your suppliers go bankrupt",
+        richness: 90,
+        gem: 85,
+        competition: "Low"
+      },
+      {
+        icon: "🍔",
+        title: "FDA Food Recalls",
+        provider: "Food & Drug Administration • Free",
+        description: "Real-time food safety alerts. What's contaminated, where it was sold, and what to do about it.",
+        idea: "\"SafePlate\" — Instant recall alerts for the groceries in your kitchen",
+        richness: 72,
+        gem: 78,
+        competition: "Medium"
+      },
+      {
+        icon: "🏠",
+        title: "Census Bureau ACS",
+        provider: "US Census • Free",
+        description: "Neighborhood-level demographics, income, education, commute times. Updated yearly for every zip code.",
+        idea: "\"NeighborIQ\" — Find your perfect neighborhood based on real data",
+        richness: 92,
+        gem: 71,
+        competition: "Medium"
+      }
+    ];
+
+    let currentIndex = 0;
+    const card = document.getElementById('card');
+    const toast = document.getElementById('toast');
+
+    function updateCard() {
+      const api = apis[currentIndex];
+      card.innerHTML = `
+        <div class="gem-tag">💎 Hidden Gem</div>
+        <div class="card-icon">${api.icon}</div>
+        <div class="card-title">${api.title}</div>
+        <div class="card-provider">${api.provider}</div>
+        <div class="card-description">${api.description}</div>
+        <div class="card-idea">
+          <div class="card-idea-label">💡 Build This</div>
+          <div class="card-idea-text">${api.idea}</div>
+        </div>
+        <div class="card-stats">
+          <div class="stat">
+            <div class="stat-value">${api.richness}</div>
+            <div class="stat-label">Data Richness</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">${api.gem}</div>
+            <div class="stat-label">Gem Score</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">${api.competition}</div>
+            <div class="stat-label">Competition</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function nextCard(direction) {
+      card.classList.add(direction === 'right' ? 'swiping-right' : 'swiping-left');
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % apis.length;
+        updateCard();
+        card.classList.remove('swiping-right', 'swiping-left');
+      }, 300);
+    }
+
+    function skip() {
+      nextCard('left');
+    }
+
+    function save() {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+      nextCard('right');
+    }
+
+    function shuffle() {
+      currentIndex = Math.floor(Math.random() * apis.length);
+      card.style.transform = 'scale(0.8) rotate(10deg)';
+      setTimeout(() => {
+        updateCard();
+        card.style.transform = '';
+      }, 200);
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') skip();
+      if (e.key === 'ArrowRight') save();
+      if (e.key === ' ') { e.preventDefault(); shuffle(); }
+    });
+  </script>
+</body>
+</html>

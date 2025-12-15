@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Gene, Idea } from './types';
+import { Gene, Idea, Api, ApiInsert } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -95,4 +95,119 @@ export async function getLatestGeneration(): Promise<number> {
     .single();
 
   return data?.generation || 0;
+}
+
+// DataGold API functions
+export async function getApis(options?: {
+  category?: string;
+  free?: boolean;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}): Promise<Api[]> {
+  let query = supabase.from('apis').select('*');
+
+  if (options?.category) {
+    query = query.eq('category', options.category);
+  }
+  if (options?.free !== undefined) {
+    query = query.eq('free', options.free);
+  }
+  if (options?.search) {
+    query = query.or(`title.ilike.%${options.search}%,hook.ilike.%${options.search}%`);
+  }
+  if (options?.limit) {
+    query = query.limit(options.limit);
+  }
+  if (options?.offset) {
+    query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
+  }
+
+  query = query.order('created_at', { ascending: false });
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching APIs:', error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function getRandomApi(): Promise<Api | null> {
+  // Get count first
+  const { count } = await supabase
+    .from('apis')
+    .select('*', { count: 'exact', head: true });
+
+  if (!count || count === 0) return null;
+
+  const randomOffset = Math.floor(Math.random() * count);
+
+  const { data, error } = await supabase
+    .from('apis')
+    .select('*')
+    .range(randomOffset, randomOffset)
+    .single();
+
+  if (error) {
+    console.error('Error fetching random API:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function getApiByTitle(title: string): Promise<Api | null> {
+  const { data, error } = await supabase
+    .from('apis')
+    .select('*')
+    .eq('title', title)
+    .single();
+
+  if (error) {
+    console.error('Error fetching API by title:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function insertApi(api: ApiInsert): Promise<Api | null> {
+  const { data, error } = await supabase
+    .from('apis')
+    .insert(api)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error inserting API:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function getApiCategories(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('apis')
+    .select('category')
+    .not('category', 'is', null);
+
+  if (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+
+  const categories = [...new Set(data?.map(d => d.category).filter(Boolean))];
+  return categories.sort();
+}
+
+export async function getApiCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from('apis')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    console.error('Error counting APIs:', error);
+    return 0;
+  }
+  return count || 0;
 }

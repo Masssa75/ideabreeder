@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataGold</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .eyebrow {
+      font-size: 0.85rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 40px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .bullets {
+      list-style: none;
+      margin-bottom: 50px;
+    }
+    .bullets li {
+      font-size: 1.4rem;
+      color: #888;
+      padding: 15px 0;
+      border-bottom: 1px solid #1a1a1a;
+      display: flex;
+      align-items: baseline;
+      gap: 15px;
+    }
+    .bullets li:last-child {
+      border-bottom: none;
+    }
+    .bullet-dot {
+      color: #fbbf24;
+      font-size: 0.8rem;
+    }
+    .highlight {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .source {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .source-link {
+      color: #fbbf24;
+      text-decoration: none;
+      font-size: 1rem;
+      border-bottom: 1px solid #fbbf24;
+      padding-bottom: 2px;
+    }
+    .source-link:hover {
+      color: #fff;
+      border-color: #fff;
+    }
+    .source-tag {
+      color: #333;
+      font-size: 0.85rem;
+      margin-left: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 14px 35px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: #fff;
+      color: #000;
+    }
+    .btn-primary:hover {
+      transform: scale(1.05);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: #444;
+    }
+    .btn-ghost:hover {
+      color: #fff;
+    }
+
+    .keyboard-hint {
+      position: fixed;
+      bottom: 30px;
+      color: #222;
+      font-size: 0.8rem;
+    }
+
+    /* Transition */
+    .fade-out { opacity: 0; transition: opacity 0.2s; }
+  </style>
+</head>
+<body>
+  <div class="container" id="content">
+    <div class="eyebrow">Free API</div>
+
+    <h1 class="title" id="title">NOAA Storm Events</h1>
+
+    <ul class="bullets" id="bullets">
+      <li><span class="bullet-dot">●</span> <span class="highlight">70 years</span> of weather disasters</li>
+      <li><span class="bullet-dot">●</span> <span class="highlight">1.7 million</span> events</li>
+      <li><span class="bullet-dot">●</span> Exact coordinates + damage costs</li>
+      <li><span class="bullet-dot">●</span> Tornadoes, floods, hail, hurricanes</li>
+    </ul>
+
+    <div class="source">
+      <a href="#" class="source-link">View API docs →</a>
+      <span class="source-tag">free</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="next()">Next →</button>
+      <button class="btn btn-ghost" onclick="save()">Save</button>
+    </div>
+  </div>
+
+  <div class="keyboard-hint">press <b>space</b> for next</div>
+
+  <script>
+    const gems = [
+      {
+        title: "NOAA Storm Events",
+        bullets: [
+          { text: "70 years", rest: "of weather disasters" },
+          { text: "1.7 million", rest: "events" },
+          { text: "Exact coordinates", rest: "+ damage costs" },
+          { text: "Tornadoes, floods, hail", rest: "" }
+        ]
+      },
+      {
+        title: "EPA Toxics Release",
+        bullets: [
+          { text: "21,000", rest: "factories tracked" },
+          { text: "600+", rest: "chemicals monitored" },
+          { text: "Exact locations", rest: "+ release amounts" },
+          { text: "20 years", rest: "of data" }
+        ]
+      },
+      {
+        title: "Federal Court Records",
+        bullets: [
+          { text: "Every bankruptcy", rest: "filing in the US" },
+          { text: "Weeks before", rest: "news coverage" },
+          { text: "Searchable", rest: "by company name" },
+          { text: "Free tier", rest: "via RECAP project" }
+        ]
+      },
+      {
+        title: "NASA Satellite Imagery",
+        bullets: [
+          { text: "Entire planet", rest: "photographed daily" },
+          { text: "Back to 1972", rest: "" },
+          { text: "30 meter", rest: "resolution" },
+          { text: "Completely free", rest: "" }
+        ]
+      },
+      {
+        title: "SEC Insider Trades",
+        bullets: [
+          { text: "Every stock trade", rest: "by executives" },
+          { text: "Before", rest: "market knows" },
+          { text: "Searchable", rest: "by person or company" },
+          { text: "Updated daily", rest: "" }
+        ]
+      },
+      {
+        title: "Ship Tracking (AIS)",
+        bullets: [
+          { text: "400,000+", rest: "vessels tracked live" },
+          { text: "Position, speed", rest: "destination" },
+          { text: "Cargo type", rest: "visible" },
+          { text: "Global coverage", rest: "" }
+        ]
+      },
+      {
+        title: "Clinical Trials Database",
+        bullets: [
+          { text: "Every drug trial", rest: "in the world" },
+          { text: "What's being tested", rest: "and where" },
+          { text: "Results", rest: "when published" },
+          { text: "Fully searchable", rest: "" }
+        ]
+      },
+      {
+        title: "Census Block Data",
+        bullets: [
+          { text: "Income + education", rest: "by neighborhood" },
+          { text: "Down to", rest: "block level" },
+          { text: "Commute times", rest: "employment stats" },
+          { text: "Updated yearly", rest: "" }
+        ]
+      },
+      {
+        title: "Real-time Flight Data",
+        bullets: [
+          { text: "Every plane", rest: "in US airspace" },
+          { text: "Live positions", rest: "and altitudes" },
+          { text: "Historical data", rest: "available" },
+          { text: "Free API", rest: "" }
+        ]
+      },
+      {
+        title: "FDA Food Recalls",
+        bullets: [
+          { text: "Real-time", rest: "contamination alerts" },
+          { text: "Which stores", rest: "sold it" },
+          { text: "Health risk", rest: "level" },
+          { text: "Instant API access", rest: "" }
+        ]
+      }
+    ];
+
+    let currentIndex = 0;
+    const titleEl = document.getElementById('title');
+    const bulletsEl = document.getElementById('bullets');
+    const content = document.getElementById('content');
+
+    function updateContent() {
+      const gem = gems[currentIndex];
+      titleEl.textContent = gem.title;
+      bulletsEl.innerHTML = gem.bullets.map(b =>
+        `<li><span class="bullet-dot">●</span> <span class="highlight">${b.text}</span> ${b.rest}</li>`
+      ).join('');
+    }
+
+    function next() {
+      content.classList.add('fade-out');
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % gems.length;
+        updateContent();
+        content.classList.remove('fade-out');
+      }, 200);
+    }
+
+    function save() {
+      alert('Saved!');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        next();
+      }
+    });
+  </script>
+</body>
+</html>
