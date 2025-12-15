@@ -414,13 +414,63 @@ APIs are categorized into these 15 categories:
 - Geography, Developer Tools, Social/News, Media
 - AI/ML, Weather, Communication, Business, Fun, Food
 
-## DataGold Current State (Dec 15, 2025)
+## DataGold Current State (Dec 16, 2025)
 
-- **~50+ APIs** in database with capabilities
-- **Cron job** running: 5 APIs processed every 5 minutes
+- **119 APIs** in database with capabilities
+- **Cron job** running: 5 APIs processed every 5 minutes (but may timeout on complex APIs - use local ingestion instead)
 - **Discovery script** ready for topic-based API discovery
 - **Browse mode** with expandable rows and tabs
 - **Capabilities field** for AI analysis
+
+## Next Feature: Continuous API Discovery (TODO)
+
+**Goal:** User specifies topics, AI searches in background, sends Telegram notifications when cycles complete.
+
+**Proposed Design (Options 3+4 combined):**
+
+1. **Depth Levels** - User chooses upfront:
+   - `quick` → 10 APIs, obvious sources
+   - `thorough` → 25 APIs, includes niche angles
+   - `exhaustive` → 50+ APIs, every possible angle
+
+2. **Iterative with Checkpoints:**
+   - AI finds batch of 10 APIs
+   - Sends Telegram notification: "Found 10 APIs for [topic]. Review or continue?"
+   - User can respond: "continue", "focus on [X]", or "stop"
+   - Repeat until depth satisfied
+
+3. **Rethink as Meta-Controller:**
+   - After each batch, AI uses `rethink` to evaluate:
+     - "What angles haven't I explored?"
+     - "Am I seeing repeat results?"
+     - "Have I reached the requested depth?"
+
+4. **Telegram Integration:**
+   - Notify when cycle completes
+   - Send summary of APIs found
+   - Allow user to respond with commands
+
+**Implementation Notes:**
+- Could run as Supabase Edge Function with longer timeout
+- Or as local script with `--background` flag
+- Store discovery state in database for resumability
+- Consider using Telegram Bot API for notifications
+
+---
+
+## Thailand Education Data (For Marc's School)
+
+If you need Thailand school/education data, here are the sources:
+
+| Source | URL | What it has |
+|--------|-----|-------------|
+| **OBEC Open Data** | https://opendata.obec.go.th/ | 31,000+ public schools, structured data |
+| **OBEC School Lists** | http://www.bopp.go.th/?page_id=878 | Downloadable lists since 2007, updated each semester |
+| **data.go.th** | https://data.go.th/dataset?groups=education | 46,000+ schools with GPS coordinates |
+| **SchoolMIS** | Via bopp.go.th | School management system data |
+| **B-OBEC** | Via bopp.go.th | School building/infrastructure database |
+
+Note: No public API exists for MOE catalog - but data is downloadable/scrapable from OBEC portals.
 
 ## Quick Commands Reference
 
