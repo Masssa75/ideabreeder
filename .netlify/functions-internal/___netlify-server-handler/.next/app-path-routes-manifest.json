@@ -1,8 +1,0 @@
-{
-  "/api/extract/route": "/api/extract",
-  "/api/evolve/route": "/api/evolve",
-  "/api/generate/route": "/api/generate",
-  "/api/score/route": "/api/score",
-  "/_not-found/page": "/_not-found",
-  "/page": "/"
-}
