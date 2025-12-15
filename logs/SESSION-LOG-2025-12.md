@@ -1,225 +1,107 @@
-# Session Log - December 2025
-
-## Session - December 15, 2025 (Web Search Integration & History Modal)
-
-### Summary
-Added Kimi K2's built-in web search capability to idea generation, enabling the AI to research real problems and market gaps before generating ideas. Also created a comprehensive history modal to view all past ideas with their scores and analysis.
-
-### Key Accomplishments
-
-**1. Web Search Integration**
-- Enabled `$web_search` builtin tool in Kimi K2 API calls
-- Updated prompts to instruct AI to research before generating:
-  - Find real problems people complain about
-  - Discover free APIs and data sources
-  - Identify market gaps
-- Added to both `/api/generate` and `/api/evolve` routes
-- Increased max_tokens to 1000 to accommodate research output
-
-**2. Research-First Prompt Updates**
-- Added "RESEARCH FIRST" section to generation prompts
-- Encouraged data + API + AI combination ideas
-- Examples: government data, public APIs, AI processing tedious data
-
-**3. History Modal Component**
-- Created `components/HistoryModal.tsx` with full functionality
-- Features:
-  - List all ideas sorted by date (default) or score
-  - Click to see full details
-  - USEFUL scores breakdown (6 dimensions)
-  - Legacy VIRUS scores support (5 dimensions)
-  - AI reasoning display
-  - Genes used and extracted
-- Added prominent "View All Ideas" button in header
-
-**4. Seed Genes Overhaul**
-- Replaced old virality-focused genes with utility/data patterns:
-  - Data + API: "free public API integration", "government open data", "aggregates fragmented information"
-  - AI leverage: "AI analyzes large datasets", "AI extracts insights from documents"
-  - Problem patterns: "replaces expensive professionals", "automates tedious paperwork"
-  - Audiences: "small business owners", "freelancers", "real estate investors"
-  - Verticals: "legal and compliance", "financial planning", "hiring and recruiting"
-  - Frequency: "daily workflow tool", "recurring decision support"
-
-### Files Modified
-- `app/api/generate/route.ts` - Added web search tool, updated prompts
-- `app/api/evolve/route.ts` - Added web search tool, updated prompts
-- `app/page.tsx` - New seed genes, history modal integration
-- `components/HistoryModal.tsx` - New component
-
-### Technical Notes
-- Web search uses `tools: [{ type: 'builtin_function', function: { name: '$web_search' } }]`
-- Model: `kimi-k2-0905-preview` (Moonshot confirmed `kimi-k2-0711-preview` may work better for search)
-- If search is unreliable, fallback option is Tavily API
-
-### Status
-- **Deployed:** Yes (auto-deploy via GitHub)
-- **Evolution:** Running with web search enabled
-- **Next:** Monitor idea quality, consider Tavily if Kimi search unreliable
+# December 2025 Session Logs
 
 ---
 
-## Session - December 14-15, 2025 (USEFUL Framework & Meta-Aware Prompts)
+## Session: December 15, 2025 - DataGold MVP
 
 ### Summary
-Major pivot from virality-focused VIRUS scoring to utility-focused USEFUL scoring. Made the AI meta-aware of the evolutionary system it's part of, improving idea quality and diversity.
+Built DataGold, a "Did You Know?" style API directory that showcases amazing data APIs with punchy, discovery-oriented hooks.
 
-### Key Accomplishments
+### Accomplishments
 
-**1. VIRUS → USEFUL Scoring Change**
-- Old VIRUS (max 50): Virality, Immediacy, Recurrence, Urgency, Simplicity
-- New USEFUL (max 60): Utility, Simplicity, Economics, Frequency, Uniqueness, Leverage
-- Focus shifted from "goes viral" to "genuinely useful"
+#### Database
+- Created Supabase `apis` table with schema for title, hook, description, bullets, technical info, etc.
+- Added RLS policies for public read/write access
+- Successfully migrated using `supabase db push`
 
-**2. Meta-Aware Prompts**
-- AI now knows it's part of an evolutionary engine
-- Understands that:
-  - Its outputs get scored and affect gene fitness
-  - High scores boost genes, low scores penalize them
-  - The system learns from its outputs
-- Added scoring criteria to generation prompt (AI optimizes for what it's scored on)
+#### Ingestion Scripts
+- **`scripts/ingest-api.ts`**: Single API ingestion using Kimi K2 with web search
+  - Multi-turn tool call handling (web_search, fetch, rethink)
+  - "Did You Know?" style prompt that generates hooks with `**bold**` markers
+  - Saves structured data to Supabase
+- **`scripts/batch-ingest.ts`**: Batch processing with 75+ curated API names
+- **`scripts/experiment-hooks.ts`**: Hook format experimentation tool
 
-**3. Gene Diversity Fix**
-- Problem: Top ideas were all badge/workout related (convergence)
-- Solution: Meta-awareness + utility focus + recent ideas context
-- Added recent idea names to prompt to avoid repetition
+#### UI (`/datagold`)
+- **Discovery Mode**: Full-screen "Did You Know?" cards with:
+  - Yellow-highlighted key phrases (parses `**bold**` markers)
+  - Source link with free/paid indicator
+  - "Show me another" / "Save this" buttons
+  - Space bar / arrow key navigation
+- **Browse Mode**: Searchable list with category filters
 
-**4. Database Reset**
-- Cleared old ideas and genes
-- Added new utility-focused seed genes
-- Reset generation counter
+#### Data
+- 6 APIs ingested with new hook format:
+  - AIS Ship Tracking API
+  - USGS Earthquake API
+  - Internet Archive API
+  - Spotify Web API
+  - USPTO Patent Database API
+  - NASA Mars Rover Photos API
 
-### Files Modified
-- `app/api/generate/route.ts` - Meta-aware prompt, USEFUL criteria
-- `app/api/score/route.ts` - USEFUL scoring framework
-- `app/api/extract/route.ts` - Meta-aware extraction prompt
-- `app/api/evolve/route.ts` - All prompts updated
-- `components/BreedingView.tsx` - USEFUL scores display
+### Key Technical Decisions
 
-### Prompt Evolution
-The generate prompt went from a prescriptive "here's how to make ideas" to a collaborative "you're part of this system, help it get smarter."
+1. **Hook Format**: Changed from dry stats to discovery-oriented "There's a..." format
+   - Before: "100M+ developers, 330M+ repositories, 4B+ annual contributions"
+   - After: "There's a live map of **every ocean vessel** on Earth — **400,000+ ships** tracked in **real-time**"
 
-Key prompt sections:
-- HOW THIS WORKS: Explains the evolutionary loop
-- YOUR OBJECTIVE: Help the engine get smarter
-- YOU WILL BE SCORED ON: The 6 USEFUL dimensions
-- GUIDELINES: Practical tips for better ideas
+2. **Kimi K2 Multi-turn**: Script handles up to 15 tool call turns before final response
 
-### Status
-- **Scoring:** USEFUL framework active (max 60)
-- **History:** Supports both legacy VIRUS and new USEFUL display
+3. **Highlight Parsing**: Hooks stored with `**bold**` markdown, parsed to yellow spans in UI
 
----
+### Files Created/Modified
 
-## Session - December 14, 2025 (Supabase Integration & Background Evolution)
+```
+scripts/
+├── ingest-api.ts        # Single API ingestion (modified with new prompt)
+├── batch-ingest.ts      # Batch processing
+└── experiment-hooks.ts  # Hook format testing
 
-### Summary
-Set up Supabase for persistence and background evolution via pg_cron. The system now runs autonomously, generating new ideas every 5 minutes when evolution is enabled.
+app/
+├── datagold/page.tsx    # Discovery + Browse UI (modified for new design)
+└── api/apis/route.ts    # API endpoint
 
-### Key Accomplishments
+supabase/migrations/
+├── 20251215170000_apis_table.sql
+└── 20251215170100_apis_policies.sql
 
-**1. Supabase Database Setup**
-- Created tables: `genes`, `ideas`, `evolution_state`
-- Row Level Security (RLS) policies for public read access
-- Service role for write operations
+lib/
+├── types.ts             # Added Api types
+└── supabase.ts          # Added API functions
 
-**2. Background Evolution (pg_cron)**
-- Supabase cron job calls `/api/evolve` every 5 minutes
-- Checks `is_running` flag before proceeding
-- Updates generation counter after each run
-
-**3. Realtime Subscriptions**
-- UI subscribes to database changes
-- New ideas appear automatically
-- Gene fitness updates reflected in real-time
-
-**4. Evolution State Management**
-- Start/Pause button toggles `is_running` flag
-- Generation counter persisted
-- Last run timestamp tracked
-
-### Database Schema
-```sql
-CREATE TABLE genes (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  text text UNIQUE NOT NULL,
-  fitness numeric DEFAULT 5,
-  offspring_count int DEFAULT 0,
-  created_at timestamp DEFAULT now()
-);
-
-CREATE TABLE ideas (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL,
-  description text,
-  hook text,
-  virus_score int,
-  scores jsonb,
-  genes_used text[],
-  genes_extracted text[],
-  reasoning text,
-  generation int,
-  created_at timestamp DEFAULT now()
-);
-
-CREATE TABLE evolution_state (
-  id int PRIMARY KEY DEFAULT 1,
-  current_generation int DEFAULT 1,
-  is_running boolean DEFAULT false,
-  last_run_at timestamp
-);
+logs/
+├── SESSION-LOG-INDEX.md
+└── SESSION-LOG-2025-12.md
 ```
 
-### Status
-- **Background evolution:** Active via pg_cron
-- **Interval:** Every 5 minutes when running
+### Next Steps
+
+1. **Ingest more APIs**: Run `npx tsx scripts/batch-ingest.ts` to populate database
+2. **Add "Save" functionality**: Currently "Save this" just switches to Browse mode
+3. **User accounts**: Allow users to save favorites
+4. **Search improvements**: Full-text search on hooks and descriptions
+5. **Deploy**: Push changes to trigger Netlify deploy
+
+### Environment Notes
+
+- Dev server runs on port 3004 (3000 was in use)
+- Requires `.env` symlinked to `.env.local` for scripts: `ln -sf .env.local .env`
+- MOONSHOT_API_KEY required for Kimi K2 ingestion
+
+### Commands
+
+```bash
+# Ingest single API
+npx tsx scripts/ingest-api.ts "GitHub REST API"
+
+# Ingest batch (first 10)
+npx tsx scripts/batch-ingest.ts --batch 0
+
+# Test hook formats
+npx tsx scripts/experiment-hooks.ts
+
+# Run dev server
+npm run dev
+```
 
 ---
-
-## Session - December 13-14, 2025 (Initial Build)
-
-### Summary
-Built the initial IdeaBreeder application with core evolutionary algorithm, Moonshot Kimi K2 integration, and real-time UI.
-
-### Key Accomplishments
-
-**1. Core Architecture**
-- Next.js 15 App Router
-- TypeScript throughout
-- Tailwind CSS with custom glass morphism styles
-
-**2. Evolutionary Algorithm**
-- Fitness-weighted gene selection
-- Gene extraction from generated ideas
-- Fitness adjustment based on scores
-
-**3. API Routes**
-- `/api/generate` - Generate idea from genes
-- `/api/score` - Score idea with framework
-- `/api/extract` - Extract new genes
-
-**4. UI Components**
-- `GenePool` - Visual gene pool with fitness indicators
-- `BreedingView` - Current generation status and idea display
-- `Leaderboard` - Top 10 ideas ranked by score
-- `ActivityLog` - Real-time evolution activity
-
-**5. Moonshot Integration**
-- Kimi K2 model for all AI operations
-- JSON-only responses for reliable parsing
-- Different temperatures for different tasks (0.9 generate, 0.3 score, 0.7 extract)
-
-### Files Created
-- `app/page.tsx` - Main application
-- `app/api/generate/route.ts`
-- `app/api/score/route.ts`
-- `app/api/extract/route.ts`
-- `components/GenePool.tsx`
-- `components/BreedingView.tsx`
-- `components/Leaderboard.tsx`
-- `components/ActivityLog.tsx`
-- `app/globals.css` - Custom styles
-
-### Status
-- **Initial deployment:** Successful on Netlify
-- **Core loop:** Working (generate → score → extract → update fitness)

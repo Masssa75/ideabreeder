@@ -44,28 +44,35 @@ When researching an API:
 
 Always provide accurate, verifiable information. If you can't find specific numbers, say so rather than making them up.`;
 
-const USER_PROMPT_TEMPLATE = (apiName: string) => `I'm building a database of amazing APIs for developers. Research this API thoroughly and extract structured data.
+const USER_PROMPT_TEMPLATE = (apiName: string) => `Research this API and extract structured data for a "Did You Know?" style directory.
 
 API: ${apiName}
 
-Extract:
+HOOK FORMAT (CRITICAL):
+Write ONE "Did You Know?" fact that makes developers say "holy shit, I had no idea."
+- Start with "There's a..." or "You can access..." or "Every..."
+- Include 1-2 specific mind-blowing numbers
+- Frame it as a discovery, not documentation
+- Keep under 30 words
+- Mark 2-3 key phrases with **bold** for highlighting
 
-HOOK: One punchy "holy shit" sentence about the DATA, not the API mechanics.
-Formula: "[Breadth statement] — [number], [number], [number]"
-Keep it under 20 words. Focus on: scale, history, coverage, uniqueness.
-NO rate limits, pricing, or technical specs in the hook.
+GOOD EXAMPLES:
+- "There's a real-time feed of **every ship** in the ocean — position, cargo type, destination. **400,000+ vessels** tracked live."
+- "**Every earthquake** since 1900 is queryable — magnitude, depth, location. **5 million events**, updated every minute."
+- "**Every patent ever filed** in America is searchable — **11 million documents** with full text back to 1790."
 
-BULLETS: 6-8 specific facts, each starting with a number
+BAD (too dry/technical):
+- "The USGS Earthquake API provides access to seismic data..." (boring!)
+- "100M+ developers, 330M+ repositories..." (just stats, no discovery)
 
-DESCRIPTION: 2-3 sentences explaining what this is
+Also extract:
+- BULLETS: 4-6 specific facts, each starting with a number
+- DESCRIPTION: 2-3 sentences
+- WHAT_IT_CONTAINS: Data types for search
+- WHO_USES_THIS: 4-5 user types
+- TECHNICAL: auth, rate limits, formats, pricing
 
-WHAT_IT_CONTAINS: List the data types inside (for search matching)
-
-WHO_USES_THIS: Who would want this? (5-6 max)
-
-TECHNICAL: auth type, rate limits, formats, pricing
-
-Output as JSON only (no markdown code blocks):
+Output as JSON only (no markdown):
 {
   "title": "",
   "hook": "",
@@ -163,7 +170,7 @@ async function researchApi(apiName: string): Promise<KimiResponse | null> {
     ];
 
     // Multi-turn conversation to handle tool calls
-    let maxTurns = 10;
+    let maxTurns = 15;
     let turn = 0;
 
     while (turn < maxTurns) {

@@ -23,6 +23,21 @@ interface Api {
 
 type Mode = 'discover' | 'browse';
 
+// Parse **bold** markers into highlighted spans
+function parseHighlights(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <span key={i} className="text-yellow-400">
+          {part.slice(2, -2)}
+        </span>
+      );
+    }
+    return part;
+  });
+}
+
 export default function DataGoldPage() {
   const [mode, setMode] = useState<Mode>('discover');
   const [apis, setApis] = useState<Api[]>([]);
@@ -92,68 +107,41 @@ export default function DataGoldPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mode, fetchRandomApi]);
 
-  // Parse bullet to highlight first word/number
-  const parseBullet = (bullet: string) => {
-    const parts = bullet.match(/^([\d,]+[+]?|[A-Za-z]+)\s*(.*)/);
-    if (parts) {
-      return { highlight: parts[1], rest: parts[2] };
-    }
-    return { highlight: bullet.split(' ')[0], rest: bullet.split(' ').slice(1).join(' ') };
-  };
-
   return (
     <div className="min-h-screen bg-black text-white">
       {mode === 'discover' ? (
-        // Discovery Mode (v6)
-        <div className="min-h-screen flex flex-col items-center justify-center p-10">
+        // Discovery Mode - "Did You Know?" style
+        <div className="min-h-screen flex flex-col items-center justify-center px-8">
           <div
-            className={`max-w-xl w-full transition-opacity duration-200 ${transitioning ? 'opacity-0' : 'opacity-100'}`}
+            className={`max-w-4xl w-full text-center transition-opacity duration-200 ${transitioning ? 'opacity-0' : 'opacity-100'}`}
           >
             {currentApi ? (
               <>
                 {/* Eyebrow */}
-                <div className="text-center mb-8">
-                  <span className="text-gray-500 text-sm uppercase tracking-widest">
-                    {currentApi.free ? 'Free API' : 'Paid API'}
+                <div className="mb-12">
+                  <span className="text-gray-500 text-sm uppercase tracking-[0.3em]">
+                    Did you know?
                   </span>
                 </div>
 
-                {/* Title */}
-                <h1 className="text-3xl font-bold text-center mb-10">
-                  {currentApi.title}
+                {/* Main Hook - Large Typography */}
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-16">
+                  {parseHighlights(currentApi.hook)}
                 </h1>
 
-                {/* Bullets */}
-                <ul className="mb-12 space-y-0">
-                  {currentApi.bullets.slice(0, 6).map((bullet, i) => {
-                    const { highlight, rest } = parseBullet(bullet);
-                    return (
-                      <li
-                        key={i}
-                        className="text-xl text-gray-400 py-4 border-b border-gray-900 last:border-0 flex items-baseline gap-4"
-                      >
-                        <span className="text-yellow-400 text-sm">●</span>
-                        <span>
-                          <span className="text-white font-semibold">{highlight}</span>{' '}
-                          {rest}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-
-                {/* Source Link */}
-                <div className="text-center mb-12">
+                {/* Source */}
+                <div className="mb-16">
+                  <span className="text-gray-600">Source: </span>
                   <a
                     href={currentApi.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-yellow-400 border-b border-yellow-400 pb-0.5 hover:text-white hover:border-white transition-colors"
+                    className="text-gray-400 underline underline-offset-4 hover:text-white transition-colors"
                   >
-                    View API docs →
+                    {currentApi.title}
                   </a>
-                  <span className="text-gray-700 text-sm ml-3">
-                    {currentApi.free ? 'free' : 'paid'}
+                  <span className="text-gray-600">
+                    {' '}— {currentApi.free ? 'completely free API' : 'paid API'}
                   </span>
                 </div>
 
@@ -161,15 +149,15 @@ export default function DataGoldPage() {
                 <div className="flex gap-4 justify-center">
                   <button
                     onClick={fetchRandomApi}
-                    className="px-10 py-4 bg-white text-black font-semibold rounded-full hover:scale-105 transition-transform"
+                    className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:scale-105 transition-transform"
                   >
-                    Next →
+                    Show me another →
                   </button>
                   <button
                     onClick={() => setMode('browse')}
-                    className="px-10 py-4 text-gray-500 hover:text-white transition-colors"
+                    className="px-8 py-4 text-gray-500 border border-gray-800 rounded-full hover:text-white hover:border-gray-600 transition-colors"
                   >
-                    Browse All
+                    Save this
                   </button>
                 </div>
               </>
@@ -181,55 +169,34 @@ export default function DataGoldPage() {
           </div>
 
           {/* Keyboard Hint */}
-          <div className="fixed bottom-8 text-gray-800 text-sm">
-            press <b>space</b> for next
+          <div className="fixed bottom-8 text-gray-700 text-sm">
+            press <span className="text-gray-500">space</span> for next
           </div>
 
-          {/* Mode Toggle */}
+          {/* Browse link */}
           <div className="fixed top-6 right-6">
-            <div className="flex bg-gray-900 rounded-lg p-1">
-              <button
-                onClick={() => setMode('discover')}
-                className="px-4 py-2 rounded-md text-sm transition-colors bg-gray-800 text-white"
-              >
-                Discover
-              </button>
-              <button
-                onClick={() => setMode('browse')}
-                className="px-4 py-2 rounded-md text-sm transition-colors text-gray-500"
-              >
-                Browse
-              </button>
-            </div>
-          </div>
-
-          {/* Logo */}
-          <div className="fixed top-6 left-6 text-xl font-bold flex items-center gap-2">
-            <span>💎</span> DataGold
+            <button
+              onClick={() => setMode('browse')}
+              className="text-gray-600 hover:text-white text-sm transition-colors"
+            >
+              Browse all →
+            </button>
           </div>
         </div>
       ) : (
-        // Browse Mode (v7)
+        // Browse Mode
         <div className="p-8 max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8 pb-5 border-b border-gray-900">
             <div className="text-xl font-bold flex items-center gap-2">
               <span>💎</span> DataGold
             </div>
-            <div className="flex bg-gray-900 rounded-lg p-1">
-              <button
-                onClick={() => setMode('discover')}
-                className="px-4 py-2 rounded-md text-sm transition-colors text-gray-500"
-              >
-                Discover
-              </button>
-              <button
-                onClick={() => setMode('browse')}
-                className="px-4 py-2 rounded-md text-sm transition-colors bg-gray-800 text-white"
-              >
-                Browse
-              </button>
-            </div>
+            <button
+              onClick={() => setMode('discover')}
+              className="text-gray-600 hover:text-white text-sm transition-colors"
+            >
+              ← Back to discovery
+            </button>
           </div>
 
           {/* Controls */}
@@ -242,7 +209,7 @@ export default function DataGoldPage() {
               className="flex-1 min-w-[250px] px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-gray-600"
             />
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setCategoryFilter('all')}
                 className={`px-4 py-3 rounded-lg text-sm transition-all ${
@@ -275,7 +242,7 @@ export default function DataGoldPage() {
           </div>
 
           {/* List */}
-          <div className="space-y-0.5">
+          <div className="space-y-3">
             {loading ? (
               <div className="text-center py-16 text-gray-600">Loading...</div>
             ) : apis.length === 0 ? (
@@ -286,45 +253,26 @@ export default function DataGoldPage() {
               apis.map((api) => (
                 <div
                   key={api.id}
-                  className="grid grid-cols-[1fr_1fr_auto] gap-10 p-5 bg-gray-950 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer items-center group"
+                  className="p-6 bg-gray-950 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer group"
                   onClick={() => window.open(api.url, '_blank')}
                 >
-                  {/* Main Info */}
-                  <div className="space-y-1">
-                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      {api.title}
-                    </div>
-                    <div className="text-lg text-white leading-snug">
-                      {api.hook}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs text-gray-600 uppercase tracking-wider">
-                        {api.category}
-                      </span>
-                      {api.free && (
-                        <span className="px-2 py-0.5 bg-green-500/15 text-green-400 text-xs rounded">
-                          Free
+                  <div className="flex justify-between items-start gap-8">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {api.title}
                         </span>
-                      )}
+                        {api.free && (
+                          <span className="px-2 py-0.5 bg-green-500/15 text-green-400 text-xs rounded">
+                            Free
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xl text-white leading-relaxed">
+                        {parseHighlights(api.hook)}
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Bullets */}
-                  <div className="flex flex-wrap gap-x-6 gap-y-2">
-                    {api.bullets.slice(0, 4).map((bullet, i) => {
-                      const { highlight, rest } = parseBullet(bullet);
-                      return (
-                        <span key={i} className="text-sm text-gray-500">
-                          <span className="text-yellow-400 font-semibold">{highlight}</span>{' '}
-                          {rest}
-                        </span>
-                      );
-                    })}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="px-4 py-2 bg-white text-black text-sm rounded-md hover:scale-105 transition-transform">
+                    <button className="px-4 py-2 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-700">
                       View →
                     </button>
                   </div>
