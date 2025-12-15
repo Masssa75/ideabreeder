@@ -6,6 +6,7 @@ import GenePool from '@/components/GenePool';
 import BreedingView from '@/components/BreedingView';
 import Leaderboard from '@/components/Leaderboard';
 import ActivityLog from '@/components/ActivityLog';
+import HistoryModal from '@/components/HistoryModal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -90,6 +91,7 @@ export default function Home() {
   const [genesUsed, setGenesUsed] = useState<string[]>([]);
   const [genesExtracted, setGenesExtracted] = useState<string[]>([]);
   const [reasoning, setReasoning] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
 
   const isRunningRef = useRef(false);
 
@@ -472,16 +474,24 @@ export default function Home() {
             Watch AI evolve startup ideas in real-time
           </p>
 
-          <button
-            onClick={toggleEvolution}
-            className={`mt-4 px-8 py-3 rounded-full font-semibold transition-all ${
-              isRunning
-                ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/30 animate-pulse-glow'
-            }`}
-          >
-            {isRunning ? 'Pause Evolution' : 'Start Evolution'}
-          </button>
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <button
+              onClick={toggleEvolution}
+              className={`px-8 py-3 rounded-full font-semibold transition-all ${
+                isRunning
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+                  : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/30 animate-pulse-glow'
+              }`}
+            >
+              {isRunning ? 'Pause Evolution' : 'Start Evolution'}
+            </button>
+            <button
+              onClick={() => setShowHistory(true)}
+              className="px-6 py-3 rounded-full font-semibold bg-white/10 text-white/70 border border-white/20 hover:bg-white/20 hover:text-white transition-all"
+            >
+              View All Ideas
+            </button>
+          </div>
 
           <div className="mt-4 flex items-center justify-center gap-6 text-sm text-white/40">
             <span>Generation: <strong className="text-white/70">{generation}</strong></span>
@@ -542,6 +552,9 @@ export default function Home() {
           <p>Built with AI that evolves itself. Each generation gets smarter.</p>
         </footer>
       </div>
+
+      {/* History Modal */}
+      <HistoryModal isOpen={showHistory} onClose={() => setShowHistory(false)} />
     </main>
   );
 }
