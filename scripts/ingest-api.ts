@@ -8,6 +8,7 @@
  *   npx tsx scripts/ingest-api.ts "NOAA Storm Events API" "PubMed API"
  */
 
+import 'dotenv/config';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import { ApiInsert } from '../lib/types';
@@ -105,93 +106,135 @@ async function researchApi(apiName: string): Promise<KimiResponse | null> {
   console.log(`\n🔍 Researching: ${apiName}`);
 
   try {
-    const response = await client.chat.completions.create({
-      model: 'kimi-k2-0711-preview',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: USER_PROMPT_TEMPLATE(apiName) }
-      ],
-      tools: [
-        {
-          type: 'function',
-          function: {
-            name: 'web_search',
-            description: 'Search the web for information',
-            parameters: {
-              type: 'object',
-              properties: {
-                query: { type: 'string', description: 'What to search for' },
-                classes: {
-                  type: 'array',
-                  items: { type: 'string', enum: ['all', 'academic', 'social', 'library', 'finance', 'code', 'ecommerce', 'medical'] },
-                  description: 'Search domains to focus on'
-                }
-              },
-              required: ['query']
-            }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'rethink',
-            description: 'Organize your thoughts before responding',
-            parameters: {
-              type: 'object',
-              properties: {
-                thought: { type: 'string', description: 'Your thought process' }
-              },
-              required: ['thought']
-            }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'fetch',
-            description: 'Fetch a URL and extract its contents',
-            parameters: {
-              type: 'object',
-              properties: {
-                url: { type: 'string', description: 'URL to fetch' },
-                max_length: { type: 'integer', default: 5000, description: 'Max characters to return' }
-              },
-              required: ['url']
-            }
+    const messages: any[] = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: USER_PROMPT_TEMPLATE(apiName) }
+    ];
+
+    const tools = [
+      {
+        type: 'function' as const,
+        function: {
+          name: 'web_search',
+          description: 'Search the web for information',
+          parameters: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'What to search for' },
+              classes: {
+                type: 'array',
+                items: { type: 'string', enum: ['all', 'academic', 'social', 'library', 'finance', 'code', 'ecommerce', 'medical'] },
+                description: 'Search domains to focus on'
+              }
+            },
+            required: ['query']
           }
         }
-      ],
-      temperature: 0.6,
-      max_tokens: 8192
-    });
+      },
+      {
+        type: 'function' as const,
+        function: {
+          name: 'rethink',
+          description: 'Organize your thoughts before responding',
+          parameters: {
+            type: 'object',
+            properties: {
+              thought: { type: 'string', description: 'Your thought process' }
+            },
+            required: ['thought']
+          }
+        }
+      },
+      {
+        type: 'function' as const,
+        function: {
+          name: 'fetch',
+          description: 'Fetch a URL and extract its contents',
+          parameters: {
+            type: 'object',
+            properties: {
+              url: { type: 'string', description: 'URL to fetch' },
+              max_length: { type: 'integer', default: 5000, description: 'Max characters to return' }
+            },
+            required: ['url']
+          }
+        }
+      }
+    ];
 
-    // Get the final response content
-    const content = response.choices[0]?.message?.content;
+    // Multi-turn conversation to handle tool calls
+    let maxTurns = 10;
+    let turn = 0;
 
-    if (!content) {
-      console.error('❌ No content in response');
+    while (turn < maxTurns) {
+      turn++;
+      console.log(`   Turn ${turn}...`);
+
+      const response = await client.chat.completions.create({
+        model: 'kimi-k2-0711-preview',
+        messages,
+        tools,
+        temperature: 0.6,
+        max_tokens: 8192
+      });
+
+      const message = response.choices[0]?.message;
+      if (!message) {
+        console.error('❌ No message in response');
+        return null;
+      }
+
+      // Add assistant message to history
+      messages.push(message);
+
+      // Check if we have tool calls to process
+      if (message.tool_calls && message.tool_calls.length > 0) {
+        for (const toolCall of message.tool_calls) {
+          const toolName = toolCall.function.name;
+          console.log(`   🔧 Tool: ${toolName}`);
+
+          // Kimi K2 handles tool execution internally - we just need to acknowledge
+          // The tool results come back encrypted from Moonshot's servers
+          messages.push({
+            role: 'tool',
+            content: JSON.stringify({ status: 'executed' }),
+            tool_call_id: toolCall.id
+          });
+        }
+        continue;
+      }
+
+      // No tool calls - check for final content
+      if (message.content) {
+        const content = message.content;
+
+        // Parse JSON from response
+        let jsonStr = content;
+        if (content.includes('```json')) {
+          jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        } else if (content.includes('```')) {
+          jsonStr = content.replace(/```\n?/g, '');
+        }
+
+        const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          console.error('❌ Could not find JSON in response');
+          console.log('Response:', content.substring(0, 500));
+          return null;
+        }
+
+        const parsed: KimiResponse = JSON.parse(jsonMatch[0]);
+        console.log(`✅ Successfully researched: ${parsed.title}`);
+        return parsed;
+      }
+
+      // No content and no tool calls - something went wrong
+      console.error('❌ No content or tool calls in response');
       return null;
     }
 
-    // Parse JSON from response (handle potential markdown code blocks)
-    let jsonStr = content;
-    if (content.includes('```json')) {
-      jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    } else if (content.includes('```')) {
-      jsonStr = content.replace(/```\n?/g, '');
-    }
-
-    // Find JSON object in response
-    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('❌ Could not find JSON in response');
-      console.log('Response:', content);
-      return null;
-    }
-
-    const parsed: KimiResponse = JSON.parse(jsonMatch[0]);
-    console.log(`✅ Successfully researched: ${parsed.title}`);
-    return parsed;
+    console.error('❌ Max turns reached without final response');
+    return null;
 
   } catch (error) {
     console.error(`❌ Error researching ${apiName}:`, error);

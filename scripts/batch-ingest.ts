@@ -9,6 +9,7 @@
  *   npx tsx scripts/batch-ingest.ts --batch 1    # APIs 11-20
  */
 
+import 'dotenv/config';
 import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import { ApiInsert } from '../lib/types';
