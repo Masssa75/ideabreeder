@@ -98,6 +98,13 @@ export async function POST(request: NextRequest) {
     console.log('Extracted:', extractedGenes);
 
     // 6. Save idea to database
+    // Combine generation insights with scoring reasoning
+    const fullReasoning = [
+      idea.research_insights ? `**Research:** ${idea.research_insights}` : '',
+      idea.why_this_idea ? `**Why this idea:** ${idea.why_this_idea}` : '',
+      reasoning ? `**Score analysis:** ${reasoning}` : ''
+    ].filter(Boolean).join('\n\n');
+
     const { error: ideaError } = await supabase.from('ideas').insert({
       name: idea.name,
       description: idea.description,
@@ -106,7 +113,7 @@ export async function POST(request: NextRequest) {
       scores,
       genes_used: selectedGenes,
       genes_extracted: extractedGenes,
-      reasoning,
+      reasoning: fullReasoning,
       generation: state.current_generation,
     });
 
@@ -267,7 +274,9 @@ Respond with ONLY valid JSON:
 {
   "name": "Short catchy name (2-4 words)",
   "description": "What it does, who it's for, why they need it, how it makes money.",
-  "hook": "One sentence that captures the core value"
+  "hook": "One sentence that captures the core value",
+  "research_insights": "What market gaps, problems, or opportunities did you find that led to this idea?",
+  "why_this_idea": "Why did you choose this specific approach over alternatives?"
 }`;
 
   const response = await fetch('https://api.moonshot.ai/v1/chat/completions', {
