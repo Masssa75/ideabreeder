@@ -91,6 +91,7 @@ export default function Home() {
   const [genesExtracted, setGenesExtracted] = useState<string[]>([]);
   const [reasoning, setReasoning] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [speedMode, setSpeedMode] = useState<'fast' | 'slow'>('slow'); // fast = 1min, slow = 5min
 
   const isRunningRef = useRef(false);
 
@@ -319,7 +320,9 @@ export default function Home() {
       setStatus('idle');
 
       if (isRunningRef.current) {
-        setTimeout(() => runGeneration(), 500);
+        const delay = speedMode === 'fast' ? 60000 : 300000; // 1 min or 5 min
+        addLog(`Next generation in ${speedMode === 'fast' ? '1 minute' : '5 minutes'}...`);
+        setTimeout(() => runGeneration(), delay);
       }
 
     } catch (error) {
@@ -328,10 +331,10 @@ export default function Home() {
       setStatus('idle');
 
       if (isRunningRef.current) {
-        setTimeout(() => runGeneration(), 5000);
+        setTimeout(() => runGeneration(), 30000); // 30s retry on error
       }
     }
-  }, [generation, genes, selectGenes, updateGeneFitness, addLog]);
+  }, [generation, genes, selectGenes, updateGeneFitness, addLog, speedMode]);
 
   const toggleEvolution = async () => {
     if (isRunning) {
@@ -483,6 +486,17 @@ export default function Home() {
               }`}
             >
               {isRunning ? 'Pause Evolution' : 'Start Evolution'}
+            </button>
+            <button
+              onClick={() => setSpeedMode(speedMode === 'fast' ? 'slow' : 'fast')}
+              className={`px-4 py-3 rounded-full font-semibold transition-all ${
+                speedMode === 'fast'
+                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                  : 'bg-white/10 text-white/50 border border-white/20'
+              }`}
+              title={speedMode === 'fast' ? 'Fast mode: 1 idea/min' : 'Slow mode: 1 idea/5min'}
+            >
+              {speedMode === 'fast' ? '⚡ 1min' : '🐢 5min'}
             </button>
             <button
               onClick={() => setShowHistory(true)}
