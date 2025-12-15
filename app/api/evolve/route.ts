@@ -189,10 +189,18 @@ Help this engine get smarter. Don't just generate a "good sounding" idea - gener
 GENES TO COMBINE:
 ${genesText}
 ${contextSection}
+YOU WILL BE SCORED ON (optimize for these):
+- Utility: Does it solve a real, painful problem?
+- Simplicity: Can a solo dev build an MVP quickly?
+- Economics: Is there a clear path to revenue?
+- Frequency: How often would people use this?
+- Uniqueness: Is it a fresh approach, not a rehash?
+- Leverage: Does it use AI/new tech in a meaningful way?
+
 GUIDELINES:
 - Solve real problems people actually have
 - Be specific about who this is for and why they'd pay
-- If you notice the genes are narrow, interpret them creatively to explore new territory
+- If the genes seem narrow, interpret them creatively
 - Avoid repeating patterns from recent ideas
 
 Respond with ONLY valid JSON:
