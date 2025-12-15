@@ -319,6 +319,47 @@ npx tsx scripts/queue-status.ts
 npx tsx scripts/check-capabilities.ts
 ```
 
+### Discovery Prompt Tips (CRITICAL INSIGHT)
+
+When using Kimi K2 (or any AI) to discover APIs, **always use the `rethink` tool** between searches. This dramatically improves results:
+
+| Without Rethink | With Rethink |
+|-----------------|--------------|
+| Standard global APIs (Google, Amadeus) | Hyperlocal government data |
+| "Oh yeah, that exists" | "Holy shit, they track THAT?" |
+| Generic "Thailand" data | Specific "Phuket Smart City" sensors |
+
+**The "Holy Shit" Discovery Prompt:**
+```
+Find APIs that will make developers say "holy shit, I had no idea this existed."
+
+Topic: "[YOUR TOPIC]"
+
+PROCESS:
+1. Search for OBVIOUS APIs first
+2. Use RETHINK: "What would SURPRISE a developer? What hidden government/sensor data exists?"
+3. Search for surprising angles
+4. Use RETHINK: "What LOCAL data exists? What real-time feeds? What niche databases?"
+5. Search deeper
+6. Use FETCH to verify APIs actually exist
+
+WHAT MAKES "HOLY SHIT" APIs:
+- Government data that's surprisingly detailed (every boat registered, every business license)
+- Real-time sensor feeds (crowd density, water quality, air quality)
+- Niche industry databases (dive conditions, coral health, marine life sightings)
+- Historical data going back decades
+- Hyperlocal data specific to the location
+
+After each search, RETHINK: "Is this surprising enough? What angle haven't I explored?"
+```
+
+**Example results with rethink enabled:**
+- Phuket CCTV Crowd Density API (1,300 cameras with AI)
+- Tourist Wristband GPS Tracking (government tracks every boat tourist)
+- Beach Water Quality (hourly bacteria levels, 20-year history)
+- Tourism Police Incident Reports (scam locations!)
+- Coral Reef Health Monitoring (underwater drone data)
+
 ## Hook Format (CRITICAL)
 
 Hooks must follow the "Did You Know?" style:
