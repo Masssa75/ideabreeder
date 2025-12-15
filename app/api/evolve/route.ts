@@ -71,12 +71,21 @@ export async function POST(request: NextRequest) {
       recentNames: recentIdeas?.map(i => i.name) || []
     };
 
-    // 2. Select genes by fitness
-    const selectedGenes = selectGenesByFitness(genes, 3);
-    console.log('Selected genes:', selectedGenes);
+    // 2. Select genes - use random every 3rd generation for exploration
+    const useExploration = state.current_generation % 3 === 0;
+    const selectedGenes = useExploration
+      ? selectGenesRandomly(genes, 3)
+      : selectGenesByFitness(genes, 3);
+    console.log(`Selected genes (${useExploration ? 'EXPLORATION' : 'fitness'}):`, selectedGenes);
 
-    // 3. Generate idea with context
-    const idea = await generateIdea(selectedGenes, context);
+    // 2b. Do web research if Tavily is configured
+    const webResearch = await searchForContext(selectedGenes);
+    if (webResearch) {
+      console.log('Web research completed');
+    }
+
+    // 3. Generate idea with context + web research
+    const idea = await generateIdea(selectedGenes, { ...context, webResearch });
     console.log('Generated:', idea.name);
 
     // 4. Score idea (new USEFUL framework - 6 dimensions, max 60)
@@ -161,7 +170,52 @@ function selectGenesByFitness(genes: Gene[], count: number): string[] {
   return selected;
 }
 
-async function generateIdea(genes: string[], context?: { generation: number; genePoolSize: number; recentNames?: string[] }) {
+// Random selection for exploration - ignores fitness
+function selectGenesRandomly(genes: Gene[], count: number): string[] {
+  const shuffled = [...genes].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count).map(g => g.text);
+}
+
+// Search for market research using Tavily (if configured)
+async function searchForContext(genes: string[]): Promise<string> {
+  const tavilyKey = process.env.TAVILY_API_KEY;
+  if (!tavilyKey) {
+    return ''; // No search if Tavily not configured
+  }
+
+  try {
+    const query = `startup problems market gaps ${genes.slice(0, 2).join(' ')} 2025`;
+    const response = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        api_key: tavilyKey,
+        query,
+        search_depth: 'basic',
+        max_results: 3,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Tavily search failed:', await response.text());
+      return '';
+    }
+
+    const data = await response.json();
+    const results = data.results?.slice(0, 3).map((r: { title: string; content: string }) =>
+      `- ${r.title}: ${r.content.slice(0, 200)}`
+    ).join('\n') || '';
+
+    return results ? `\nWEB RESEARCH:\n${results}\n` : '';
+  } catch (error) {
+    console.error('Tavily search error:', error);
+    return '';
+  }
+}
+
+async function generateIdea(genes: string[], context?: { generation: number; genePoolSize: number; recentNames?: string[]; webResearch?: string }) {
   const genesText = genes.map(g => `"${g}"`).join(', ');
 
   let contextSection = '';
@@ -171,6 +225,7 @@ CURRENT STATE:
 - Generation: ${context.generation}
 - Gene pool size: ${context.genePoolSize} genes
 ${context.recentNames?.length ? `- Recent ideas (avoid similar): ${context.recentNames.slice(0, 5).join(', ')}` : ''}
+${context.webResearch || ''}
 `;
   }
 
@@ -185,12 +240,6 @@ HOW THIS WORKS:
 
 YOUR OBJECTIVE:
 Help this engine get smarter. Don't just generate a "good sounding" idea - generate one that genuinely solves a painful problem for real people. The system is learning from your outputs.
-
-RESEARCH FIRST:
-Before generating, use web search to:
-1. Find real problems people complain about related to these genes
-2. Discover what free APIs or data sources exist in this space
-3. Identify market gaps - what's missing or poorly served?
 
 Consider ideas that combine:
 - Free/cheap data sources (government data, public APIs, scraped data)
@@ -230,14 +279,8 @@ Respond with ONLY valid JSON:
     body: JSON.stringify({
       model: 'kimi-k2-0905-preview',
       messages: [
-        { role: 'system', content: 'You are a creative startup idea generator with web search capabilities. Research real problems and market gaps before generating. Always respond with valid JSON only.' },
+        { role: 'system', content: 'You are a creative startup idea generator. Always respond with valid JSON only.' },
         { role: 'user', content: prompt },
-      ],
-      tools: [
-        {
-          type: 'builtin_function',
-          function: { name: '$web_search' }
-        }
       ],
       temperature: 0.95,
       max_tokens: 1000,

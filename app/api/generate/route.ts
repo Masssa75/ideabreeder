@@ -44,12 +44,6 @@ HOW THIS WORKS:
 YOUR OBJECTIVE:
 Help this engine get smarter. Don't just generate a "good sounding" idea - generate one that genuinely solves a painful problem for real people. The system is learning from your outputs.
 
-RESEARCH FIRST:
-Before generating, use web search to:
-1. Find real problems people complain about related to these genes
-2. Discover what free APIs or data sources exist in this space
-3. Identify market gaps - what's missing or poorly served?
-
 Consider ideas that combine:
 - Free/cheap data sources (government data, public APIs, scraped data)
 - AI processing that was previously too expensive or tedious
@@ -88,14 +82,8 @@ Respond with ONLY valid JSON:
       body: JSON.stringify({
         model: 'kimi-k2-0905-preview',
         messages: [
-          { role: 'system', content: 'You are a creative startup idea generator with web search capabilities. Research real problems and market gaps before generating. Always respond with valid JSON only.' },
+          { role: 'system', content: 'You are a creative startup idea generator. Always respond with valid JSON only.' },
           { role: 'user', content: prompt }
-        ],
-        tools: [
-          {
-            type: 'builtin_function',
-            function: { name: '$web_search' }
-          }
         ],
         temperature: 0.9,
         max_tokens: 1000
