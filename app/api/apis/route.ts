@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const free = searchParams.get('free');
   const search = searchParams.get('search');
   const random = searchParams.get('random');
-  const limit = parseInt(searchParams.get('limit') || '50');
+  const limit = parseInt(searchParams.get('limit') || '200');
 
   try {
     // Random single API for Discovery mode

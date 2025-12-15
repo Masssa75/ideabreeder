@@ -54,6 +54,7 @@ export interface Api {
   title: string;
   hook: string;
   description: string;
+  capabilities: string[];
   bullets: string[];
   what_it_contains: string[];
   who_uses_this: string[];
@@ -69,6 +70,7 @@ export interface ApiInsert {
   title: string;
   hook: string;
   description: string;
+  capabilities?: string[];
   bullets: string[];
   what_it_contains: string[];
   who_uses_this: string[];

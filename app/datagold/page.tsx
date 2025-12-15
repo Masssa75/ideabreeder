@@ -7,6 +7,7 @@ interface Api {
   title: string;
   hook: string;
   description: string;
+  capabilities: string[];
   bullets: string[];
   what_it_contains: string[];
   who_uses_this: string[];
@@ -38,6 +39,8 @@ function parseHighlights(text: string) {
   });
 }
 
+type Tab = 'capabilities' | 'facts' | 'technical' | 'audience';
+
 export default function DataGoldPage() {
   const [mode, setMode] = useState<Mode>('discover');
   const [apis, setApis] = useState<Api[]>([]);
@@ -49,6 +52,10 @@ export default function DataGoldPage() {
   // Browse mode filters
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+
+  // Expandable state
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>('facts');
 
   // Fetch random API for Discovery mode
   const fetchRandomApi = useCallback(async () => {
@@ -250,34 +257,184 @@ export default function DataGoldPage() {
                 No APIs found. Add some using the ingestion script!
               </div>
             ) : (
-              apis.map((api) => (
-                <div
-                  key={api.id}
-                  className="p-6 bg-gray-950 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer group"
-                  onClick={() => window.open(api.url, '_blank')}
-                >
-                  <div className="flex justify-between items-start gap-8">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          {api.title}
-                        </span>
-                        {api.free && (
-                          <span className="px-2 py-0.5 bg-green-500/15 text-green-400 text-xs rounded">
-                            Free
+              apis.map((api) => {
+                const isExpanded = expandedId === api.id;
+
+                return (
+                  <div
+                    key={api.id}
+                    className={`bg-gray-950 rounded-lg transition-all ${isExpanded ? 'ring-1 ring-gray-800' : 'hover:bg-gray-900'}`}
+                  >
+                    {/* Main Row */}
+                    <div
+                      className="p-6 cursor-pointer"
+                      onClick={() => {
+                        if (isExpanded) {
+                          setExpandedId(null);
+                        } else {
+                          setExpandedId(api.id);
+                          setActiveTab('capabilities');
+                        }
+                      }}
+                    >
+                      <div className="flex justify-between items-start gap-8">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {api.title}
+                            </span>
+                            {api.free && (
+                              <span className="px-2 py-0.5 bg-green-500/15 text-green-400 text-xs rounded">
+                                Free
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xl text-white leading-relaxed">
+                            {parseHighlights(api.hook)}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className={`text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                            ▼
                           </span>
-                        )}
-                      </div>
-                      <div className="text-xl text-white leading-relaxed">
-                        {parseHighlights(api.hook)}
+                        </div>
                       </div>
                     </div>
-                    <button className="px-4 py-2 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-700">
-                      View →
-                    </button>
+
+                    {/* Expanded Content */}
+                    {isExpanded && (
+                      <div className="px-6 pb-6 border-t border-gray-900">
+                        {/* Tabs */}
+                        <div className="flex gap-1 pt-4 pb-4 border-b border-gray-900">
+                          {[
+                            { id: 'capabilities' as Tab, label: 'Capabilities', count: api.capabilities?.length || 0 },
+                            { id: 'facts' as Tab, label: 'Facts', count: api.bullets?.length || 0 },
+                            { id: 'technical' as Tab, label: 'Technical', count: null },
+                            { id: 'audience' as Tab, label: 'Audience', count: api.who_uses_this?.length || 0 },
+                          ].map((tab) => (
+                            <button
+                              key={tab.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveTab(tab.id);
+                              }}
+                              className={`px-4 py-2 rounded-md text-sm transition-all ${
+                                activeTab === tab.id
+                                  ? 'bg-yellow-400 text-black font-medium'
+                                  : 'text-gray-500 hover:text-white hover:bg-gray-800'
+                              }`}
+                            >
+                              {tab.label}
+                              {tab.count !== null && (
+                                <span className={`ml-1.5 ${activeTab === tab.id ? 'text-black/60' : 'text-gray-600'}`}>
+                                  {tab.count}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+
+                          {/* View API button */}
+                          <a
+                            href={api.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="ml-auto px-4 py-2 bg-white text-black text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+                          >
+                            View API →
+                          </a>
+                        </div>
+
+                        {/* Tab Content */}
+                        <div className="pt-4">
+                          {activeTab === 'capabilities' && (
+                            <div>
+                              <div className="text-xs uppercase tracking-wider text-gray-600 mb-3">What you can do with this API</div>
+                              {api.capabilities && api.capabilities.length > 0 ? (
+                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                  {api.capabilities.map((cap, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-gray-300">
+                                      <span className="text-yellow-400 mt-1">→</span>
+                                      <span>{cap}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="text-gray-500 italic">Capabilities not yet extracted. Re-ingest this API to populate.</p>
+                              )}
+                            </div>
+                          )}
+
+                          {activeTab === 'facts' && (
+                            <div className="space-y-3">
+                              {api.description && (
+                                <p className="text-gray-400 mb-4">{api.description}</p>
+                              )}
+                              <ul className="space-y-2">
+                                {api.bullets?.map((bullet, i) => (
+                                  <li key={i} className="flex items-start gap-3 text-gray-300">
+                                    <span className="text-yellow-400 mt-1">•</span>
+                                    <span>{bullet}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              {api.what_it_contains && api.what_it_contains.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-gray-900">
+                                  <div className="text-xs uppercase tracking-wider text-gray-600 mb-2">Contains</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {api.what_it_contains.map((item, i) => (
+                                      <span key={i} className="px-2 py-1 bg-gray-900 text-gray-400 text-sm rounded">
+                                        {item}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {activeTab === 'technical' && (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                              <div>
+                                <div className="text-xs uppercase tracking-wider text-gray-600 mb-1">Auth</div>
+                                <div className="text-white">{api.technical?.auth || 'Not specified'}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs uppercase tracking-wider text-gray-600 mb-1">Rate Limit</div>
+                                <div className="text-white">{api.technical?.rate_limit || 'Not specified'}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs uppercase tracking-wider text-gray-600 mb-1">Pricing</div>
+                                <div className="text-white">{api.technical?.pricing || 'Not specified'}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs uppercase tracking-wider text-gray-600 mb-1">Formats</div>
+                                <div className="text-white">
+                                  {api.technical?.formats?.join(', ') || 'Not specified'}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {activeTab === 'audience' && (
+                            <div>
+                              <div className="text-xs uppercase tracking-wider text-gray-600 mb-3">Who uses this</div>
+                              <ul className="space-y-2">
+                                {api.who_uses_this?.map((user, i) => (
+                                  <li key={i} className="flex items-start gap-3 text-gray-300">
+                                    <span className="text-yellow-400 mt-1">→</span>
+                                    <span>{user}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

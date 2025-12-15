@@ -136,28 +136,35 @@ When researching an API:
 
 Always provide accurate, verifiable information. If you can't find specific numbers, say so rather than making them up.`;
 
-const USER_PROMPT_TEMPLATE = (apiName: string) => `I'm building a database of amazing APIs for developers. Research this API thoroughly and extract structured data.
+const USER_PROMPT_TEMPLATE = (apiName: string) => `Research this API and extract structured data for a "Did You Know?" style directory.
 
 API: ${apiName}
 
-Extract:
+HOOK FORMAT (CRITICAL):
+Write ONE "Did You Know?" fact that makes developers say "holy shit, I had no idea."
+- Start with "There's a..." or "You can access..." or "Every..."
+- Include 1-2 specific mind-blowing numbers
+- Frame it as a discovery, not documentation
+- Keep under 30 words
+- Mark 2-3 key phrases with **bold** for highlighting
 
-HOOK: One punchy "holy shit" sentence about the DATA, not the API mechanics.
-Formula: "[Breadth statement] — [number], [number], [number]"
-Keep it under 20 words. Focus on: scale, history, coverage, uniqueness.
-NO rate limits, pricing, or technical specs in the hook.
+GOOD EXAMPLES:
+- "There's a real-time feed of **every ship** in the ocean — position, cargo type, destination. **400,000+ vessels** tracked live."
+- "**Every earthquake** since 1900 is queryable — magnitude, depth, location. **5 million events**, updated every minute."
+- "**Every patent ever filed** in America is searchable — **11 million documents** with full text back to 1790."
 
-BULLETS: 6-8 specific facts, each starting with a number
+BAD (too dry/technical):
+- "The USGS Earthquake API provides access to seismic data..." (boring!)
+- "100M+ developers, 330M+ repositories..." (just stats, no discovery)
 
-DESCRIPTION: 2-3 sentences explaining what this is
+Also extract:
+- BULLETS: 4-6 specific facts, each starting with a number
+- DESCRIPTION: 2-3 sentences
+- WHAT_IT_CONTAINS: Data types for search
+- WHO_USES_THIS: 4-5 user types
+- TECHNICAL: auth, rate limits, formats, pricing
 
-WHAT_IT_CONTAINS: List the data types inside (for search matching)
-
-WHO_USES_THIS: Who would want this? (5-6 max)
-
-TECHNICAL: auth type, rate limits, formats, pricing
-
-Output as JSON only (no markdown code blocks):
+Output as JSON only (no markdown):
 {
   "title": "",
   "hook": "",
@@ -188,78 +195,111 @@ async function checkIfExists(title: string): Promise<boolean> {
 
 async function researchApi(apiName: string): Promise<any | null> {
   try {
-    const response = await client.chat.completions.create({
-      model: 'kimi-k2-0711-preview',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: USER_PROMPT_TEMPLATE(apiName) }
-      ],
-      tools: [
-        {
-          type: 'function',
-          function: {
-            name: 'web_search',
-            description: 'Search the web for information',
-            parameters: {
-              type: 'object',
-              properties: {
-                query: { type: 'string', description: 'What to search for' },
-                classes: {
-                  type: 'array',
-                  items: { type: 'string', enum: ['all', 'academic', 'social', 'library', 'finance', 'code', 'ecommerce', 'medical'] },
-                  description: 'Search domains to focus on'
-                }
-              },
-              required: ['query']
-            }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'rethink',
-            description: 'Organize your thoughts before responding',
-            parameters: {
-              type: 'object',
-              properties: {
-                thought: { type: 'string', description: 'Your thought process' }
-              },
-              required: ['thought']
-            }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'fetch',
-            description: 'Fetch a URL and extract its contents',
-            parameters: {
-              type: 'object',
-              properties: {
-                url: { type: 'string', description: 'URL to fetch' },
-                max_length: { type: 'integer', default: 5000, description: 'Max characters to return' }
-              },
-              required: ['url']
-            }
+    const messages: any[] = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: USER_PROMPT_TEMPLATE(apiName) }
+    ];
+
+    const tools = [
+      {
+        type: 'function' as const,
+        function: {
+          name: 'web_search',
+          description: 'Search the web for information',
+          parameters: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'What to search for' },
+              classes: {
+                type: 'array',
+                items: { type: 'string', enum: ['all', 'academic', 'social', 'library', 'finance', 'code', 'ecommerce', 'medical'] },
+                description: 'Search domains to focus on'
+              }
+            },
+            required: ['query']
           }
         }
-      ],
-      temperature: 0.6,
-      max_tokens: 8192
-    });
+      },
+      {
+        type: 'function' as const,
+        function: {
+          name: 'rethink',
+          description: 'Organize your thoughts before responding',
+          parameters: {
+            type: 'object',
+            properties: {
+              thought: { type: 'string', description: 'Your thought process' }
+            },
+            required: ['thought']
+          }
+        }
+      },
+      {
+        type: 'function' as const,
+        function: {
+          name: 'fetch',
+          description: 'Fetch a URL and extract its contents',
+          parameters: {
+            type: 'object',
+            properties: {
+              url: { type: 'string', description: 'URL to fetch' },
+              max_length: { type: 'integer', default: 5000, description: 'Max characters to return' }
+            },
+            required: ['url']
+          }
+        }
+      }
+    ];
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) return null;
+    // Multi-turn conversation to handle tool calls
+    let maxTurns = 15;
+    let turn = 0;
 
-    let jsonStr = content;
-    if (content.includes('```')) {
-      jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    while (turn < maxTurns) {
+      turn++;
+
+      const response = await client.chat.completions.create({
+        model: 'kimi-k2-0711-preview',
+        messages,
+        tools,
+        temperature: 0.6,
+        max_tokens: 8192
+      });
+
+      const message = response.choices[0]?.message;
+      if (!message) return null;
+
+      messages.push(message);
+
+      // Check if we have tool calls to process
+      if (message.tool_calls && message.tool_calls.length > 0) {
+        for (const toolCall of message.tool_calls) {
+          messages.push({
+            role: 'tool',
+            content: JSON.stringify({ status: 'executed' }),
+            tool_call_id: toolCall.id
+          });
+        }
+        continue;
+      }
+
+      // No tool calls - check for final content
+      if (message.content) {
+        const content = message.content;
+
+        let jsonStr = content;
+        if (content.includes('```')) {
+          jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        }
+
+        const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) return null;
+
+        return JSON.parse(jsonMatch[0]);
+      }
     }
 
-    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-
-    return JSON.parse(jsonMatch[0]);
+    return null;
 
   } catch (error) {
     console.error(`Error:`, error);

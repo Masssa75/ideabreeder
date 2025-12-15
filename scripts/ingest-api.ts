@@ -66,6 +66,7 @@ BAD (too dry/technical):
 - "100M+ developers, 330M+ repositories..." (just stats, no discovery)
 
 Also extract:
+- CAPABILITIES: 8-15 specific things you can DO with this API (endpoints, data you can fetch, actions you can perform). Be comprehensive - this is the source of truth for what the API offers.
 - BULLETS: 4-6 specific facts, each starting with a number
 - DESCRIPTION: 2-3 sentences
 - WHAT_IT_CONTAINS: Data types for search
@@ -77,6 +78,7 @@ Output as JSON only (no markdown):
   "title": "",
   "hook": "",
   "description": "",
+  "capabilities": [],
   "bullets": [],
   "what_it_contains": [],
   "who_uses_this": [],
@@ -95,6 +97,7 @@ interface KimiResponse {
   title: string;
   hook: string;
   description: string;
+  capabilities: string[];
   bullets: string[];
   what_it_contains: string[];
   who_uses_this: string[];
@@ -254,6 +257,7 @@ async function saveToSupabase(data: KimiResponse): Promise<boolean> {
     title: data.title,
     hook: data.hook,
     description: data.description,
+    capabilities: data.capabilities,
     bullets: data.bullets,
     what_it_contains: data.what_it_contains,
     who_uses_this: data.who_uses_this,
