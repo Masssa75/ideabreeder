@@ -220,6 +220,133 @@ npx tsx scripts/check-capabilities.ts
 
 ---
 
+## Session: December 16, 2025 (Night) - Soulmate Finder & Shake Alert
+
+### Summary
+Built two new prototypes: Shake Alert (earthquake tracker) and Soulmate Finder (AI personality interview for matching). Added user accounts with Supabase auth using email magic links, with optional save functionality.
+
+### Accomplishments
+
+#### Shake Alert (`/shake`)
+- Real-time earthquake data from USGS API
+- Geolocation support - shows distance from user's location
+- Color-coded magnitude display
+- Live deployment at ideabreeder-ai.netlify.app/shake
+
+#### Soulmate Finder (`/soulmate`)
+- AI interview chat using Moonshot Kimi K2 API
+- Research-backed psychology system prompt incorporating:
+  - **Arthur Aron's 36 Questions** (escalating self-disclosure)
+  - **Attachment Theory** (Secure, Anxious, Avoidant, Fearful-Avoidant)
+  - **Big Five Personality** (OCEAN)
+  - **Gottman Method** (conflict predictors)
+  - **24 Compatibility Factors** (2024 research)
+- 5 phases, 36 questions, progressively deeper
+- Auto-expanding textarea for long responses
+
+#### 5 UI Variations for A/B Testing
+- `/soulmate/v1` - Light & Clean
+- `/soulmate/v2` - Dark Romantic
+- `/soulmate/v3` - Glassmorphism
+- `/soulmate/v4` - Warm & Cozy
+- `/soulmate/v5` - Bold Modern
+- `/soulmate/versions` - Version selector
+
+#### User Accounts & Persistence
+- **Supabase Auth** with email magic link (no password needed)
+- **Database schema** for sessions, messages, and profiles with RLS
+- **Anonymous chat** works immediately (localStorage)
+- **"Save Progress"** button in chat header for non-logged users
+- **Migration** - localStorage data migrates to Supabase on login
+- **Cross-device sync** - continue interview from any device
+
+#### Data Migration
+- Manually migrated friend's interview from localhost localStorage to Supabase
+- Created user `philipp@desci.com` via admin API
+- Inserted 9 messages into their session
+
+### Database Schema Created
+
+```sql
+-- soulmate_sessions: Interview sessions per user
+-- soulmate_messages: Chat messages with role and index
+-- soulmate_profiles: Extracted personality data (for future matching)
+-- All with RLS policies for user data isolation
+```
+
+### Files Created/Modified
+
+```
+app/
+├── shake/page.tsx                    # Earthquake tracker
+├── soulmate/page.tsx                 # Main chat (updated for auth)
+├── soulmate/v1-v5/page.tsx          # UI variations
+├── soulmate/versions/page.tsx        # Version selector
+└── api/soulmate/chat/route.ts        # Chat API (supports anon + auth)
+
+components/
+└── AuthModal.tsx                     # Email magic link login
+
+lib/
+├── soulmate/session.ts               # Session management helpers
+└── supabase/
+    ├── client.ts                     # Browser Supabase client
+    ├── server.ts                     # Server Supabase client
+    └── middleware.ts                 # Session refresh
+
+middleware.ts                         # Root auth middleware
+
+supabase/migrations/
+└── 20251216_soulmate_auth.sql        # Sessions, messages, profiles tables
+
+tests/
+├── verify-deploy.spec.ts             # Playwright tests for deployed site
+└── verify-local.spec.ts              # Playwright tests for localhost
+```
+
+### Key Design Decisions
+
+1. **Anonymous-first**: Users can start chatting immediately without login
+2. **Optional save**: Green "Save Progress" button appears only for non-logged users
+3. **Dual storage**: localStorage for anonymous, Supabase for authenticated
+4. **API flexibility**: Supports both `{messages: []}` (anon) and `{sessionId, userMessage}` (auth)
+5. **Migration on login**: localStorage data automatically migrates to Supabase
+
+### Deployment
+- **URL**: https://ideabreeder-ai.netlify.app
+- **Soulmate**: https://ideabreeder-ai.netlify.app/soulmate
+- **Shake Alert**: https://ideabreeder-ai.netlify.app/shake
+
+### Future Ideas Discussed
+- **Friend Matching**: With 100K+ completed interviews, could match people as best friends (not just romantic)
+- **Profile Extraction**: AI generates structured personality profile after 30+ questions
+- **Matching Algorithm**: Compare profiles based on shared values, compatible energy levels, complementary traits
+
+### Next Steps
+
+1. **Profile Extraction** - After interview completion, have AI generate structured JSON profile
+2. **Matching MVP** - Have AI read two transcripts and write compatibility report
+3. **Supabase Dashboard Config** - Set Site URL and Redirect URLs for magic links:
+   - Site URL: `https://ideabreeder-ai.netlify.app`
+   - Redirect URL: `https://ideabreeder-ai.netlify.app/soulmate`
+
+### Commands
+
+```bash
+# Run dev server
+npm run dev -- -p 3005
+
+# Check localStorage data (browser console)
+localStorage.getItem('soulmate-chat-messages')
+
+# Create user via Supabase admin API (example)
+curl -X POST "${SUPABASE_URL}/auth/v1/admin/users" \
+  -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+  -d '{"email": "user@example.com", "email_confirm": true}'
+```
+
+---
+
 ## Session: December 16, 2025 (Evening) - Bamboo Valley Carousel Content
 
 ### Summary
