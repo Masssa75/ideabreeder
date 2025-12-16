@@ -200,7 +200,8 @@ async function researchApi(apiName: string): Promise<KimiResponse | null> {
       // Check if we have tool calls to process
       if (message.tool_calls && message.tool_calls.length > 0) {
         for (const toolCall of message.tool_calls) {
-          const toolName = toolCall.function.name;
+          const tc = toolCall as { id: string; function: { name: string; arguments: string } };
+          const toolName = tc.function.name;
           console.log(`   🔧 Tool: ${toolName}`);
 
           // Kimi K2 handles tool execution internally - we just need to acknowledge
@@ -208,7 +209,7 @@ async function researchApi(apiName: string): Promise<KimiResponse | null> {
           messages.push({
             role: 'tool',
             content: JSON.stringify({ status: 'executed' }),
-            tool_call_id: toolCall.id
+            tool_call_id: tc.id
           });
         }
         continue;

@@ -143,8 +143,9 @@ async function discoverApis(topic: string): Promise<DiscoveredApi[]> {
 
     if (message.tool_calls && message.tool_calls.length > 0) {
       for (const toolCall of message.tool_calls) {
-        const toolName = toolCall.function.name;
-        const args = JSON.parse(toolCall.function.arguments || '{}');
+        const tc = toolCall as { id: string; function: { name: string; arguments: string } };
+        const toolName = tc.function.name;
+        const args = JSON.parse(tc.function.arguments || '{}');
         console.log(`   🔧 ${toolName}: ${args.query || args.url || args.thought?.substring(0, 50) + '...'}`);
 
         messages.push({
