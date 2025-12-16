@@ -13,6 +13,7 @@ interface Message {
 export default function SoulmateFinder() {
   const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
+  const [showLogin, setShowLogin] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -44,6 +45,7 @@ export default function SoulmateFinder() {
       setUser(currentUser)
 
       if (currentUser && event === 'SIGNED_IN') {
+        setShowLogin(false)
         await loadSession(currentUser.id)
       }
     })
@@ -126,6 +128,16 @@ export default function SoulmateFinder() {
     setSessionId(null)
     setMessages([])
     setStarted(false)
+  }
+
+  const handleBeginJourney = () => {
+    if (user && sessionId) {
+      // Already logged in, start the interview
+      startInterview()
+    } else {
+      // Show login prompt
+      setShowLogin(true)
+    }
   }
 
   const startNewChat = async () => {
@@ -228,61 +240,71 @@ export default function SoulmateFinder() {
     )
   }
 
-  // Not authenticated - show login
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
-        <div className="max-w-lg text-center">
-          <div className="text-8xl mb-6">💜</div>
-          <h1 className="text-5xl font-bold text-white mb-4">
-            Find Your Soulmate
-          </h1>
-          <p className="text-xl text-purple-200 mb-8">
-            An AI will interview you to understand who you truly are — your values, dreams, quirks, and what makes your heart sing. Then we'll find someone perfect for you.
-          </p>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
-            <p className="text-purple-200 text-sm mb-4">Sign in to start or continue your interview</p>
-            <AuthModal />
-          </div>
-
-          <p className="text-purple-300 text-sm">
-            Takes about 10-15 minutes • Your answers are saved securely
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  // Authenticated but not started
+  // Welcome screen (not started yet)
   if (!started) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
+        {/* Small login indicator in top right */}
+        <div className="absolute top-4 right-4">
+          {user ? (
+            <div className="flex items-center gap-2 text-sm text-purple-300">
+              <span>{user.email}</span>
+              <button
+                onClick={handleSignOut}
+                className="text-purple-400 hover:text-white underline"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowLogin(true)}
+              className="text-purple-300 hover:text-white text-sm"
+            >
+              Sign in
+            </button>
+          )}
+        </div>
+
         <div className="max-w-lg text-center">
           <div className="text-8xl mb-6">💜</div>
           <h1 className="text-5xl font-bold text-white mb-4">
-            {messages.length > 0 ? 'Welcome Back!' : 'Find Your Soulmate'}
+            {user && messages.length > 0 ? 'Welcome Back!' : 'Find Your Soulmate'}
           </h1>
           <p className="text-xl text-purple-200 mb-8">
-            {messages.length > 0
+            {user && messages.length > 0
               ? 'Ready to continue your interview? Your progress has been saved.'
               : 'An AI will interview you to understand who you truly are — your values, dreams, quirks, and what makes your heart sing. Then we\'ll find someone perfect for you.'
             }
           </p>
+
+          {/* Login modal overlay */}
+          {showLogin && !user && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-purple-900/90 border border-purple-500/30 rounded-2xl p-8 max-w-md w-full relative">
+                <button
+                  onClick={() => setShowLogin(false)}
+                  className="absolute top-4 right-4 text-purple-300 hover:text-white text-xl"
+                >
+                  &times;
+                </button>
+                <h2 className="text-2xl font-semibold text-white mb-4">Sign in to save progress</h2>
+                <p className="text-purple-200 text-sm mb-6">
+                  Your answers will be saved so you can continue from any device.
+                </p>
+                <AuthModal onSuccess={() => setShowLogin(false)} />
+              </div>
+            </div>
+          )}
+
           <button
-            onClick={startInterview}
+            onClick={handleBeginJourney}
             className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-xl font-semibold px-8 py-4 rounded-full transition-all transform hover:scale-105 shadow-lg"
           >
-            {messages.length > 0 ? 'Continue Interview' : 'Begin Your Journey'} ✨
+            {user && messages.length > 0 ? 'Continue Interview' : 'Begin Your Journey'} ✨
           </button>
           <p className="text-purple-300 text-sm mt-6">
-            Signed in as {user.email}
-            <button
-              onClick={handleSignOut}
-              className="ml-2 text-purple-400 hover:text-white underline"
-            >
-              Sign out
-            </button>
+            Takes about 10-15 minutes • Your answers are private
           </p>
         </div>
       </div>
@@ -312,12 +334,14 @@ export default function SoulmateFinder() {
             >
               New Chat
             </button>
-            <button
-              onClick={handleSignOut}
-              className="text-purple-300 hover:text-white text-sm"
-            >
-              Sign out
-            </button>
+            {user && (
+              <button
+                onClick={handleSignOut}
+                className="text-purple-300 hover:text-white text-sm"
+              >
+                Sign out
+              </button>
+            )}
           </div>
         </div>
       </div>
