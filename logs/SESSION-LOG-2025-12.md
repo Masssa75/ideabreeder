@@ -219,3 +219,94 @@ npx tsx scripts/check-capabilities.ts
 - **Categories**: 15 normalized
 
 ---
+
+## Session: December 16, 2025 (Evening) - Bamboo Valley Carousel Content
+
+### Summary
+Created Instagram carousel content and designs for Bamboo Valley School about "The Homework Myth" - research showing homework doesn't help children under 10.
+
+### Accomplishments
+
+#### Deep Research
+- Conducted extensive research into actual academic sources on homework effectiveness
+- Created `data/education-research/HOMEWORK-RESEARCH-DEEP-DIVE.md` with sourced findings:
+  - NAEP: 4th graders doing 45+ min homework scored WORSE
+  - Cooper meta-analysis: <4% of test variance explained by homework
+  - 50-country TIMSS study: ALL correlations negative
+  - Stanford: 56% of students say homework is #1 stress
+  - Japan/Hong Kong/Taiwan: below-average homework, top math scores
+  - Family fights 200% more likely without college degree
+
+#### Carousel Design Iterations
+Created multiple design versions exploring different aesthetics:
+
+```
+content/
+├── carousel-headlines.html       # Interactive headline brainstorm tool (47 options)
+├── carousel-simple-mockup.html   # 10 simple style options
+├── carousel-slide1-options.html  # Slide 1 variations (13 options)
+├── carousel-content-flow.html    # Big numbers + flow design
+├── carousel-text-heavy.html      # Bullet-point text-heavy version
+├── carousel-text-iconic.html     # Iconic text sizing with varying opacity
+├── carousel-bold-display.html    # Bold Anton font, chunky colors
+├── carousel-waldorf.html         # First Waldorf attempt (rejected - too blurry)
+└── carousel-waldorf-v2.html      # Current: Soft Waldorf gradients, multiple approaches
+```
+
+#### Design Direction Discovered
+- User prefers "children" over "kids" (respectful language)
+- Need source citations for credibility
+- Waldorf aesthetic: soft, organic, natural
+- Rejected: blurry backdrop-filter overlays on images
+- Preferred: soft watercolor gradients, serif fonts (Cormorant Garamond)
+- Brand colors: sage, cream, blush, lavender, wheat, mist, rose, moss
+
+#### CLAUDE.md Updates
+- Added enhanced workflow documentation (build monitoring, debugging protocol)
+- Added autonomous working principles
+- (Bamboo Valley content section added then removed per user preference)
+
+### Key Technical Fixes
+- Fixed JavaScript syntax error in carousel-headlines.html: smart quotes (`'`) breaking string literals - replaced with escaped straight quotes (`\'`)
+
+### Files Created
+
+```
+content/
+├── carousel-waldorf-v2.html      # Current working version
+├── carousel-bold-display.html
+├── carousel-text-iconic.html
+├── carousel-text-heavy.html
+├── carousel-content-flow.html
+├── carousel-slide1-options.html
+└── social/homework-myth-carousel.md
+
+data/education-research/
+└── HOMEWORK-RESEARCH-DEEP-DIVE.md
+
+images/                           # Created folder for carousel images
+```
+
+### Next Steps
+
+1. **Get Gemini image** - User has a watercolor forest image from Gemini to try as background
+2. **Finalize design approach** - Choose from 4 approaches in waldorf-v2:
+   - A: Split (image top, text bottom)
+   - B: Circular image accent
+   - C: Full image with text card overlay
+   - D: No image, soft watercolor gradients
+3. **Export for Instagram** - Final slides at 1080x1350 (4:5) or 1080x1080 (1:1)
+
+### Carousel Content (9 slides)
+
+1. **Hook**: "Homework Doesn't Help Children Under 10" - 35 years, 35 studies, zero benefit
+2. **NAEP**: 45+ minutes = worse scores
+3. **Cooper**: <4% of test score differences
+4. **50 Countries**: All correlations negative
+5. **A+ Teachers**: Give less homework, more choices
+6. **Family Fights**: 200% more likely without college degree
+7. **Stress**: 56% say homework is #1 stress
+8. **Top Countries**: Japan, Hong Kong, Taiwan - below-average homework, top scores
+9. **CTA**: Bamboo Valley - give your children their evenings back
+
+---

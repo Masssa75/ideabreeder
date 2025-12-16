@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { getSessionMessages, saveMessage, getSession } from '@/lib/soulmate/session'
 import OpenAI from 'openai'
 
 const client = new OpenAI({
@@ -111,7 +113,7 @@ You can offer to summarize their "Personality Portrait" including:
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
+    const { sessionId, userMessage } = await req.json()
 
     if (!process.env.MOONSHOT_API_KEY) {
       return NextResponse.json(
@@ -120,17 +122,63 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Get Supabase client
+    const supabase = await createClient()
+
+    // Verify user is authenticated
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      )
+    }
+
+    // Verify session belongs to user
+    const session = await getSession(supabase, sessionId)
+    if (!session || session.user_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      )
+    }
+
+    // Load existing messages from database
+    const existingMessages = await getSessionMessages(supabase, sessionId)
+    const messageCount = existingMessages.length
+
+    // If user sent a message, save it first
+    if (userMessage) {
+      await saveMessage(supabase, sessionId, 'user', userMessage, messageCount)
+    }
+
+    // Build message history for AI
+    const aiMessages = existingMessages.map(m => ({
+      role: m.role as 'user' | 'assistant',
+      content: m.content
+    }))
+
+    // Add new user message if provided
+    if (userMessage) {
+      aiMessages.push({ role: 'user', content: userMessage })
+    }
+
+    // Call Kimi K2 API
     const response = await client.chat.completions.create({
       model: 'kimi-k2-0711-preview',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
-        ...messages
+        ...aiMessages
       ],
       temperature: 0.8,
       max_tokens: 500
     })
 
     const reply = response.choices[0]?.message?.content || 'I seem to have lost my train of thought. Could you repeat that?'
+
+    // Save AI response to database
+    const newMessageIndex = userMessage ? messageCount + 1 : messageCount
+    await saveMessage(supabase, sessionId, 'assistant', reply, newMessageIndex)
 
     return NextResponse.json({ reply })
   } catch (error: any) {

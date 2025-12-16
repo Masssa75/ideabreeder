@@ -1,55 +1,110 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import AuthModal from '@/components/AuthModal'
+import { User } from '@supabase/supabase-js'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
-const STORAGE_KEY = 'soulmate-chat-messages'
-const STARTED_KEY = 'soulmate-chat-started'
-
 export default function SoulmateFinder() {
+  const [user, setUser] = useState<User | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [started, setStarted] = useState(false)
-  const [hydrated, setHydrated] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedMessages = localStorage.getItem(STORAGE_KEY)
-    const savedStarted = localStorage.getItem(STARTED_KEY)
+  const supabase = createClient()
 
-    if (savedMessages) {
-      try {
-        setMessages(JSON.parse(savedMessages))
-      } catch (e) {
-        console.error('Failed to parse saved messages:', e)
+  // Check auth state on mount
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setAuthLoading(false)
+
+      if (user) {
+        // Load or create session
+        await loadSession(user.id)
       }
     }
-    if (savedStarted === 'true') {
-      setStarted(true)
-    }
-    setHydrated(true)
+
+    checkUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+
+      if (currentUser && event === 'SIGNED_IN') {
+        await loadSession(currentUser.id)
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  // Save to localStorage whenever messages change
-  useEffect(() => {
-    if (hydrated && messages.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
-    }
-  }, [messages, hydrated])
+  // Load or create session from Supabase
+  const loadSession = async (userId: string) => {
+    try {
+      // Get or create session
+      const { data: existingSession } = await supabase
+        .from('soulmate_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'in_progress')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
 
-  // Save started state
-  useEffect(() => {
-    if (hydrated) {
-      localStorage.setItem(STARTED_KEY, String(started))
+      let currentSessionId: string
+
+      if (existingSession) {
+        currentSessionId = existingSession.id
+        setSessionId(currentSessionId)
+
+        // Load existing messages
+        const { data: existingMessages } = await supabase
+          .from('soulmate_messages')
+          .select('*')
+          .eq('session_id', currentSessionId)
+          .order('message_index', { ascending: true })
+
+        if (existingMessages && existingMessages.length > 0) {
+          setMessages(existingMessages.map(m => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content
+          })))
+          setStarted(true)
+        }
+      } else {
+        // Create new session
+        const { data: newSession } = await supabase
+          .from('soulmate_sessions')
+          .insert({
+            user_id: userId,
+            status: 'in_progress',
+            message_count: 0,
+          })
+          .select()
+          .single()
+
+        if (newSession) {
+          currentSessionId = newSession.id
+          setSessionId(currentSessionId)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading session:', error)
     }
-  }, [started, hydrated])
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -65,16 +120,50 @@ export default function SoulmateFinder() {
     }
   }, [started, loading])
 
-  const clearConversation = () => {
-    if (confirm('Start a new conversation? This will clear your current chat.')) {
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    setSessionId(null)
+    setMessages([])
+    setStarted(false)
+  }
+
+  const startNewChat = async () => {
+    if (!user) return
+
+    if (messages.length > 0 && !confirm('Start a new conversation? This will begin a fresh interview.')) {
+      return
+    }
+
+    // Mark current session as abandoned if it exists
+    if (sessionId) {
+      await supabase
+        .from('soulmate_sessions')
+        .update({ status: 'abandoned' })
+        .eq('id', sessionId)
+    }
+
+    // Create new session
+    const { data: newSession } = await supabase
+      .from('soulmate_sessions')
+      .insert({
+        user_id: user.id,
+        status: 'in_progress',
+        message_count: 0,
+      })
+      .select()
+      .single()
+
+    if (newSession) {
+      setSessionId(newSession.id)
       setMessages([])
       setStarted(false)
-      localStorage.removeItem(STORAGE_KEY)
-      localStorage.removeItem(STARTED_KEY)
     }
   }
 
   const startInterview = async () => {
+    if (!sessionId) return
+
     setStarted(true)
     setLoading(true)
 
@@ -82,25 +171,29 @@ export default function SoulmateFinder() {
       const res = await fetch('/api/soulmate/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [] })
+        body: JSON.stringify({ sessionId })
       })
 
       const data = await res.json()
       if (data.reply) {
         setMessages([{ role: 'assistant', content: data.reply }])
+      } else if (data.error) {
+        console.error('Start error:', data.error)
+        setStarted(false)
       }
     } catch (error) {
       console.error('Failed to start interview:', error)
+      setStarted(false)
     } finally {
       setLoading(false)
     }
   }
 
   const sendMessage = async () => {
-    if (!input.trim() || loading) return
+    if (!input.trim() || loading || !sessionId) return
 
-    const userMessage: Message = { role: 'user', content: input.trim() }
-    const newMessages = [...messages, userMessage]
+    const userMessage = input.trim()
+    const newMessages = [...messages, { role: 'user' as const, content: userMessage }]
     setMessages(newMessages)
     setInput('')
     setLoading(true)
@@ -109,7 +202,7 @@ export default function SoulmateFinder() {
       const res = await fetch('/api/soulmate/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages })
+        body: JSON.stringify({ sessionId, userMessage })
       })
 
       const data = await res.json()
@@ -126,7 +219,17 @@ export default function SoulmateFinder() {
     }
   }
 
-  if (!started) {
+  // Loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  // Not authenticated - show login
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
         <div className="max-w-lg text-center">
@@ -137,20 +240,56 @@ export default function SoulmateFinder() {
           <p className="text-xl text-purple-200 mb-8">
             An AI will interview you to understand who you truly are — your values, dreams, quirks, and what makes your heart sing. Then we'll find someone perfect for you.
           </p>
-          <button
-            onClick={startInterview}
-            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-xl font-semibold px-8 py-4 rounded-full transition-all transform hover:scale-105 shadow-lg"
-          >
-            Begin Your Journey ✨
-          </button>
-          <p className="text-purple-300 text-sm mt-6">
-            Takes about 10-15 minutes • Your answers are private
+
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+            <p className="text-purple-200 text-sm mb-4">Sign in to start or continue your interview</p>
+            <AuthModal />
+          </div>
+
+          <p className="text-purple-300 text-sm">
+            Takes about 10-15 minutes • Your answers are saved securely
           </p>
         </div>
       </div>
     )
   }
 
+  // Authenticated but not started
+  if (!started) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
+        <div className="max-w-lg text-center">
+          <div className="text-8xl mb-6">💜</div>
+          <h1 className="text-5xl font-bold text-white mb-4">
+            {messages.length > 0 ? 'Welcome Back!' : 'Find Your Soulmate'}
+          </h1>
+          <p className="text-xl text-purple-200 mb-8">
+            {messages.length > 0
+              ? 'Ready to continue your interview? Your progress has been saved.'
+              : 'An AI will interview you to understand who you truly are — your values, dreams, quirks, and what makes your heart sing. Then we\'ll find someone perfect for you.'
+            }
+          </p>
+          <button
+            onClick={startInterview}
+            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-xl font-semibold px-8 py-4 rounded-full transition-all transform hover:scale-105 shadow-lg"
+          >
+            {messages.length > 0 ? 'Continue Interview' : 'Begin Your Journey'} ✨
+          </button>
+          <p className="text-purple-300 text-sm mt-6">
+            Signed in as {user.email}
+            <button
+              onClick={handleSignOut}
+              className="ml-2 text-purple-400 hover:text-white underline"
+            >
+              Sign out
+            </button>
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Chat interface
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex flex-col">
       {/* Header */}
@@ -168,10 +307,16 @@ export default function SoulmateFinder() {
               {messages.filter(m => m.role === 'user').length} responses
             </span>
             <button
-              onClick={clearConversation}
+              onClick={startNewChat}
               className="text-purple-300 hover:text-white text-sm px-3 py-1 rounded border border-purple-500/30 hover:border-purple-400 transition-colors"
             >
               New Chat
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="text-purple-300 hover:text-white text-sm"
+            >
+              Sign out
             </button>
           </div>
         </div>
