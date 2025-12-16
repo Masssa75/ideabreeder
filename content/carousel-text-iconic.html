@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel - Iconic Text</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1a1a1a;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0 40px;
+      max-width: 100%;
+    }
+
+    .card {
+      flex: 0 0 340px;
+      height: 340px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 35px;
+      background: #f8f5f0;
+      color: #2d5a3d;
+      position: relative;
+    }
+
+    .slide-num {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 11px;
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    .source {
+      position: absolute;
+      bottom: 20px;
+      left: 35px;
+      right: 35px;
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Typography */
+    .line {
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .large {
+      font-size: 26px;
+    }
+
+    .medium {
+      font-size: 20px;
+    }
+
+    .small {
+      font-size: 16px;
+    }
+
+    .dim {
+      opacity: 0.45;
+    }
+
+    .red {
+      color: #c0392b;
+    }
+
+    .green {
+      color: #2d5a3d;
+    }
+
+    .black {
+      color: #1a1a1a;
+    }
+
+    .caps {
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .spacer {
+      height: 15px;
+    }
+
+    /* CTA card */
+    .card.cta {
+      background: #2d5a3d;
+      color: #fff;
+      text-align: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Iconic Text Version</h1>
+  <p class="subtitle">Scroll right →</p>
+
+  <div class="carousel">
+
+    <!-- SLIDE 1: Hook -->
+    <div class="card" style="text-align: center; align-items: center;">
+      <span class="slide-num">1/9</span>
+      <div class="line large">Homework Doesn't Help</div>
+      <div class="line large">Children Under 10</div>
+      <div class="spacer"></div>
+      <div class="line medium dim">35 years.</div>
+      <div class="line medium dim">35 studies.</div>
+      <div class="line medium green">Zero benefit.</div>
+      <div class="source" style="text-align: center;">Cooper et al., Duke University</div>
+    </div>
+
+    <!-- SLIDE 2: NAEP -->
+    <div class="card">
+      <span class="slide-num">2/9</span>
+      <div class="line medium dim">4th graders with</div>
+      <div class="line large black">NO homework</div>
+      <div class="line medium dim">scored the</div>
+      <div class="line large black">SAME</div>
+      <div class="line medium dim">as those doing 30 min.</div>
+      <div class="spacer"></div>
+      <div class="line medium">45+ minutes?</div>
+      <div class="line large red">WORSE.</div>
+      <div class="source">NAEP National Math Assessment</div>
+    </div>
+
+    <!-- SLIDE 3: Cooper -->
+    <div class="card">
+      <span class="slide-num">3/9</span>
+      <div class="line small dim caps">The pro-homework researcher</div>
+      <div class="spacer"></div>
+      <div class="line medium">Homework explains</div>
+      <div class="line large black">less than 4%</div>
+      <div class="line medium">of test score differences.</div>
+      <div class="spacer"></div>
+      <div class="line small dim">"It's equally plausible</div>
+      <div class="line small dim">the causation is</div>
+      <div class="line medium red">reversed."</div>
+      <div class="source">Harris Cooper, Duke University</div>
+    </div>
+
+    <!-- SLIDE 4: 50 Countries -->
+    <div class="card">
+      <span class="slide-num">4/9</span>
+      <div class="line large black">50 countries.</div>
+      <div class="spacer"></div>
+      <div class="line medium dim">Correlations between</div>
+      <div class="line medium dim">homework and achievement?</div>
+      <div class="spacer"></div>
+      <div class="line large red">ALL NEGATIVE.</div>
+      <div class="spacer"></div>
+      <div class="line small dim">"Countries raising homework</div>
+      <div class="line small dim">may be undermining</div>
+      <div class="line small black">their own success."</div>
+      <div class="source">Baker & LeTendre, TIMSS Study</div>
+    </div>
+
+    <!-- SLIDE 5: A+ Teachers -->
+    <div class="card">
+      <span class="slide-num">5/9</span>
+      <div class="line small dim caps">300 award-winning teachers</div>
+      <div class="spacer"></div>
+      <div class="line medium">"A+ teachers" give</div>
+      <div class="line large red">LESS</div>
+      <div class="line medium">homework than average.</div>
+      <div class="spacer"></div>
+      <div class="line medium dim">They also give students</div>
+      <div class="line medium black">more choices.</div>
+      <div class="source">Tschudin Study</div>
+    </div>
+
+    <!-- SLIDE 6: Family Fights -->
+    <div class="card">
+      <span class="slide-num">6/9</span>
+      <div class="line medium dim">Family fights about homework:</div>
+      <div class="spacer"></div>
+      <div class="line large red">200% more likely</div>
+      <div class="spacer"></div>
+      <div class="line medium dim">when parents don't have</div>
+      <div class="line medium black">a college degree.</div>
+      <div class="spacer"></div>
+      <div class="line small dim">Kindergarteners get 25 min/night.</div>
+      <div class="line small black">NEA says: zero.</div>
+      <div class="source">Pressman et al., 2015</div>
+    </div>
+
+    <!-- SLIDE 7: Stanford Stress -->
+    <div class="card">
+      <span class="slide-num">7/9</span>
+      <div class="line large black">56%</div>
+      <div class="line medium">of students say homework</div>
+      <div class="line medium">is their</div>
+      <div class="line large red">#1 stress.</div>
+      <div class="spacer"></div>
+      <div class="line small dim">More than tests.</div>
+      <div class="line small dim">More than grades.</div>
+      <div class="spacer"></div>
+      <div class="line small">>2 hours =</div>
+      <div class="line small red">depression, sleep problems.</div>
+      <div class="source">Stanford University</div>
+    </div>
+
+    <!-- SLIDE 8: Top Countries -->
+    <div class="card">
+      <span class="slide-num">8/9</span>
+      <div class="line large black">Japan.</div>
+      <div class="line large black">Hong Kong.</div>
+      <div class="line large black">Taiwan.</div>
+      <div class="spacer"></div>
+      <div class="line medium dim">Homework loads</div>
+      <div class="line medium red">BELOW average.</div>
+      <div class="spacer"></div>
+      <div class="line medium dim">Math scores?</div>
+      <div class="line medium green">TOP of the world.</div>
+      <div class="source">TIMSS International Rankings</div>
+    </div>
+
+    <!-- SLIDE 9: CTA -->
+    <div class="card cta">
+      <span class="slide-num" style="color: rgba(255,255,255,0.4);">9/9</span>
+      <div class="line large" style="color: #fff;">Give your children</div>
+      <div class="line large" style="color: #fff;">their evenings back.</div>
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <div style="font-size: 16px; opacity: 0.9;">🌿 Bamboo Valley</div>
+        <div style="font-size: 13px; opacity: 0.7; margin-top: 8px;">Alternative Outdoor School</div>
+        <div style="font-size: 13px; opacity: 0.7;">Phuket • Ages 3-10 • No homework</div>
+      </div>
+      <div style="margin-top: 20px; font-size: 12px; opacity: 0.5;">
+        Full research → link in bio
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

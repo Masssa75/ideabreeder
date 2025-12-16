@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel - Bold Display</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Black+Ops+One&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1a1a1a;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0 40px;
+      max-width: 100%;
+    }
+
+    .card {
+      flex: 0 0 340px;
+      height: 340px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .slide-num {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 11px;
+      opacity: 0.4;
+      font-weight: 500;
+      font-family: sans-serif;
+    }
+
+    .source {
+      position: absolute;
+      bottom: 15px;
+      font-size: 9px;
+      opacity: 0.5;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: sans-serif;
+    }
+
+    /* Bold display font */
+    .display {
+      font-family: 'Anton', 'Bebas Neue', 'Oswald', sans-serif;
+      text-transform: uppercase;
+      line-height: 0.95;
+      letter-spacing: -1px;
+    }
+
+    /* Color schemes */
+    .scheme-1 {
+      background: #E8D5F2;
+      color: #1a3a8f;
+    }
+
+    .scheme-2 {
+      background: #1a3a8f;
+      color: #7DF9FF;
+    }
+
+    .scheme-3 {
+      background: #FFE5E5;
+      color: #c0392b;
+    }
+
+    .scheme-4 {
+      background: #2d5a3d;
+      color: #c5f7dc;
+    }
+
+    .scheme-5 {
+      background: #0d1b2a;
+      color: #e0fbfc;
+    }
+
+    .scheme-6 {
+      background: #ffd166;
+      color: #073b4c;
+    }
+
+    .scheme-7 {
+      background: #118ab2;
+      color: #ffd166;
+    }
+
+    .scheme-8 {
+      background: #ef476f;
+      color: #fff;
+    }
+
+    .scheme-green {
+      background: #d4edda;
+      color: #155724;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bold Display Version</h1>
+  <p class="subtitle">Chunky type, bold colors →</p>
+
+  <div class="carousel">
+
+    <!-- SLIDE 1: Hook -->
+    <div class="card scheme-1">
+      <span class="slide-num">1/9</span>
+      <div class="display" style="font-size: 42px;">
+        HOMEWORK<br>
+        DOESN'T<br>
+        HELP<br>
+        CHILDREN<br>
+        UNDER 10
+      </div>
+      <div class="source">35 YEARS OF RESEARCH</div>
+    </div>
+
+    <!-- SLIDE 2: NAEP -->
+    <div class="card scheme-2">
+      <span class="slide-num">2/9</span>
+      <div class="display" style="font-size: 32px;">
+        KIDS WITH<br>
+        NO HOMEWORK<br>
+        SCORED THE<br>
+        SAME
+      </div>
+      <div class="display" style="font-size: 24px; margin-top: 20px; opacity: 0.6;">
+        45+ MINUTES?<br>
+        WORSE.
+      </div>
+      <div class="source">NAEP MATH DATA</div>
+    </div>
+
+    <!-- SLIDE 3: 4% -->
+    <div class="card scheme-3">
+      <span class="slide-num">3/9</span>
+      <div class="display" style="font-size: 36px;">
+        HOMEWORK<br>
+        EXPLAINS<br>
+        LESS THAN<br>
+        4%<br>
+        OF TEST<br>
+        SCORES
+      </div>
+      <div class="source">COOPER META-ANALYSIS</div>
+    </div>
+
+    <!-- SLIDE 4: 50 Countries -->
+    <div class="card scheme-5">
+      <span class="slide-num">4/9</span>
+      <div class="display" style="font-size: 38px;">
+        50<br>
+        COUNTRIES<br>
+        STUDIED
+      </div>
+      <div class="display" style="font-size: 32px; margin-top: 20px;">
+        ALL<br>
+        CORRELATIONS<br>
+        NEGATIVE
+      </div>
+      <div class="source">TIMSS STUDY</div>
+    </div>
+
+    <!-- SLIDE 5: A+ Teachers -->
+    <div class="card scheme-6">
+      <span class="slide-num">5/9</span>
+      <div class="display" style="font-size: 34px;">
+        AWARD<br>
+        WINNING<br>
+        TEACHERS<br>
+        GIVE LESS<br>
+        HOMEWORK
+      </div>
+      <div class="source">TSCHUDIN STUDY</div>
+    </div>
+
+    <!-- SLIDE 6: Family Fights -->
+    <div class="card scheme-8">
+      <span class="slide-num">6/9</span>
+      <div class="display" style="font-size: 38px;">
+        200%<br>
+        MORE<br>
+        FAMILY<br>
+        FIGHTS
+      </div>
+      <div class="display" style="font-size: 20px; margin-top: 15px; opacity: 0.8;">
+        OVER HOMEWORK
+      </div>
+      <div class="source">PRESSMAN ET AL.</div>
+    </div>
+
+    <!-- SLIDE 7: 56% Stress -->
+    <div class="card scheme-7">
+      <span class="slide-num">7/9</span>
+      <div class="display" style="font-size: 44px;">
+        56%
+      </div>
+      <div class="display" style="font-size: 30px; margin-top: 10px;">
+        SAY<br>
+        HOMEWORK<br>
+        IS THEIR<br>
+        #1 STRESS
+      </div>
+      <div class="source">STANFORD UNIVERSITY</div>
+    </div>
+
+    <!-- SLIDE 8: Top Countries -->
+    <div class="card scheme-4">
+      <span class="slide-num">8/9</span>
+      <div class="display" style="font-size: 36px;">
+        JAPAN<br>
+        HONG KONG<br>
+        TAIWAN
+      </div>
+      <div class="display" style="font-size: 24px; margin-top: 20px; opacity: 0.7;">
+        LESS HOMEWORK<br>
+        TOP SCORES
+      </div>
+      <div class="source">TIMSS RANKINGS</div>
+    </div>
+
+    <!-- SLIDE 9: CTA -->
+    <div class="card scheme-green">
+      <span class="slide-num">9/9</span>
+      <div class="display" style="font-size: 36px;">
+        GIVE YOUR<br>
+        CHILDREN<br>
+        THEIR<br>
+        EVENINGS<br>
+        BACK
+      </div>
+      <div class="source">BAMBOO VALLEY • PHUKET</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

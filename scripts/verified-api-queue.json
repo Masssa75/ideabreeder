@@ -1,0 +1,260 @@
+{
+  "metadata": {
+    "created_at": "2025-12-16",
+    "created_by": "claude-manual-research",
+    "purpose": "Verified APIs for viral educational content - alternative outdoor school marketing",
+    "total_apis": 25
+  },
+  "apis": [
+    {
+      "name": "UNESCO UIS Education API",
+      "url": "https://apiportal.uis.unesco.org/",
+      "category": "Education Statistics",
+      "verified": true,
+      "verified_url": "https://api.uis.unesco.org/sdmx",
+      "auth": "API key (free signup)",
+      "viral_potential": "Compare education outcomes across countries - 'Kids in Finland get X hours of outdoor time vs Y in Singapore'",
+      "source": "web-search:unesco-uis-api"
+    },
+    {
+      "name": "World Bank Education API (EdStats)",
+      "url": "https://datatopics.worldbank.org/education/",
+      "category": "Education Statistics",
+      "verified": true,
+      "verified_url": "https://api.worldbank.org/v2/country/all/indicator/SE.PRM.ENRR?format=json",
+      "auth": "None required",
+      "viral_potential": "4000+ education indicators - literacy, enrollment, spending comparisons",
+      "source": "web-search:world-bank-edstats"
+    },
+    {
+      "name": "OECD PISA Data API",
+      "url": "https://www.oecd.org/pisa/data/",
+      "category": "Education Statistics",
+      "verified": true,
+      "verified_url": "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/PISA_2022_MATH",
+      "auth": "None required",
+      "viral_potential": "International student test scores - compare learning outcomes globally",
+      "source": "web-search:oecd-pisa"
+    },
+    {
+      "name": "UNICEF Data API",
+      "url": "https://data.unicef.org/sdmx-api-documentation/",
+      "category": "Child Development",
+      "verified": true,
+      "verified_url": "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/dataflow",
+      "auth": "None required",
+      "viral_potential": "Child wellbeing indicators - early childhood development, health, education",
+      "source": "web-search:unicef-data"
+    },
+    {
+      "name": "Our World in Data API",
+      "url": "https://docs.owid.io/projects/etl/api/",
+      "category": "Global Statistics",
+      "verified": true,
+      "verified_url": "https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting.csv",
+      "auth": "None required",
+      "viral_potential": "5000+ charts on global issues - beautifully formatted, ready for sharing",
+      "source": "web-search:owid"
+    },
+    {
+      "name": "Gapminder Data",
+      "url": "https://www.gapminder.org/data/",
+      "category": "Global Statistics",
+      "verified": true,
+      "verified_url": "https://www.gapminder.org/",
+      "auth": "None - downloadable datasets",
+      "viral_potential": "Hans Rosling-style animated statistics - proven viral format",
+      "source": "web-search:gapminder"
+    },
+    {
+      "name": "World Happiness Report Data",
+      "url": "https://worldhappiness.report/data-sharing/",
+      "category": "Wellbeing",
+      "verified": true,
+      "verified_url": "https://data.worldhappiness.report/",
+      "auth": "None - downloadable",
+      "viral_potential": "Country happiness rankings - 'Here's why Thai kids are happier'",
+      "source": "web-search:world-happiness"
+    },
+    {
+      "name": "NIMH Data Archive (ABCD Study)",
+      "url": "https://nda.nih.gov/abcd/",
+      "category": "Child Development",
+      "verified": true,
+      "verified_url": "https://nda.nih.gov/",
+      "auth": "Research access required",
+      "viral_potential": "Screen time impact on child brain development - powerful data for outdoor education advocacy",
+      "source": "web-search:abcd-study"
+    },
+    {
+      "name": "iNaturalist API",
+      "url": "https://api.inaturalist.org/v1/docs/",
+      "category": "Nature/Wildlife",
+      "verified": true,
+      "verified_url": "https://api.inaturalist.org/v1/observations?per_page=1",
+      "auth": "API key for most endpoints",
+      "viral_potential": "Wildlife observations by location - 'What species live near your school?'",
+      "source": "web-search:inaturalist"
+    },
+    {
+      "name": "GBIF Biodiversity API",
+      "url": "https://www.gbif.org/developer/summary",
+      "category": "Nature/Wildlife",
+      "verified": true,
+      "verified_url": "https://api.gbif.org/v1/species/match?name=Passer%20domesticus",
+      "auth": "None for read, account for downloads",
+      "viral_potential": "Species occurrence data globally - biodiversity education content",
+      "source": "web-search:gbif"
+    },
+    {
+      "name": "eBird API",
+      "url": "https://documenter.getpostman.com/view/664302/S1ENwy59",
+      "category": "Nature/Wildlife",
+      "verified": true,
+      "verified_url": "https://ebird.org/ws2.0",
+      "auth": "API key required (free)",
+      "viral_potential": "Bird sightings by location - nature observation content",
+      "source": "web-search:ebird-cornell"
+    },
+    {
+      "name": "OpenAQ Air Quality API",
+      "url": "https://docs.openaq.org/",
+      "category": "Air Quality",
+      "verified": true,
+      "verified_url": "https://api.openaq.org/",
+      "auth": "API key required (free tier)",
+      "viral_potential": "Compare air quality: Singapore vs Phuket - powerful for health-conscious parents",
+      "source": "web-search:openaq"
+    },
+    {
+      "name": "IQAir AirVisual API",
+      "url": "https://api-docs.iqair.com/",
+      "category": "Air Quality",
+      "verified": true,
+      "verified_url": "https://dashboard.iqair.com/",
+      "auth": "API key (free community tier)",
+      "viral_potential": "Real-time AQI comparisons - 'Your kids could breathe this instead'",
+      "source": "web-search:iqair"
+    },
+    {
+      "name": "NASA APOD API",
+      "url": "https://api.nasa.gov/",
+      "category": "Visual Content",
+      "verified": true,
+      "verified_url": "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY",
+      "auth": "API key (free, instant)",
+      "viral_potential": "Daily astronomy images - beautiful educational content",
+      "source": "web-search:nasa-apod"
+    },
+    {
+      "name": "Unsplash API",
+      "url": "https://unsplash.com/developers",
+      "category": "Visual Content",
+      "verified": true,
+      "verified_url": "https://unsplash.com/documentation",
+      "auth": "API key (free)",
+      "viral_potential": "900k+ free high-quality photos for educational content",
+      "source": "web-search:unsplash"
+    },
+    {
+      "name": "Pexels API",
+      "url": "https://www.pexels.com/api/",
+      "category": "Visual Content",
+      "verified": true,
+      "verified_url": "https://www.pexels.com/api/documentation/",
+      "auth": "API key (free)",
+      "viral_potential": "Free photos AND videos - great for social media content",
+      "source": "web-search:pexels"
+    },
+    {
+      "name": "REST Countries API",
+      "url": "https://restcountries.com/",
+      "category": "Reference Data",
+      "verified": true,
+      "verified_url": "https://restcountries.com/v3.1/name/thailand",
+      "auth": "None required",
+      "viral_potential": "Country data for comparisons - flags, populations, languages",
+      "source": "web-search:restcountries"
+    },
+    {
+      "name": "ZenQuotes API",
+      "url": "https://zenquotes.io/",
+      "category": "Inspirational Content",
+      "verified": true,
+      "verified_url": "https://zenquotes.io/api/random",
+      "auth": "None required (with attribution)",
+      "viral_potential": "Daily inspirational quotes for educational social content",
+      "source": "web-search:zenquotes"
+    },
+    {
+      "name": "PubMed API (E-utilities)",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK25501/",
+      "category": "Research",
+      "verified": true,
+      "verified_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/",
+      "auth": "API key optional (higher limits)",
+      "viral_potential": "35M+ research papers - cite studies on outdoor education benefits",
+      "source": "web-search:pubmed"
+    },
+    {
+      "name": "Springer Nature API",
+      "url": "https://dev.springernature.com/",
+      "category": "Research",
+      "verified": true,
+      "verified_url": "https://dev.springernature.com/",
+      "auth": "API key required",
+      "viral_potential": "14M+ scientific documents - education and child development research",
+      "source": "web-search:springer-nature"
+    },
+    {
+      "name": "ERIC Education Research API",
+      "url": "https://eric.ed.gov/?api",
+      "category": "Education Research",
+      "verified": true,
+      "verified_url": "https://eric.ed.gov/",
+      "auth": "None required",
+      "viral_potential": "Education research database - evidence for alternative education methods",
+      "source": "web-search:eric"
+    },
+    {
+      "name": "CDC WONDER API",
+      "url": "https://wonder.cdc.gov/wonder/help/main.html",
+      "category": "Health Statistics",
+      "verified": true,
+      "verified_url": "https://wonder.cdc.gov/",
+      "auth": "None for public data",
+      "viral_potential": "Child health statistics - support health benefits of outdoor education",
+      "source": "web-search:cdc-wonder"
+    },
+    {
+      "name": "Open-Meteo Weather API",
+      "url": "https://open-meteo.com/en/docs",
+      "category": "Weather",
+      "verified": true,
+      "verified_url": "https://api.open-meteo.com/v1/forecast?latitude=7.89&longitude=98.39&current_weather=true",
+      "auth": "None required (free tier)",
+      "viral_potential": "Weather comparisons - 'Perfect outdoor learning weather in Phuket today'",
+      "source": "web-search:open-meteo"
+    },
+    {
+      "name": "Sunrise-Sunset API",
+      "url": "https://sunrise-sunset.org/api",
+      "category": "Astronomy",
+      "verified": true,
+      "verified_url": "https://api.sunrise-sunset.org/json?lat=7.89&lng=98.39",
+      "auth": "None required",
+      "viral_potential": "Golden hour calculations - beautiful outdoor photo content timing",
+      "source": "web-search:sunrise-sunset"
+    },
+    {
+      "name": "Marine Debris Tracker Data",
+      "url": "https://debristracker.org/",
+      "category": "Environmental",
+      "verified": true,
+      "verified_url": "https://debristracker.org/",
+      "auth": "Dataset download",
+      "viral_potential": "Beach cleanup data - environmental education content",
+      "source": "web-search:debris-tracker"
+    }
+  ]
+}

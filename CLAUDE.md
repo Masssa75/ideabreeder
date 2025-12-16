@@ -90,9 +90,23 @@ evolution_state (
 ```bash
 1. Make code changes
 2. git add -A && git commit -m "feat: description" && git push
-3. Verify Netlify deployment succeeds
-4. Test on deployed site
-5. If issues, fix and repeat from step 1
+3. IMMEDIATELY start streaming logs: netlify logs:deploy
+4. Watch until "Build script success" or error
+5. If build fails, analyze error and fix immediately
+6. Test on deployed site
+7. If issues, fix and repeat from step 1
+```
+
+### Real-time Build Monitoring
+```bash
+# Stream deployment logs in real-time
+netlify logs:deploy
+
+# Check deployment status
+netlify api listSiteDeploys --data '{"site_id": "YOUR_SITE_ID"}' | jq '.[0] | {state, created_at, error_message}'
+
+# Quick status check
+curl -s https://ideabreeder.netlify.app | head -1
 ```
 
 ### Your Full Permissions
@@ -134,11 +148,38 @@ When user says "WRAP", end session with:
 2. **Push frequently** - Don't wait until "it's ready"
 3. **Document changes** - Update logs after significant work
 4. **API keys in .env.local** - Never in code or CLAUDE.md
+5. **Never create fallback systems** without explicit request
+6. **Do only what's asked** - nothing more, nothing less
+7. **Always prefer editing** existing files to creating new ones
 
 ### Testing Approach:
 - Test API endpoints with curl
 - Verify UI changes in browser
 - Check Supabase data directly when needed
+
+### The Sunbeam Debugging Protocol
+When debugging issues, follow this systematic approach:
+
+1. **Browser Testing First** - Manually reproduce the issue, note exact steps
+2. **Investigate Root Cause** - Trace data flow, check API responses, identify failure point
+3. **Implement Minimal Fix** - Fix only what's broken, avoid unnecessary refactoring
+4. **Verify with Testing** - Test fix consistently, check edge cases
+5. **Document Everything** - Update CLAUDE.md immediately
+
+### Autonomous Working Principles
+
+**ALWAYS Do Without Asking:**
+- Deploy to production (for prototyping/MVP)
+- Fix bugs and errors
+- Run tests and diagnostics
+- Update documentation
+- Try up to 10 different approaches to solve problems
+
+**ALWAYS Ask Before:**
+- Deleting user data
+- Major architectural refactors
+- Rolling back deployed changes
+- Changing core business logic
 
 ## Key API Endpoints
 
@@ -170,8 +211,83 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 
 ## Current Status
 - **Version:** 1.0.0
-- **Last Updated:** 2025-12-15
+- **Last Updated:** 2025-12-16
 - **Status:** Active - Evolution running with web search enabled
+
+---
+
+# Bamboo Valley Content Creation
+
+## Overview
+
+This project also hosts content creation work for **Bamboo Valley School** - an alternative outdoor school in Phuket, Thailand. Content is created here for social media, blog posts, and marketing materials.
+
+**Related Project:** `/Users/marcschwyn/Desktop/projects/BambooValley`
+**School Website:** https://bamboovalleyphuket.com
+**Instagram:** @bamboovalleyphuket
+
+## Content Files
+
+```
+content/
+├── blog/                      # Blog post drafts and research
+├── social/                    # Social media content
+│   └── homework-myth-carousel.md  # Instagram carousel content
+├── carousel-*.html            # Carousel design iterations
+│   ├── carousel-waldorf-v2.html   # Current: Soft Waldorf aesthetic
+│   ├── carousel-bold-display.html # Bold Anton font version
+│   ├── carousel-text-iconic.html  # Iconic text sizing
+│   └── ...
+└── images/                    # Image assets for content
+
+data/
+└── education-research/
+    └── HOMEWORK-RESEARCH-DEEP-DIVE.md  # Research sources for homework myth content
+```
+
+## Brand Guidelines (Bamboo Valley)
+
+### Brand Colors (Waldorf-inspired pastels)
+- **Peachy Pink**: `#EBC3C3`
+- **Sage Green**: `#BED7AF`
+- **Sky Blue**: `#C8DCE1`
+- **Cream Yellow**: `#FAD7AA`
+- **Pale Mint**: `#DCEBE1`
+
+### Writing Style
+- **Always use "children" instead of "kids"** - Brand preference for respectful language
+- Include source citations for credibility
+- Focus on outcomes and feelings, not just features
+- Emphasize nature, calm, wholesome experiences
+
+### Design Direction
+- **Waldorf aesthetic**: Soft, organic, natural
+- Large impactful images when using photos
+- Soft watercolor gradients as alternatives
+- Serif fonts (Cormorant Garamond) for elegance
+- Earth tones: sage, cream, blush, moss
+
+## Current Carousel Project (Dec 2025)
+
+Creating Instagram carousel about "The Homework Myth" - research showing homework doesn't help children under 10.
+
+**Key Research Stats:**
+- NAEP: 45+ min homework = worse scores
+- Cooper: <4% of test variance explained
+- 50 countries: ALL correlations negative
+- 56% students say homework is #1 stress
+- Japan/Hong Kong/Taiwan: below-average homework, top scores
+
+**Slide Structure:**
+1. Hook: "Homework Doesn't Help Children Under 10"
+2. NAEP data (45+ minutes = worse)
+3. <4% variance (Cooper)
+4. 50 countries negative
+5. A+ teachers give less
+6. 200% more family fights
+7. 56% stress
+8. Top countries paradox
+9. CTA: Bamboo Valley
 
 ---
 

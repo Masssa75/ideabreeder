@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel - Text Heavy Version</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1a1a1a;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0 40px;
+      max-width: 100%;
+    }
+
+    .card {
+      flex: 0 0 340px;
+      height: 340px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 30px;
+      background: #f8f5f0;
+      color: #333;
+      position: relative;
+    }
+
+    .slide-num {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 11px;
+      color: #bbb;
+      font-weight: 500;
+    }
+
+    .study-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2d5a3d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 15px;
+    }
+
+    .finding {
+      font-size: 17px;
+      font-weight: 600;
+      color: #2d5a3d;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .bullet {
+      font-size: 15px;
+      color: #444;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .bullet::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #2d5a3d;
+      font-weight: bold;
+    }
+
+    .highlight {
+      color: #c0392b;
+      font-weight: 600;
+    }
+
+    .source {
+      margin-top: auto;
+      padding-top: 15px;
+      font-size: 11px;
+      color: #999;
+    }
+
+    /* Slide 1 special styling */
+    .card.hook {
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card.cta {
+      background: #2d5a3d;
+      color: #fff;
+      text-align: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Full Carousel - Text Heavy Version</h1>
+  <p class="subtitle">Scroll right to see all slides →</p>
+
+  <div class="carousel">
+
+    <!-- SLIDE 1: Hook -->
+    <div class="card hook">
+      <span class="slide-num">1/9</span>
+      <div style="font-size: 28px; font-weight: 700; color: #2d5a3d; line-height: 1.15;">
+        Homework Doesn't Help Children Under 10
+      </div>
+      <div style="font-size: 24px; font-weight: 700; margin-top: 30px; line-height: 1.1;">
+        <div style="opacity: 0.5;">35 years.</div>
+        <div style="opacity: 0.5;">35 studies.</div>
+        <div style="color: #2d5a3d;">Zero benefit.</div>
+      </div>
+      <div class="source" style="text-align: center;">Source: Cooper et al., Duke University</div>
+    </div>
+
+    <!-- SLIDE 2: NAEP -->
+    <div class="card">
+      <span class="slide-num">2/9</span>
+      <div class="study-name">NAEP Math Test Data</div>
+      <div class="bullet">
+        4th graders with <strong>NO homework</strong> scored the <strong>SAME</strong> as those doing 30 min/night
+      </div>
+      <div class="bullet">
+        4th graders doing 45+ minutes scored <span class="highlight">WORSE</span>
+      </div>
+      <div class="source">National Assessment of Educational Progress</div>
+    </div>
+
+    <!-- SLIDE 3: Cooper -->
+    <div class="card">
+      <span class="slide-num">3/9</span>
+      <div class="study-name">Cooper's Meta-Analysis</div>
+      <div class="finding">(The guy who's pro-homework!)</div>
+      <div class="bullet">
+        Homework accounts for <strong>less than 4%</strong> of test score differences
+      </div>
+      <div class="bullet">
+        Even he admits: "It's equally plausible" the <span class="highlight">causation is reversed</span>
+      </div>
+      <div class="source">Harris Cooper, Duke University</div>
+    </div>
+
+    <!-- SLIDE 4: 50 Countries -->
+    <div class="card">
+      <span class="slide-num">4/9</span>
+      <div class="study-name">50-Country TIMSS Study</div>
+      <div class="bullet">
+        Correlations between homework and achievement were <span class="highlight">ALL NEGATIVE</span>
+      </div>
+      <div class="bullet">
+        "Countries that try to improve by raising homework may actually be <strong>undermining their own success</strong>"
+      </div>
+      <div class="source">Baker & LeTendre, Penn State</div>
+    </div>
+
+    <!-- SLIDE 5: A+ Teachers -->
+    <div class="card">
+      <span class="slide-num">5/9</span>
+      <div class="study-name">Exceptional Teachers Study</div>
+      <div class="bullet">
+        Award-winning "A+ teachers" give <span class="highlight">LESS homework</span> than average teachers
+      </div>
+      <div class="bullet">
+        They also give students <strong>more choices</strong> about their assignments
+      </div>
+      <div class="source">Tschudin Study</div>
+    </div>
+
+    <!-- SLIDE 6: Family Fights -->
+    <div class="card">
+      <span class="slide-num">6/9</span>
+      <div class="study-name">Family Fights Study</div>
+      <div class="bullet">
+        <strong>200% more likely</strong> when parents don't have a college degree
+      </div>
+      <div class="bullet">
+        Kindergarteners getting 25 min/night when NEA says they should get <span class="highlight">ZERO</span>
+      </div>
+      <div class="source">Pressman et al., American Journal of Family Therapy</div>
+    </div>
+
+    <!-- SLIDE 7: Stanford Stress -->
+    <div class="card">
+      <span class="slide-num">7/9</span>
+      <div class="study-name">Stanford Study</div>
+      <div class="bullet">
+        <strong>56% of students</strong> say homework is their primary stress source
+      </div>
+      <div class="bullet">
+        More than 2 hours = <span class="highlight">depression, sleep problems</span>, worse outcomes
+      </div>
+      <div class="source">Pope et al., Stanford University</div>
+    </div>
+
+    <!-- SLIDE 8: Top Countries -->
+    <div class="card">
+      <span class="slide-num">8/9</span>
+      <div class="study-name">Top Math Countries</div>
+      <div class="finding">Japan. Hong Kong. Taiwan.</div>
+      <div class="bullet">
+        Had homework loads <strong>BELOW</strong> international average
+      </div>
+      <div class="bullet">
+        Yet <span class="highlight">topped TIMSS rankings</span>
+      </div>
+      <div class="source">TIMSS International Assessment</div>
+    </div>
+
+    <!-- SLIDE 9: CTA -->
+    <div class="card cta">
+      <span class="slide-num" style="color: rgba(255,255,255,0.4);">9/9</span>
+      <div style="font-size: 24px; font-weight: 700;">
+        Give your children<br>their evenings back.
+      </div>
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <div style="font-size: 16px; opacity: 0.9;">🌿 Bamboo Valley</div>
+        <div style="font-size: 13px; opacity: 0.7; margin-top: 8px;">Alternative Outdoor School</div>
+        <div style="font-size: 13px; opacity: 0.7;">Phuket • Ages 3-10 • No homework</div>
+      </div>
+      <div style="margin-top: 20px; font-size: 13px; opacity: 0.6;">
+        Full research → link in bio
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

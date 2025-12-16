@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Visualizations Mockup - Pick Your Favorites</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 50px;
+    }
+
+    .viz-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 40px;
+      color: #333;
+    }
+
+    .viz-section h2 {
+      color: #2d5a3d;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .viz-section .description {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .viz-section .placement {
+      background: #f0f7f0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #2d5a3d;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+
+    /* Chart containers */
+    .chart-container {
+      padding: 20px 0;
+    }
+
+    /* ========== VIZ 1: Homework Effect Bars ========== */
+    .effect-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .effect-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .effect-label {
+      width: 140px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .effect-bar-container {
+      flex: 1;
+      height: 40px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .effect-bar {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #fff;
+      transition: width 1s ease-out;
+    }
+
+    .effect-bar.negative {
+      background: linear-gradient(90deg, #dc3545, #ff6b6b);
+      justify-content: flex-end;
+    }
+
+    .effect-bar.zero {
+      background: #aaa;
+      width: 3px !important;
+      margin-left: 50%;
+    }
+
+    .effect-bar.positive-small {
+      background: linear-gradient(90deg, #ffc107, #ffda6a);
+      color: #333;
+    }
+
+    .effect-bar.positive-medium {
+      background: linear-gradient(90deg, #8fb07a, #a8d08d);
+    }
+
+    .effect-bar.positive-large {
+      background: linear-gradient(90deg, #2d5a3d, #3d7a4d);
+    }
+
+    .effect-value {
+      margin-left: auto;
+      font-size: 13px;
+    }
+
+    /* ========== VIZ 2: Finland Comparison ========== */
+    .comparison-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .country-card {
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .country-card.finland {
+      background: linear-gradient(135deg, #2d5a3d 0%, #1a3a2a 100%);
+      color: #fff;
+    }
+
+    .country-card.singapore {
+      background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+      color: #fff;
+    }
+
+    .country-name {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+
+    .homework-time {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .homework-time span {
+      font-size: 20px;
+      font-weight: 400;
+    }
+
+    .homework-label {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    .country-stats {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    /* ========== VIZ 3: What Works Horizontal Bars ========== */
+    .what-works {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .works-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .works-label {
+      width: 180px;
+      font-size: 14px;
+    }
+
+    .works-bar-bg {
+      flex: 1;
+      height: 35px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      position: relative;
+    }
+
+    .works-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #8fb07a, #2d5a3d);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .works-bar.low-cost {
+      background: linear-gradient(90deg, #8fb07a, #2d5a3d);
+    }
+
+    .works-bar.high-cost {
+      background: linear-gradient(90deg, #dc3545, #8b0000);
+    }
+
+    .works-cost {
+      width: 60px;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* ========== VIZ 4: Vocabulary Comparison ========== */
+    .vocab-comparison {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 60px;
+      padding: 30px 0;
+    }
+
+    .vocab-item {
+      text-align: center;
+    }
+
+    .vocab-bar-wrapper {
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .vocab-bar {
+      width: 80px;
+      background: linear-gradient(180deg, #8fb07a, #2d5a3d);
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 15px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 24px;
+      transition: height 1s ease-out;
+    }
+
+    .vocab-bar.small {
+      height: 60px;
+      background: linear-gradient(180deg, #ccc, #999);
+    }
+
+    .vocab-bar.large {
+      height: 250px;
+    }
+
+    .vocab-label {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+      max-width: 120px;
+    }
+
+    .vocab-multiplier {
+      font-size: 48px;
+      font-weight: 800;
+      color: #2d5a3d;
+      align-self: center;
+    }
+
+    /* ========== VIZ 5: Sleep Pie Chart ========== */
+    .sleep-viz {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 20px 0;
+    }
+
+    .sleep-donut {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: conic-gradient(#2d5a3d 0deg 90deg, #e0e0e0 90deg 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .sleep-donut-inner {
+      width: 100px;
+      height: 100px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .sleep-percent {
+      font-size: 32px;
+      font-weight: 800;
+      color: #2d5a3d;
+    }
+
+    .sleep-text {
+      max-width: 280px;
+    }
+
+    .sleep-text h3 {
+      font-size: 18px;
+      color: #2d5a3d;
+      margin-bottom: 8px;
+    }
+
+    .sleep-text p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* ========== VIZ 6: Interactive Calculator ========== */
+    .calculator {
+      background: #f8faf8;
+      border-radius: 12px;
+      padding: 25px;
+    }
+
+    .calc-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .calc-label {
+      width: 140px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .calc-input {
+      flex: 1;
+    }
+
+    .calc-input select,
+    .calc-input input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .calc-input select:focus,
+    .calc-input input:focus {
+      outline: none;
+      border-color: #8fb07a;
+    }
+
+    .calc-result {
+      background: #fff;
+      border: 2px solid #8fb07a;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .calc-result.warning {
+      border-color: #dc3545;
+      background: #fff5f5;
+    }
+
+    .calc-result.good {
+      border-color: #2d5a3d;
+      background: #f0f7f0;
+    }
+
+    .result-title {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .result-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d5a3d;
+    }
+
+    .result-value.warning {
+      color: #dc3545;
+    }
+
+    .result-message {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    /* ========== VIZ 7: Timeline/Process ========== */
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      padding: 20px 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 45px;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      background: #e0e0e0;
+    }
+
+    .timeline-item {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      width: 25%;
+    }
+
+    .timeline-icon {
+      width: 50px;
+      height: 50px;
+      background: #2d5a3d;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .timeline-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .timeline-desc {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* ========== VIZ 8: Stat Cards Row ========== */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #f8faf8, #e8f0e8);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #d0e0d0;
+    }
+
+    .stat-number {
+      font-size: 36px;
+      font-weight: 800;
+      color: #2d5a3d;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    /* ========== VIZ 9: Animated Counter ========== */
+    .counter-section {
+      text-align: center;
+      padding: 30px;
+    }
+
+    .counter-value {
+      font-size: 72px;
+      font-weight: 800;
+      color: #2d5a3d;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .counter-label {
+      font-size: 18px;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .counter-context {
+      font-size: 14px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    /* ========== VIZ 10: Quote Highlight ========== */
+    .quote-highlight {
+      background: linear-gradient(135deg, #2d5a3d, #1a3a2a);
+      color: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    .quote-highlight::before {
+      content: '"';
+      font-size: 120px;
+      position: absolute;
+      top: -20px;
+      left: 20px;
+      opacity: 0.2;
+      font-family: Georgia, serif;
+    }
+
+    .quote-text {
+      font-size: 20px;
+      font-style: italic;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .quote-source {
+      margin-top: 20px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 600px) {
+      .comparison-cards {
+        grid-template-columns: 1fr;
+      }
+      .vocab-comparison {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+      .vocab-bar.large {
+        height: 150px;
+      }
+      .stat-cards {
+        grid-template-columns: 1fr;
+      }
+      .sleep-viz {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Blog Visualization Options</h1>
+    <p class="subtitle">Review each option and pick which ones to include in the article</p>
+
+    <!-- VIZ 1: Homework Effect by Grade -->
+    <div class="viz-section">
+      <span class="placement">📍 After "What 35 Studies Found" section</span>
+      <h2>1. Homework Effect by Grade Level</h2>
+      <p class="description">Shows the research finding that homework has negative/zero effect for young kids but positive for older students.</p>
+
+      <div class="effect-bars">
+        <div class="effect-row">
+          <div class="effect-label">3rd Grade</div>
+          <div class="effect-bar-container">
+            <div class="effect-bar negative" style="width: 25%; margin-left: auto;">
+              <span>Negative</span>
+            </div>
+          </div>
+        </div>
+        <div class="effect-row">
+          <div class="effect-label">Elementary (avg)</div>
+          <div class="effect-bar-container">
+            <div class="effect-bar zero"></div>
+          </div>
+        </div>
+        <div class="effect-row">
+          <div class="effect-label">Middle School</div>
+          <div class="effect-bar-container">
+            <div class="effect-bar positive-small" style="width: 35%;">
+              <span class="effect-value">+3 months</span>
+            </div>
+          </div>
+        </div>
+        <div class="effect-row">
+          <div class="effect-label">High School</div>
+          <div class="effect-bar-container">
+            <div class="effect-bar positive-medium" style="width: 55%;">
+              <span class="effect-value">+5 months</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 2: Finland vs Singapore -->
+    <div class="viz-section">
+      <span class="placement">📍 "How much homework do Finnish students get?" section</span>
+      <h2>2. Finland vs Singapore Comparison</h2>
+      <p class="description">Side-by-side comparison of homework loads and outcomes.</p>
+
+      <div class="comparison-cards">
+        <div class="country-card finland">
+          <div class="country-name">Finland</div>
+          <div class="homework-time">30 <span>min/day</span></div>
+          <div class="homework-label">average homework</div>
+          <div class="country-stats">
+            PISA: Top 10 globally<br>
+            One standardized test (end of high school)
+          </div>
+        </div>
+        <div class="country-card singapore">
+          <div class="country-name">Singapore</div>
+          <div class="homework-time">3 <span>hrs/day</span></div>
+          <div class="homework-label">average homework</div>
+          <div class="country-stats">
+            PISA: Top 3 globally<br>
+            Highest student stress rates
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 3: What Works (EEF Data) -->
+    <div class="viz-section">
+      <span class="placement">📍 "What helps children learn instead of homework?" section</span>
+      <h2>3. What Actually Works (EEF Research)</h2>
+      <p class="description">Horizontal bars showing months of progress gained, with cost indicator.</p>
+
+      <div class="what-works">
+        <div class="works-item">
+          <div class="works-label">Metacognition</div>
+          <div class="works-bar-bg">
+            <div class="works-bar low-cost" style="width: 100%;">+8 months</div>
+          </div>
+          <div class="works-cost">💰 Low</div>
+        </div>
+        <div class="works-item">
+          <div class="works-label">Quality Feedback</div>
+          <div class="works-bar-bg">
+            <div class="works-bar low-cost" style="width: 100%;">+8 months</div>
+          </div>
+          <div class="works-cost">💰 Low</div>
+        </div>
+        <div class="works-item">
+          <div class="works-label">Oral Language</div>
+          <div class="works-bar-bg">
+            <div class="works-bar low-cost" style="width: 75%;">+6 months</div>
+          </div>
+          <div class="works-cost">💰 Low</div>
+        </div>
+        <div class="works-item">
+          <div class="works-label">Homework (HS)</div>
+          <div class="works-bar-bg">
+            <div class="works-bar low-cost" style="width: 62%;">+5 months</div>
+          </div>
+          <div class="works-cost">💰 Low</div>
+        </div>
+        <div class="works-item">
+          <div class="works-label">Smaller Classes</div>
+          <div class="works-bar-bg">
+            <div class="works-bar high-cost" style="width: 37%;">+3 months</div>
+          </div>
+          <div class="works-cost">💸 High</div>
+        </div>
+        <div class="works-item">
+          <div class="works-label">Homework (Elem)</div>
+          <div class="works-bar-bg">
+            <div class="works-bar high-cost" style="width: 5%;">0</div>
+          </div>
+          <div class="works-cost">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 4: Vocabulary Comparison -->
+    <div class="viz-section">
+      <span class="placement">📍 "Eat dinner together and talk" paragraph</span>
+      <h2>4. Dinner Table vs Reading Aloud</h2>
+      <p class="description">Visual comparison of vocabulary words learned. The 7x difference is striking.</p>
+
+      <div class="vocab-comparison">
+        <div class="vocab-item">
+          <div class="vocab-bar-wrapper">
+            <div class="vocab-bar large">1,000</div>
+          </div>
+          <div class="vocab-label">words learned at<br><strong>dinner table</strong></div>
+        </div>
+        <div class="vocab-multiplier">7×</div>
+        <div class="vocab-item">
+          <div class="vocab-bar-wrapper">
+            <div class="vocab-bar small">143</div>
+          </div>
+          <div class="vocab-label">words learned from<br><strong>reading aloud</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 5: Sleep Donut -->
+    <div class="viz-section">
+      <span class="placement">📍 "Prioritize sleep" paragraph</span>
+      <h2>5. Sleep Impact on Grades</h2>
+      <p class="description">Donut chart showing sleep accounts for 25% of grade variance.</p>
+
+      <div class="sleep-viz">
+        <div class="sleep-donut">
+          <div class="sleep-donut-inner">
+            <div class="sleep-percent">25%</div>
+          </div>
+        </div>
+        <div class="sleep-text">
+          <h3>Sleep determines 1/4 of academic performance</h3>
+          <p>Quality, duration, and consistency of sleep account for 25% of the variance in grades. When Seattle pushed school start times later, 34 extra minutes of sleep improved grades by 4.5%.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 6: Interactive Calculator -->
+    <div class="viz-section">
+      <span class="placement">📍 Could be standalone widget or in "Set a Time Limit" section</span>
+      <h2>6. Interactive: Homework Time Calculator</h2>
+      <p class="description">Parents input their child's grade and current homework time, get personalized feedback.</p>
+
+      <div class="calculator">
+        <div class="calc-row">
+          <div class="calc-label">Child's Grade</div>
+          <div class="calc-input">
+            <select id="grade-select">
+              <option value="1">1st Grade</option>
+              <option value="2">2nd Grade</option>
+              <option value="3" selected>3rd Grade</option>
+              <option value="4">4th Grade</option>
+              <option value="5">5th Grade</option>
+              <option value="6">6th Grade</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-label">Current Homework</div>
+          <div class="calc-input">
+            <input type="number" id="homework-input" placeholder="Minutes per night" value="60">
+          </div>
+        </div>
+        <div class="calc-result" id="calc-result">
+          <div class="result-title">Research-based recommendation</div>
+          <div class="result-value" id="result-value">30 minutes max</div>
+          <div class="result-message" id="result-message">You're doing 2× the recommended amount</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 7: What To Do Instead Timeline -->
+    <div class="viz-section">
+      <span class="placement">📍 Could replace or supplement the bullet list of activities</span>
+      <h2>7. What To Do Instead (Visual Timeline)</h2>
+      <p class="description">Shows the evening activities that actually help learning.</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-icon">🍽️</div>
+          <div class="timeline-title">Dinner & Talk</div>
+          <div class="timeline-desc">1,000 rare words learned</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon">📖</div>
+          <div class="timeline-title">Read Aloud</div>
+          <div class="timeline-desc">2-3 grades above level</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon">🎮</div>
+          <div class="timeline-title">Free Play</div>
+          <div class="timeline-desc">Builds executive function</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon">😴</div>
+          <div class="timeline-title">Sleep</div>
+          <div class="timeline-desc">25% of grade impact</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 8: Stat Cards -->
+    <div class="viz-section">
+      <span class="placement">📍 Hero section or summary box</span>
+      <h2>8. Key Stats Cards</h2>
+      <p class="description">Quick-glance statistics in a row.</p>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-number">35</div>
+          <div class="stat-label">years of research</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">0</div>
+          <div class="stat-label">benefit for elementary</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">7×</div>
+          <div class="stat-label">more vocab at dinner</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIZ 9: Animated Counter -->
+    <div class="viz-section">
+      <span class="placement">📍 Hero or section opener</span>
+      <h2>9. Animated Counter</h2>
+      <p class="description">Counts up on scroll for dramatic effect.</p>
+
+      <div class="counter-section">
+        <div class="counter-value" id="counter">35</div>
+        <div class="counter-label">years we've known homework doesn't help young kids</div>
+        <div class="counter-context">Since Harris Cooper's 1989 research at Duke University</div>
+      </div>
+    </div>
+
+    <!-- VIZ 10: Pull Quote -->
+    <div class="viz-section">
+      <span class="placement">📍 Section break or emphasis</span>
+      <h2>10. Pull Quote Block</h2>
+      <p class="description">For emphasizing key research quotes.</p>
+
+      <div class="quote-highlight">
+        <div class="quote-text">
+          There is no evidence that any amount of homework improves the academic performance of elementary students.
+        </div>
+        <div class="quote-source">— Harris Cooper, Duke University (1989)</div>
+      </div>
+    </div>
+
+    <!-- VIZ 11: Chart.js Bar Chart -->
+    <div class="viz-section">
+      <span class="placement">📍 Alternative for EEF data</span>
+      <h2>11. Chart.js Version (Interactive)</h2>
+      <p class="description">Hover to see details. More polished look.</p>
+
+      <div class="chart-container">
+        <canvas id="eefChart" height="250"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Calculator interactivity
+    const gradeSelect = document.getElementById('grade-select');
+    const homeworkInput = document.getElementById('homework-input');
+    const resultValue = document.getElementById('result-value');
+    const resultMessage = document.getElementById('result-message');
+    const calcResult = document.getElementById('calc-result');
+
+    function updateCalculator() {
+      const grade = parseInt(gradeSelect.value);
+      const current = parseInt(homeworkInput.value) || 0;
+      const recommended = grade * 10;
+
+      resultValue.textContent = `${recommended} minutes max`;
+
+      if (current > recommended * 1.5) {
+        calcResult.className = 'calc-result warning';
+        resultValue.className = 'result-value warning';
+        const ratio = (current / recommended).toFixed(1);
+        resultMessage.textContent = `You're doing ${ratio}× the recommended amount. Research shows this may be counterproductive.`;
+      } else if (current <= recommended) {
+        calcResult.className = 'calc-result good';
+        resultValue.className = 'result-value';
+        resultMessage.textContent = `You're within the recommended range. Consider if this time could be better spent on dinner conversation or play.`;
+      } else {
+        calcResult.className = 'calc-result';
+        resultValue.className = 'result-value';
+        const over = current - recommended;
+        resultMessage.textContent = `You're ${over} minutes over the recommendation.`;
+      }
+    }
+
+    gradeSelect.addEventListener('change', updateCalculator);
+    homeworkInput.addEventListener('input', updateCalculator);
+    updateCalculator();
+
+    // Chart.js EEF Chart
+    const ctx = document.getElementById('eefChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Metacognition', 'Feedback', 'Oral Language', 'Homework (HS)', 'Smaller Classes', 'Homework (Elem)'],
+        datasets: [{
+          label: 'Months of Progress',
+          data: [8, 8, 6, 5, 3, 0],
+          backgroundColor: [
+            '#2d5a3d',
+            '#2d5a3d',
+            '#3d7a4d',
+            '#5a9a6d',
+            '#dc3545',
+            '#ccc'
+          ],
+          borderRadius: 6
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const costs = ['Low cost', 'Low cost', 'Low cost', 'Low cost', 'Very high cost', 'N/A'];
+                return `+${context.raw} months (${costs[context.dataIndex]})`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 10,
+            title: {
+              display: true,
+              text: 'Additional months of learning progress'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

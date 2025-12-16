@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide 1 Combinations</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1a1a1a;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 20px;
+      color: #888;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .card {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+      background: #f8f5f0;
+      color: #2d5a3d;
+    }
+
+    .title {
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .stacked {
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .stacked .dim {
+      opacity: 0.5;
+    }
+
+    .subtext {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #888;
+      font-weight: 500;
+    }
+
+    .arrow {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #aaa;
+    }
+
+    .label {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-size: 11px;
+      color: #aaa;
+      font-weight: 500;
+    }
+
+    .card {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <h1>Slide 1 - Cream + Stacked Combinations</h1>
+
+  <div class="grid">
+
+    <!-- Option 1: Title on top, stacked stats below -->
+    <div class="card">
+      <span class="label">Option 1</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Children Under 10
+      </div>
+      <div class="stacked" style="font-size: 24px; margin-top: 30px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero benefit.</div>
+      </div>
+      <div style="margin-top: 25px; font-size: 11px; color: #bbb; letter-spacing: 0.5px;">
+        Source: Cooper et al., Duke University
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 1b: Different source format -->
+    <div class="card">
+      <span class="label">Option 1b</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Children Under 10
+      </div>
+      <div class="stacked" style="font-size: 24px; margin-top: 30px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero benefit.</div>
+      </div>
+      <div style="margin-top: 25px; font-size: 11px; color: #aaa;">
+        Meta-analysis, Duke University
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 1c: Source with line -->
+    <div class="card">
+      <span class="label">Option 1c</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Children Under 10
+      </div>
+      <div class="stacked" style="font-size: 24px; margin-top: 30px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero benefit.</div>
+      </div>
+      <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 11px; color: #aaa; width: 80%;">
+        Based on meta-analysis by Harris Cooper, Duke University
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 1d: Minimal source -->
+    <div class="card">
+      <span class="label">Option 1d</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Children Under 10
+      </div>
+      <div class="stacked" style="font-size: 24px; margin-top: 30px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero benefit.</div>
+      </div>
+      <div style="margin-top: 25px; font-size: 10px; color: #ccc; text-transform: uppercase; letter-spacing: 1px;">
+        Duke University Research
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 1e: Zero to negative with source -->
+    <div class="card">
+      <span class="label">Option 1e - w/ NEGATIVE</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Children Under 10
+      </div>
+      <div class="stacked" style="font-size: 24px; margin-top: 30px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero to <span style="color: #c0392b;">negative</span> benefit.</div>
+      </div>
+      <div style="margin-top: 25px; font-size: 11px; color: #bbb;">
+        Source: Cooper et al., Duke University
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 2: Stacked first, title as subtext -->
+    <div class="card">
+      <span class="label">Option 2</span>
+      <div class="stacked" style="font-size: 32px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero benefit.</div>
+      </div>
+      <div class="subtext" style="font-size: 16px; margin-top: 25px;">
+        Homework doesn't help kids under 10
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 3: Integrated -->
+    <div class="card">
+      <span class="label">Option 3</span>
+      <div class="stacked" style="font-size: 26px;">
+        <div class="dim">35 years of research.</div>
+        <div class="dim">35 studies.</div>
+        <div style="margin-top: 15px; font-size: 30px;">Homework doesn't help<br>kids under 10.</div>
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 4: Big zero -->
+    <div class="card">
+      <span class="label">Option 4</span>
+      <div class="title" style="font-size: 24px;">
+        Homework Doesn't Help Kids Under 10
+      </div>
+      <div style="font-size: 80px; font-weight: 900; margin: 20px 0; line-height: 1;">0</div>
+      <div class="subtext">35 years of research</div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 5: Cleaner stacked -->
+    <div class="card">
+      <span class="label">Option 5</span>
+      <div class="stacked" style="font-size: 28px;">
+        <div style="opacity: 0.4;">35 years.</div>
+        <div style="opacity: 0.6;">35 studies.</div>
+        <div style="opacity: 1;">Zero benefit.</div>
+      </div>
+      <div style="margin-top: 30px; font-size: 18px; font-weight: 600; color: #2d5a3d;">
+        for kids under 10
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 6: Statement first -->
+    <div class="card">
+      <span class="label">Option 6</span>
+      <div class="title" style="font-size: 26px; line-height: 1.3;">
+        Homework doesn't help<br>elementary students.
+      </div>
+      <div style="margin-top: 25px; font-size: 16px; color: #666;">
+        <span style="opacity: 0.6;">35 years.</span>
+        <span style="opacity: 0.6;">35 studies.</span>
+        <span style="font-weight: 700; color: #2d5a3d;">Zero benefit.</span>
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 7: Horizontal stats -->
+    <div class="card">
+      <span class="label">Option 7</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Kids Under 10
+      </div>
+      <div style="display: flex; gap: 30px; margin-top: 30px; font-size: 14px; color: #888;">
+        <div><strong style="font-size: 24px; color: #2d5a3d; display: block;">35</strong>years</div>
+        <div><strong style="font-size: 24px; color: #2d5a3d; display: block;">35</strong>studies</div>
+        <div><strong style="font-size: 24px; color: #2d5a3d; display: block;">0</strong>benefit</div>
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 8: Minimal -->
+    <div class="card">
+      <span class="label">Option 8</span>
+      <div class="stacked" style="font-size: 30px;">
+        <div style="opacity: 0.35;">35 years.</div>
+        <div style="opacity: 0.55;">35 studies.</div>
+        <div style="opacity: 1; color: #2d5a3d;">Zero benefit.</div>
+      </div>
+      <div style="margin-top: 35px; font-size: 15px; color: #999; letter-spacing: 0.5px;">
+        Homework & kids under 10
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 9: Zero to NEGATIVE - Title first -->
+    <div class="card">
+      <span class="label">Option 9 - NEGATIVE</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Kids Under 10
+      </div>
+      <div class="stacked" style="font-size: 24px; margin-top: 30px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero to <span style="color: #c0392b;">negative</span> benefit.</div>
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 10: Zero to NEGATIVE - Stacked first -->
+    <div class="card">
+      <span class="label">Option 10 - NEGATIVE</span>
+      <div class="stacked" style="font-size: 32px;">
+        <div class="dim">35 years.</div>
+        <div class="dim">35 studies.</div>
+        <div>Zero to <span style="color: #c0392b;">negative</span> benefit.</div>
+      </div>
+      <div class="subtext" style="font-size: 16px; margin-top: 25px;">
+        Homework doesn't help kids under 10
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 11: Stronger negative emphasis -->
+    <div class="card">
+      <span class="label">Option 11 - NEGATIVE</span>
+      <div class="title" style="font-size: 26px; line-height: 1.3;">
+        Homework Doesn't Help Kids Under 10
+      </div>
+      <div class="stacked" style="font-size: 22px; margin-top: 25px;">
+        <div style="opacity: 0.5;">35 years of research.</div>
+        <div style="opacity: 0.5;">35 studies.</div>
+        <div style="margin-top: 10px; font-size: 26px;">Zero benefit.</div>
+        <div style="font-size: 20px; color: #c0392b; margin-top: 5px;">(Sometimes negative.)</div>
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 12: Clean negative -->
+    <div class="card">
+      <span class="label">Option 12 - NEGATIVE</span>
+      <div class="stacked" style="font-size: 28px;">
+        <div style="opacity: 0.4;">35 years.</div>
+        <div style="opacity: 0.6;">35 studies.</div>
+        <div style="opacity: 1;">Zero to <span style="color: #c0392b;">negative</span></div>
+        <div style="opacity: 1;">benefit.</div>
+      </div>
+      <div style="margin-top: 30px; font-size: 18px; font-weight: 600; color: #2d5a3d;">
+        for kids under 10
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option 13: Bold negative callout -->
+    <div class="card">
+      <span class="label">Option 13 - NEGATIVE</span>
+      <div class="title" style="font-size: 28px;">
+        Homework Doesn't Help Kids Under 10
+      </div>
+      <div style="margin-top: 25px; padding: 15px 25px; background: rgba(192, 57, 43, 0.1); border-radius: 8px;">
+        <div style="font-size: 20px; font-weight: 700;">
+          <span style="color: #666;">35 years. 35 studies.</span><br>
+          <span style="color: #c0392b;">Zero to negative benefit.</span>
+        </div>
+      </div>
+      <div class="arrow">→</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

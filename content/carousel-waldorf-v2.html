@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel - Waldorf Style v2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Crimson Pro', serif;
+      background: #1a1a1a;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0 40px;
+      max-width: 100%;
+    }
+
+    .card {
+      flex: 0 0 360px;
+      height: 450px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Version A: Image at top, text below */
+    .card.split-top .image-area {
+      height: 50%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .card.split-top .text-area {
+      height: 50%;
+      padding: 25px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Version B: Small image accent, mostly text */
+    .card.accent-image {
+      padding: 35px;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card.accent-image .small-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 25px;
+    }
+
+    /* Version C: Full image with text box */
+    .card.text-box {
+      background-size: cover;
+      background-position: center;
+      justify-content: flex-end;
+      padding: 25px;
+    }
+
+    .card.text-box .content-box {
+      background: rgba(255,255,255,0.95);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .slide-num {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 11px;
+      color: rgba(0,0,0,0.3);
+      font-weight: 500;
+      z-index: 10;
+    }
+
+    .source {
+      font-size: 10px;
+      color: rgba(0,0,0,0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 15px;
+    }
+
+    /* Soft Waldorf palette */
+    .bg-cream { background: #f9f5f0; }
+    .bg-sage { background: #e8efe5; }
+    .bg-blush { background: #f5ebe5; }
+    .bg-lavender { background: #ede8f0; }
+    .bg-wheat { background: #f5f0e5; }
+    .bg-mist { background: #e8eef0; }
+    .bg-rose { background: #f5e8e8; }
+    .bg-moss { background: #e5efe8; }
+    .bg-forest { background: #4a5d4a; color: #fff; }
+
+    /* Typography */
+    .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 28px;
+      line-height: 1.2;
+      color: #3d4a3d;
+    }
+
+    .stacked {
+      font-family: 'Crimson Pro', serif;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 1.3;
+      margin-top: 15px;
+      color: #5a6a5a;
+    }
+
+    .stacked .dim {
+      opacity: 0.5;
+    }
+
+    .stat {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: 52px;
+      color: #3d4a3d;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Crimson Pro', serif;
+      font-size: 18px;
+      color: #5a6a5a;
+      margin-top: 10px;
+    }
+
+    .accent {
+      color: #8b6b4d;
+    }
+
+    /* Watercolor gradient backgrounds (no image needed) */
+    .watercolor-1 {
+      background: linear-gradient(135deg, #f5ebe5 0%, #e8ded5 40%, #d5e5d5 70%, #e5f0e8 100%);
+    }
+
+    .watercolor-2 {
+      background: linear-gradient(160deg, #f0e8dd 0%, #e5ddd0 50%, #dde5d8 100%);
+    }
+
+    .watercolor-3 {
+      background: linear-gradient(145deg, #ede5dd 0%, #e0d8d0 60%, #d8e0d5 100%);
+    }
+
+    /* For when you add the Gemini image */
+    .gemini-bg {
+      background-image: url('../images/gemini-forest.png');
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Waldorf Style v2 - Multiple Approaches</h1>
+  <p class="subtitle">Different ways to use the watercolor image</p>
+
+  <div class="carousel">
+
+    <!-- APPROACH A: Split - Image top, text bottom -->
+    <div class="card split-top">
+      <span class="slide-num">A</span>
+      <div class="image-area watercolor-1"></div>
+      <div class="text-area bg-cream">
+        <div class="title">
+          Homework Doesn't Help<br>Children Under 10
+        </div>
+        <div class="stacked">
+          <span class="dim">35 years. 35 studies.</span><br>
+          Zero benefit.
+        </div>
+        <div class="source">Cooper et al., Duke University</div>
+      </div>
+    </div>
+
+    <!-- APPROACH B: Circular image accent -->
+    <div class="card accent-image bg-cream">
+      <span class="slide-num">B</span>
+      <div class="small-image watercolor-1"></div>
+      <div class="title">
+        Homework Doesn't Help<br>Children Under 10
+      </div>
+      <div class="stacked">
+        <span class="dim">35 years. 35 studies.</span><br>
+        Zero benefit.
+      </div>
+      <div class="source">Cooper et al., Duke University</div>
+    </div>
+
+    <!-- APPROACH C: Full image with text card -->
+    <div class="card text-box watercolor-1">
+      <span class="slide-num">C</span>
+      <div class="content-box">
+        <div class="title">
+          Homework Doesn't Help<br>Children Under 10
+        </div>
+        <div class="stacked">
+          <span class="dim">35 years. 35 studies.</span><br>
+          Zero benefit.
+        </div>
+        <div class="source">Cooper et al., Duke University</div>
+      </div>
+    </div>
+
+    <!-- APPROACH D: No image, soft gradient -->
+    <div class="card accent-image watercolor-2">
+      <span class="slide-num">D</span>
+      <div class="title">
+        Homework Doesn't Help<br>Children Under 10
+      </div>
+      <div class="stacked" style="margin-top: 25px;">
+        <span class="dim">35 years.</span><br>
+        <span class="dim">35 studies.</span><br>
+        <span class="accent">Zero benefit.</span>
+      </div>
+      <div class="source">Cooper et al., Duke University</div>
+    </div>
+
+    <!-- Full carousel with Approach D style -->
+
+    <!-- SLIDE 1: Hook -->
+    <div class="card accent-image watercolor-1">
+      <span class="slide-num">1/9</span>
+      <div class="title">
+        Homework Doesn't Help<br>Children Under 10
+      </div>
+      <div class="stacked" style="margin-top: 25px;">
+        <span class="dim">35 years.</span><br>
+        <span class="dim">35 studies.</span><br>
+        <span class="accent">Zero benefit.</span>
+      </div>
+      <div class="source">Cooper et al., Duke University</div>
+    </div>
+
+    <!-- SLIDE 2: NAEP -->
+    <div class="card accent-image bg-sage">
+      <span class="slide-num">2/9</span>
+      <div class="stat">45+</div>
+      <div class="stat-label">minutes of homework</div>
+      <div class="title" style="font-size: 24px; margin-top: 20px;">
+        = <span class="accent">worse</span> scores
+      </div>
+      <div class="stacked" style="font-size: 16px; margin-top: 15px;">
+        <span class="dim">Children with no homework</span><br>
+        <span class="dim">scored the same as those</span><br>
+        <span class="dim">doing 30 min/night</span>
+      </div>
+      <div class="source">NAEP Math Assessment</div>
+    </div>
+
+    <!-- SLIDE 3: 4% -->
+    <div class="card accent-image bg-blush">
+      <span class="slide-num">3/9</span>
+      <div class="stat">&lt;4%</div>
+      <div class="stat-label">of test score differences</div>
+      <div class="stacked" style="margin-top: 20px;">
+        <span class="dim">Even the pro-homework</span><br>
+        <span class="dim">researcher admits:</span><br>
+        The effect is tiny.
+      </div>
+      <div class="source">Cooper, Duke University</div>
+    </div>
+
+    <!-- SLIDE 4: 50 Countries -->
+    <div class="card accent-image bg-mist">
+      <span class="slide-num">4/9</span>
+      <div class="stat">50</div>
+      <div class="stat-label">countries studied</div>
+      <div class="title" style="font-size: 22px; margin-top: 20px;">
+        All correlations <span class="accent">negative</span>
+      </div>
+      <div class="stacked" style="font-size: 16px; margin-top: 10px;">
+        <span class="dim">"Countries raising homework</span><br>
+        <span class="dim">may be undermining</span><br>
+        their own success."
+      </div>
+      <div class="source">Baker & LeTendre, TIMSS</div>
+    </div>
+
+    <!-- SLIDE 5: A+ Teachers -->
+    <div class="card accent-image bg-wheat">
+      <span class="slide-num">5/9</span>
+      <div class="title" style="font-size: 26px;">
+        Award-winning teachers<br>give <span class="accent">less</span> homework
+      </div>
+      <div class="stacked" style="margin-top: 25px;">
+        <span class="dim">A study of 300 "A+ teachers"</span><br>
+        <span class="dim">found they also give students</span><br>
+        more choices.
+      </div>
+      <div class="source">Tschudin Study</div>
+    </div>
+
+    <!-- SLIDE 6: Family Fights -->
+    <div class="card accent-image bg-rose">
+      <span class="slide-num">6/9</span>
+      <div class="stat">200%</div>
+      <div class="stat-label">more family fights</div>
+      <div class="stacked" style="margin-top: 15px;">
+        <span class="dim">over homework, when</span><br>
+        <span class="dim">parents don't have</span><br>
+        a college degree.
+      </div>
+      <div class="stacked" style="font-size: 15px; margin-top: 10px;">
+        <span class="dim">Kindergarteners get 25 min/night.</span><br>
+        NEA says: <span class="accent">zero.</span>
+      </div>
+      <div class="source">Pressman et al.</div>
+    </div>
+
+    <!-- SLIDE 7: 56% Stress -->
+    <div class="card accent-image bg-lavender">
+      <span class="slide-num">7/9</span>
+      <div class="stat">56%</div>
+      <div class="stat-label">say homework is their</div>
+      <div class="title" style="font-size: 26px; margin-top: 5px;">
+        #1 stress
+      </div>
+      <div class="stacked" style="font-size: 16px; margin-top: 15px;">
+        <span class="dim">More than tests. More than grades.</span><br>
+        >2 hours = <span class="accent">depression, sleep problems.</span>
+      </div>
+      <div class="source">Stanford University</div>
+    </div>
+
+    <!-- SLIDE 8: Top Countries -->
+    <div class="card accent-image bg-moss">
+      <span class="slide-num">8/9</span>
+      <div class="title" style="font-size: 28px;">
+        Japan. Hong Kong. Taiwan.
+      </div>
+      <div class="stacked" style="margin-top: 25px;">
+        <span class="dim">Homework loads below average.</span><br>
+        <span style="color: #3d6a3d;">Top math scores in the world.</span>
+      </div>
+      <div class="source">TIMSS Rankings</div>
+    </div>
+
+    <!-- SLIDE 9: CTA -->
+    <div class="card accent-image bg-forest">
+      <span class="slide-num" style="color: rgba(255,255,255,0.4);">9/9</span>
+      <div class="title" style="color: #e5f0e8; font-size: 28px;">
+        Give your children<br>their evenings back.
+      </div>
+      <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <div style="font-size: 18px; color: #c5e0c8;">Bamboo Valley</div>
+        <div style="font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 10px;">Alternative Outdoor School</div>
+        <div style="font-size: 14px; color: rgba(255,255,255,0.7);">Phuket | Ages 3-10</div>
+      </div>
+      <div class="source" style="color: rgba(255,255,255,0.4);">Link in bio</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

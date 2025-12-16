@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Headline Brainstorm - Bamboo Valley</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    .stats span {
+      color: #4ade80;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    button.success {
+      background: #16a34a;
+    }
+
+    button.success:hover {
+      background: #15803d;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      background: transparent;
+      color: #888;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      font-size: 14px;
+    }
+
+    .tab.active {
+      background: #333;
+      color: #fff;
+    }
+
+    .tab .count {
+      background: #555;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      margin-left: 5px;
+    }
+
+    .tab.active .count {
+      background: #4ade80;
+      color: #000;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .slide {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s;
+      opacity: 1;
+    }
+
+    .slide:hover {
+      transform: scale(1.02);
+    }
+
+    .slide.removing {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    .slide-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 5px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .slide:hover .slide-actions {
+      opacity: 1;
+    }
+
+    .slide-action {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .slide-action:hover {
+      transform: scale(1.1);
+    }
+
+    .slide-action.remove {
+      background: rgba(220, 38, 38, 0.9);
+      color: #fff;
+    }
+
+    .slide-action.favorite {
+      background: rgba(250, 204, 21, 0.9);
+      color: #000;
+    }
+
+    .slide-action.restore {
+      background: rgba(74, 222, 128, 0.9);
+      color: #000;
+    }
+
+    .category-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .favorite-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 20px;
+    }
+
+    .headline {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+
+    .headline span {
+      color: #ffeaa7;
+    }
+
+    .subtext {
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+    }
+
+    /* Color styles */
+    .style-number { background: linear-gradient(135deg, #2d5a41 0%, #1a3a2a 100%); }
+    .style-question { background: linear-gradient(135deg, #d4a574 0%, #b8956e 100%); }
+    .style-secret { background: linear-gradient(135deg, #4a7c59 0%, #2d5a41 100%); }
+    .style-flip { background: linear-gradient(135deg, #6b8e7a 0%, #4a7060 100%); }
+    .style-bold { background: linear-gradient(135deg, #5d8a6b 0%, #3d6b4a 100%); }
+    .style-parent { background: linear-gradient(135deg, #8fbc8f 0%, #5d8a6b 100%); }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+
+    .empty-state p {
+      margin-bottom: 15px;
+    }
+
+    .instructions {
+      background: #252540;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .instructions strong {
+      color: #fff;
+    }
+
+    .export-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: #252540;
+      border-radius: 12px;
+    }
+
+    .export-section h3 {
+      margin-bottom: 15px;
+    }
+
+    .export-list {
+      background: #1a1a2e;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎯 Headline Brainstorm</h1>
+      <div class="stats">
+        <div>Remaining: <span id="remaining-count">0</span></div>
+        <div>Favorites: <span id="favorites-count">0</span></div>
+        <div>Removed: <span id="removed-count">0</span></div>
+      </div>
+      <div class="controls">
+        <button onclick="resetAll()" class="danger">Reset All</button>
+        <button onclick="exportFavorites()" class="success">Export Favorites</button>
+      </div>
+    </header>
+
+    <div class="instructions">
+      <strong>How to use:</strong> Hover over a card and click ❌ to remove or ⭐ to favorite.
+      Favorites will appear first. Check the "Removed" tab to restore any headline.
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('active')" id="tab-active">
+        Active <span class="count" id="active-tab-count">0</span>
+      </button>
+      <button class="tab" onclick="switchTab('favorites')" id="tab-favorites">
+        ⭐ Favorites <span class="count" id="favorites-tab-count">0</span>
+      </button>
+      <button class="tab" onclick="switchTab('removed')" id="tab-removed">
+        Removed <span class="count" id="removed-tab-count">0</span>
+      </button>
+    </div>
+
+    <div class="grid" id="headlines-grid">
+      <!-- Headlines will be rendered here -->
+    </div>
+
+    <div class="export-section hidden" id="export-section">
+      <h3>⭐ Your Favorite Headlines</h3>
+      <div class="export-list" id="export-list"></div>
+    </div>
+  </div>
+
+  <script>
+    // Headline data
+    const initialHeadlines = [
+      {
+        id: 1,
+        category: 'number',
+        headline: '<span>355 studies</span> found the #1 way kids learn.',
+        subtext: "It's not what you think →",
+        style: 'style-number'
+      },
+      {
+        id: 2,
+        category: 'number',
+        headline: '<span>+8 months</span> of learning.<br>One method.',
+        subtext: "Here's what it is →",
+        style: 'style-number'
+      },
+      {
+        id: 3,
+        category: 'number',
+        headline: 'We analyzed <span>10,000</span> education studies.',
+        subtext: 'One finding stood out →',
+        style: 'style-number'
+      },
+      {
+        id: 4,
+        category: 'number',
+        headline: '<span>8 extra months</span> of learning per year.',
+        subtext: 'Cost: Almost nothing →',
+        style: 'style-number'
+      },
+      {
+        id: 5,
+        category: 'question',
+        headline: 'What if everything you know about <span>homework</span> is wrong?',
+        subtext: 'The research says... →',
+        style: 'style-question'
+      },
+      {
+        id: 6,
+        category: 'question',
+        headline: 'What actually helps kids learn?',
+        subtext: 'We looked at the research →',
+        style: 'style-question'
+      },
+      {
+        id: 7,
+        category: 'question',
+        headline: 'Why do the best methods cost the least?',
+        subtext: 'The data is surprising →',
+        style: 'style-question'
+      },
+      {
+        id: 8,
+        category: 'secret',
+        headline: 'The education secret <span>hiding in plain sight.</span>',
+        subtext: 'Exposed →',
+        style: 'style-secret'
+      },
+      {
+        id: 9,
+        category: 'secret',
+        headline: 'The #1 learning method <span>most schools ignore.</span>',
+        subtext: '→',
+        style: 'style-secret'
+      },
+      {
+        id: 10,
+        category: 'secret',
+        headline: 'Finland knows something <span>we don\'t.</span>',
+        subtext: "Here's what →",
+        style: 'style-secret'
+      },
+      {
+        id: 11,
+        category: 'secret',
+        headline: '<span>355 researchers</span> agree on one thing.',
+        subtext: "Most parents don't know this →",
+        style: 'style-secret'
+      },
+      {
+        id: 12,
+        category: 'flip',
+        headline: 'The most <span>expensive</span> teaching method is one of the <span>least effective.</span>',
+        subtext: '→',
+        style: 'style-flip'
+      },
+      {
+        id: 13,
+        category: 'flip',
+        headline: 'More homework <span>≠</span> better learning.',
+        subtext: "Here's what works instead →",
+        style: 'style-flip'
+      },
+      {
+        id: 14,
+        category: 'flip',
+        headline: 'Less school. <span>More learning.</span>',
+        subtext: 'How Finland does it →',
+        style: 'style-flip'
+      },
+      {
+        id: 15,
+        category: 'flip',
+        headline: 'Kids learn more from <span>this</span> than from homework.',
+        subtext: '→',
+        style: 'style-flip'
+      },
+      {
+        id: 16,
+        category: 'bold',
+        headline: '<span>This</span> adds 8 months of learning.',
+        subtext: '→',
+        style: 'style-bold'
+      },
+      {
+        id: 17,
+        category: 'bold',
+        headline: 'One skill.<br><span>8 months ahead.</span>',
+        subtext: '→',
+        style: 'style-bold'
+      },
+      {
+        id: 18,
+        category: 'bold',
+        headline: 'The research is clear.',
+        subtext: 'Schools just ignore it →',
+        style: 'style-bold'
+      },
+      {
+        id: 19,
+        category: 'bold',
+        headline: 'How kids <span>actually</span> learn.',
+        subtext: 'According to 355 studies →',
+        style: 'style-bold'
+      },
+      {
+        id: 20,
+        category: 'parent',
+        headline: 'What I wish I knew <span>before choosing a school.</span>',
+        subtext: '→',
+        style: 'style-parent'
+      },
+      {
+        id: 21,
+        category: 'parent',
+        headline: "The homework fight <span>isn't worth it.</span>",
+        subtext: "Here's why →",
+        style: 'style-parent'
+      },
+      {
+        id: 22,
+        category: 'parent',
+        headline: 'Your instincts were right.',
+        subtext: 'The research agrees →',
+        style: 'style-parent'
+      },
+      // NEW: Based on actual blog research
+      {
+        id: 23,
+        category: 'number',
+        headline: '<span>35 years</span> of research.<br>Zero benefit.',
+        subtext: 'For kids under 10 →',
+        style: 'style-number'
+      },
+      {
+        id: 24,
+        category: 'flip',
+        headline: 'More homework = <span>worse</span> grades.',
+        subtext: 'For 3rd graders, the correlation was negative →',
+        style: 'style-flip'
+      },
+      {
+        id: 25,
+        category: 'number',
+        headline: '<span>1,000</span> words at the dinner table.<br><span>143</span> from reading aloud.',
+        subtext: 'Talk to your kids →',
+        style: 'style-number'
+      },
+      {
+        id: 26,
+        category: 'number',
+        headline: 'Sleep determines <span>25%</span> of your child\'s grades.',
+        subtext: 'Homework steals it →',
+        style: 'style-number'
+      },
+      {
+        id: 27,
+        category: 'flip',
+        headline: 'Finland: <span>30 min</span> homework.<br>USA: <span>3 hours</span>.',
+        subtext: 'Same test scores. Happier kids →',
+        style: 'style-flip'
+      },
+      {
+        id: 28,
+        category: 'flip',
+        headline: 'Helping with homework <span>doesn\'t help.</span>',
+        subtext: 'Penn State studied it →',
+        style: 'style-flip'
+      },
+      {
+        id: 29,
+        category: 'bold',
+        headline: '"No evidence. <span>None.</span>"',
+        subtext: '— Duke University researcher, after 35 years of data →',
+        style: 'style-bold'
+      },
+      {
+        id: 30,
+        category: 'parent',
+        headline: 'The tears.<br>The fights.<br><span>For nothing.</span>',
+        subtext: 'The research is brutal →',
+        style: 'style-parent'
+      },
+      {
+        id: 31,
+        category: 'secret',
+        headline: 'What <span>actually</span> helps kids learn?',
+        subtext: 'It\'s not what schools are doing →',
+        style: 'style-secret'
+      },
+      {
+        id: 32,
+        category: 'number',
+        headline: '<span>34 extra minutes</span> of sleep.<br><span>4.5%</span> better grades.',
+        subtext: 'Seattle proved it →',
+        style: 'style-number'
+      },
+      {
+        id: 33,
+        category: 'bold',
+        headline: 'Homework doesn\'t work.<br><span>Here\'s what does.</span>',
+        subtext: '→',
+        style: 'style-bold'
+      },
+      {
+        id: 34,
+        category: 'parent',
+        headline: 'Stop fighting over worksheets.',
+        subtext: 'Science says you\'re right →',
+        style: 'style-parent'
+      },
+      {
+        id: 35,
+        category: 'flip',
+        headline: 'Free play beats homework.',
+        subtext: 'For executive function →',
+        style: 'style-flip'
+      },
+      // NEW: Deep research findings with specific stats
+      {
+        id: 36,
+        category: 'number',
+        headline: '4th graders doing <span>45+ min</span> of homework scored <span>worse</span>.',
+        subtext: 'Than kids who did none. (NAEP data) →',
+        style: 'style-number'
+      },
+      {
+        id: 37,
+        category: 'number',
+        headline: 'Homework explains <span>less than 4%</span> of test scores.',
+        subtext: 'Even the pro-homework researcher admits it →',
+        style: 'style-number'
+      },
+      {
+        id: 38,
+        category: 'flip',
+        headline: '<span>50 countries.</span> More homework = lower scores.',
+        subtext: 'Every correlation was negative →',
+        style: 'style-flip'
+      },
+      {
+        id: 39,
+        category: 'secret',
+        headline: 'Award-winning teachers give <span>less</span> homework.',
+        subtext: 'A study of 300 "A+ teachers" found... →',
+        style: 'style-secret'
+      },
+      {
+        id: 40,
+        category: 'parent',
+        headline: 'Family fights over homework: <span>200%</span> more likely.',
+        subtext: 'When parents don\'t have a college degree →',
+        style: 'style-parent'
+      },
+      {
+        id: 41,
+        category: 'number',
+        headline: '<span>56%</span> of students say homework is their #1 stress.',
+        subtext: 'More than tests. More than grades. →',
+        style: 'style-number'
+      },
+      {
+        id: 42,
+        category: 'flip',
+        headline: 'Japan. Hong Kong. Taiwan.<br><span>Below-average</span> homework.',
+        subtext: 'Top math scores in the world →',
+        style: 'style-flip'
+      },
+      {
+        id: 43,
+        category: 'bold',
+        headline: 'The homework effect <span>disappeared</span>.',
+        subtext: 'When Harvard controlled for other variables →',
+        style: 'style-bold'
+      },
+      {
+        id: 44,
+        category: 'parent',
+        headline: 'Kindergartners get <span>25 min</span> of homework.',
+        subtext: 'The NEA says they should get zero →',
+        style: 'style-parent'
+      },
+      {
+        id: 45,
+        category: 'bold',
+        headline: '"No evidence.<br>Any amount.<br><span>Elementary students.</span>"',
+        subtext: '— Harris Cooper, Duke University →',
+        style: 'style-bold'
+      },
+      {
+        id: 46,
+        category: 'flip',
+        headline: 'Countries with <span>most homework</span> have <span>lowest scores</span>.',
+        subtext: 'Iran, Thailand vs Denmark, Czech Republic →',
+        style: 'style-flip'
+      },
+      {
+        id: 47,
+        category: 'secret',
+        headline: 'The homework myth has a <span>source</span>.',
+        subtext: 'And even he says it doesn\'t work →',
+        style: 'style-secret'
+      }
+    ];
+
+    // State
+    let state = {
+      headlines: [],
+      removed: [],
+      favorites: []
+    };
+
+    let currentTab = 'active';
+
+    // Load from localStorage or initialize
+    function loadState() {
+      const saved = localStorage.getItem('headline-brainstorm');
+      if (saved) {
+        state = JSON.parse(saved);
+      } else {
+        state = {
+          headlines: initialHeadlines.map(h => h.id),
+          removed: [],
+          favorites: []
+        };
+      }
+      render();
+    }
+
+    // Save to localStorage
+    function saveState() {
+      localStorage.setItem('headline-brainstorm', JSON.stringify(state));
+    }
+
+    // Get headline by ID
+    function getHeadline(id) {
+      return initialHeadlines.find(h => h.id === id);
+    }
+
+    // Remove headline
+    function removeHeadline(id, event) {
+      event.stopPropagation();
+      const card = document.querySelector(`[data-id="${id}"]`);
+      card.classList.add('removing');
+
+      setTimeout(() => {
+        state.headlines = state.headlines.filter(hid => hid !== id);
+        state.favorites = state.favorites.filter(hid => hid !== id);
+        if (!state.removed.includes(id)) {
+          state.removed.push(id);
+        }
+        saveState();
+        render();
+      }, 300);
+    }
+
+    // Restore headline
+    function restoreHeadline(id, event) {
+      event.stopPropagation();
+      state.removed = state.removed.filter(hid => hid !== id);
+      if (!state.headlines.includes(id)) {
+        state.headlines.push(id);
+      }
+      saveState();
+      render();
+    }
+
+    // Toggle favorite
+    function toggleFavorite(id, event) {
+      event.stopPropagation();
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(fid => fid !== id);
+      } else {
+        state.favorites.push(id);
+      }
+      saveState();
+      render();
+    }
+
+    // Reset all
+    function resetAll() {
+      if (confirm('Reset all headlines? This will restore everything to the original state.')) {
+        localStorage.removeItem('headline-brainstorm');
+        loadState();
+      }
+    }
+
+    // Export favorites
+    function exportFavorites() {
+      const section = document.getElementById('export-section');
+      const list = document.getElementById('export-list');
+
+      if (state.favorites.length === 0) {
+        alert('No favorites yet! Star some headlines first.');
+        return;
+      }
+
+      const favHeadlines = state.favorites.map(id => {
+        const h = getHeadline(id);
+        // Strip HTML tags for export
+        const cleanHeadline = h.headline.replace(/<[^>]*>/g, '');
+        return `${id}. ${cleanHeadline}`;
+      });
+
+      list.innerHTML = favHeadlines.join('<br>');
+      section.classList.remove('hidden');
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Switch tab
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      render();
+    }
+
+    // Render headlines
+    function render() {
+      const grid = document.getElementById('headlines-grid');
+      let idsToShow = [];
+
+      if (currentTab === 'active') {
+        // Show favorites first, then others
+        const favs = state.headlines.filter(id => state.favorites.includes(id));
+        const others = state.headlines.filter(id => !state.favorites.includes(id));
+        idsToShow = [...favs, ...others];
+      } else if (currentTab === 'favorites') {
+        idsToShow = state.favorites.filter(id => state.headlines.includes(id));
+      } else if (currentTab === 'removed') {
+        idsToShow = state.removed;
+      }
+
+      if (idsToShow.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <p>${currentTab === 'removed' ? '🎉 No removed headlines' : currentTab === 'favorites' ? '⭐ No favorites yet. Star some headlines!' : 'All headlines removed. Click "Reset All" to start over.'}</p>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = idsToShow.map(id => {
+          const h = getHeadline(id);
+          const isFavorite = state.favorites.includes(id);
+          const isRemoved = currentTab === 'removed';
+
+          return `
+            <div class="slide ${h.style}" data-id="${h.id}">
+              <span class="category-tag">${h.category}</span>
+              <div class="slide-actions">
+                ${isRemoved ? `
+                  <button class="slide-action restore" onclick="restoreHeadline(${h.id}, event)" title="Restore">↩</button>
+                ` : `
+                  <button class="slide-action favorite" onclick="toggleFavorite(${h.id}, event)" title="Favorite">${isFavorite ? '★' : '☆'}</button>
+                  <button class="slide-action remove" onclick="removeHeadline(${h.id}, event)" title="Remove">✕</button>
+                `}
+              </div>
+              <p class="headline">${h.headline}</p>
+              <p class="subtext">${h.subtext}</p>
+              ${isFavorite && !isRemoved ? '<span class="favorite-badge">⭐</span>' : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Update counts
+      const activeCount = state.headlines.length;
+      const favCount = state.favorites.filter(id => state.headlines.includes(id)).length;
+      const removedCount = state.removed.length;
+
+      document.getElementById('remaining-count').textContent = activeCount;
+      document.getElementById('favorites-count').textContent = favCount;
+      document.getElementById('removed-count').textContent = removedCount;
+      document.getElementById('active-tab-count').textContent = activeCount;
+      document.getElementById('favorites-tab-count').textContent = favCount;
+      document.getElementById('removed-tab-count').textContent = removedCount;
+    }
+
+    // Initialize
+    loadState();
+  </script>
+</body>
+</html>

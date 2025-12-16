@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel - Waldorf Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1a1a1a;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0 40px;
+      max-width: 100%;
+    }
+
+    .card {
+      flex: 0 0 360px;
+      height: 360px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    /* Soft overlay for text readability */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(1px);
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .slide-num {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+      z-index: 1;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .source {
+      position: absolute;
+      bottom: 15px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      z-index: 1;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Soft, elegant typography */
+    .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 32px;
+      line-height: 1.15;
+      color: #2d3a2d;
+      text-shadow: 0 1px 8px rgba(255,255,255,0.8);
+    }
+
+    .stacked {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 1.2;
+      margin-top: 20px;
+      color: #3d4a3d;
+      text-shadow: 0 1px 8px rgba(255,255,255,0.8);
+    }
+
+    .stacked .dim {
+      opacity: 0.6;
+    }
+
+    /* Placeholder backgrounds - replace with Midjourney images */
+    .slide-1 {
+      background-image: url('../../images/0_0.jpg');
+    }
+
+    .slide-2 {
+      background: linear-gradient(135deg, #d4dde8 0%, #c4d0dc 50%, #b8c4d0 100%);
+    }
+
+    .slide-3 {
+      background: linear-gradient(135deg, #e8ddd4 0%, #dcd0c4 50%, #d0c4b8 100%);
+    }
+
+    .slide-4 {
+      background: linear-gradient(135deg, #d4e8dd 0%, #c4dcd0 50%, #b8d0c4 100%);
+    }
+
+    .slide-5 {
+      background: linear-gradient(135deg, #e8e4d4 0%, #dcd8c4 50%, #d0ccb8 100%);
+    }
+
+    .slide-6 {
+      background: linear-gradient(135deg, #e8d4d8 0%, #dcc4c8 50%, #d0b8bc 100%);
+    }
+
+    .slide-7 {
+      background: linear-gradient(135deg, #d4d8e8 0%, #c4c8dc 50%, #b8bcd0 100%);
+    }
+
+    .slide-8 {
+      background: linear-gradient(135deg, #e4d4e8 0%, #d8c4dc 50%, #ccb8d0 100%);
+    }
+
+    .slide-9 {
+      background: linear-gradient(135deg, #d4e8d8 0%, #c4dcc8 50%, #b8d0bc 100%);
+    }
+  </style>
+</head>
+<body>
+  <h1>Waldorf Style - Soft & Beautiful</h1>
+  <p class="subtitle">Add Midjourney backgrounds to each slide →</p>
+
+  <div class="carousel">
+
+    <!-- SLIDE 1: Hook -->
+    <div class="card slide-1">
+      <span class="slide-num">1/9</span>
+      <div class="card-content">
+        <div class="title">
+          Homework Doesn't Help<br>Children Under 10
+        </div>
+        <div class="stacked">
+          <div class="dim">35 years.</div>
+          <div class="dim">35 studies.</div>
+          <div>Zero benefit.</div>
+        </div>
+      </div>
+      <div class="source">Cooper et al., Duke University</div>
+    </div>
+
+    <!-- SLIDE 2: NAEP -->
+    <div class="card slide-2">
+      <span class="slide-num">2/9</span>
+      <div class="card-content">
+        <div class="title">
+          Children with no homework<br>scored the same
+        </div>
+        <div class="stacked">
+          <div class="dim">as those doing 30 min/night.</div>
+          <div style="margin-top: 15px;">45+ minutes?</div>
+          <div>Worse.</div>
+        </div>
+      </div>
+      <div class="source">NAEP Math Assessment</div>
+    </div>
+
+    <!-- SLIDE 3: 4% -->
+    <div class="card slide-3">
+      <span class="slide-num">3/9</span>
+      <div class="card-content">
+        <div class="title">
+          Homework explains<br>less than 4%
+        </div>
+        <div class="stacked">
+          <div class="dim">of test score differences.</div>
+          <div style="margin-top: 15px; font-size: 18px;">Even the pro-homework researcher</div>
+          <div style="font-size: 18px;">admits the effect is tiny.</div>
+        </div>
+      </div>
+      <div class="source">Cooper, Duke University</div>
+    </div>
+
+    <!-- SLIDE 4: 50 Countries -->
+    <div class="card slide-4">
+      <span class="slide-num">4/9</span>
+      <div class="card-content">
+        <div class="title">
+          50 countries studied
+        </div>
+        <div class="stacked">
+          <div>All correlations negative.</div>
+          <div style="margin-top: 15px; font-size: 16px; opacity: 0.8;">"Countries raising homework</div>
+          <div style="font-size: 16px; opacity: 0.8;">may be undermining their own success."</div>
+        </div>
+      </div>
+      <div class="source">Baker & LeTendre, TIMSS</div>
+    </div>
+
+    <!-- SLIDE 5: A+ Teachers -->
+    <div class="card slide-5">
+      <span class="slide-num">5/9</span>
+      <div class="card-content">
+        <div class="title">
+          Award-winning teachers<br>give less homework
+        </div>
+        <div class="stacked">
+          <div class="dim">A study of 300 "A+ teachers"</div>
+          <div class="dim">found they also give students</div>
+          <div>more choices.</div>
+        </div>
+      </div>
+      <div class="source">Tschudin Study</div>
+    </div>
+
+    <!-- SLIDE 6: Family Fights -->
+    <div class="card slide-6">
+      <span class="slide-num">6/9</span>
+      <div class="card-content">
+        <div class="title">
+          200% more family fights<br>over homework
+        </div>
+        <div class="stacked">
+          <div class="dim">when parents don't have</div>
+          <div class="dim">a college degree.</div>
+          <div style="margin-top: 15px; font-size: 16px;">Kindergarteners get 25 min/night.</div>
+          <div style="font-size: 16px;">NEA says: zero.</div>
+        </div>
+      </div>
+      <div class="source">Pressman et al.</div>
+    </div>
+
+    <!-- SLIDE 7: 56% Stress -->
+    <div class="card slide-7">
+      <span class="slide-num">7/9</span>
+      <div class="card-content">
+        <div class="title">
+          56% of students say<br>homework is their #1 stress
+        </div>
+        <div class="stacked">
+          <div class="dim">More than tests.</div>
+          <div class="dim">More than grades.</div>
+          <div style="margin-top: 10px; font-size: 16px;">>2 hours = depression, sleep problems.</div>
+        </div>
+      </div>
+      <div class="source">Stanford University</div>
+    </div>
+
+    <!-- SLIDE 8: Top Countries -->
+    <div class="card slide-8">
+      <span class="slide-num">8/9</span>
+      <div class="card-content">
+        <div class="title">
+          Japan. Hong Kong. Taiwan.
+        </div>
+        <div class="stacked">
+          <div class="dim">Homework loads below average.</div>
+          <div style="margin-top: 10px;">Top math scores in the world.</div>
+        </div>
+      </div>
+      <div class="source">TIMSS Rankings</div>
+    </div>
+
+    <!-- SLIDE 9: CTA -->
+    <div class="card slide-9">
+      <span class="slide-num">9/9</span>
+      <div class="card-content">
+        <div class="title">
+          Give your children<br>their evenings back.
+        </div>
+        <div class="stacked" style="margin-top: 30px;">
+          <div>🌿 Bamboo Valley</div>
+          <div class="dim" style="font-size: 16px; margin-top: 10px;">Alternative Outdoor School</div>
+          <div class="dim" style="font-size: 16px;">Phuket • Ages 3-10</div>
+        </div>
+      </div>
+      <div class="source">Link in bio</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homework Carousel - Final</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1a1a1a;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 60px 0 20px;
+      padding-top: 40px;
+      border-top: 1px solid #333;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .card {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+    }
+
+    /* Base styles */
+    .dark-green {
+      background: #2d5a3d;
+      color: #fff;
+    }
+
+    .light-green {
+      background: #8fb07a;
+      color: #1a3a2a;
+    }
+
+    .cream {
+      background: #f8f5f0;
+      color: #2d5a3d;
+    }
+
+    .black {
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid #333;
+    }
+
+    .warm {
+      background: #d4a574;
+      color: #3d2914;
+    }
+
+    /* Typography */
+    .hook-text {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .big-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+    }
+
+    .highlight {
+      color: #BED7AF;
+    }
+
+    .highlight-dark {
+      color: #2d5a3d;
+    }
+
+    .subtext {
+      margin-top: 20px;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .source {
+      margin-top: 20px;
+      font-size: 12px;
+      opacity: 0.5;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .arrow {
+      margin-top: 20px;
+      font-size: 20px;
+      opacity: 0.5;
+    }
+
+    /* Carousel flow */
+    .carousel-row {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      padding: 20px 0;
+      max-width: 100%;
+    }
+
+    .carousel-row .card {
+      flex: 0 0 320px;
+      height: 320px;
+    }
+
+    .slide-number {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-size: 11px;
+      opacity: 0.4;
+      font-weight: 500;
+    }
+
+    .card {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <h1>Homework Carousel</h1>
+  <p class="subtitle">Pick your favorite Slide 1 hook, then scroll right to see the full carousel</p>
+
+  <!-- ============================================
+       SLIDE 1 OPTIONS - THE HOOK
+       ============================================ -->
+  <p class="section-label">Slide 1 Options - Pick Your Hook</p>
+  <div class="grid">
+
+    <!-- Option A: The Quote -->
+    <div class="card dark-green">
+      <div class="hook-text" style="font-size: 24px; font-style: italic; line-height: 1.4;">
+        "There is no evidence that any amount of homework improves the academic performance of elementary students."
+      </div>
+      <div class="source">Harris Cooper, Duke University</div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option B: Title Style -->
+    <div class="card cream">
+      <div class="hook-text" style="font-size: 28px;">
+        Homework Doesn't Help Kids Under 10
+      </div>
+      <div class="subtext" style="color: #888; font-weight: 500;">35 Years of Research</div>
+      <div class="arrow" style="color: #2d5a3d;">→</div>
+    </div>
+
+    <!-- Option C: Stacked dramatic -->
+    <div class="card black">
+      <div class="hook-text" style="font-size: 32px;">
+        35 years.<br>
+        35 studies.<br>
+        <span class="highlight">Zero benefit.</span>
+      </div>
+      <div class="subtext">For kids under 10</div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Option D: Bold statement -->
+    <div class="card dark-green">
+      <div class="hook-text" style="font-size: 26px;">
+        Homework doesn't work for elementary students.
+      </div>
+      <div class="subtext" style="opacity: 0.8;">Here's what 35 years of research found →</div>
+    </div>
+
+    <!-- Option E: Question -->
+    <div class="card light-green">
+      <div class="hook-text" style="font-size: 28px;">
+        What if homework doesn't help kids under 10?
+      </div>
+      <div class="subtext">35 years of research says it doesn't →</div>
+    </div>
+
+    <!-- Option F: Number focus -->
+    <div class="card black">
+      <div class="big-number" style="font-size: 100px;"><span class="highlight">0</span></div>
+      <div class="hook-text" style="font-size: 20px; margin-top: 15px;">
+        benefit from homework<br>for elementary students
+      </div>
+      <div class="source">35 years of research</div>
+    </div>
+
+    <!-- Option G: No Evidence, None -->
+    <div class="card dark-green">
+      <div class="hook-text" style="font-size: 36px;">
+        No evidence.<br>
+        <span style="opacity: 0.6;">Any amount.</span><br>
+        <span class="highlight">None.</span>
+      </div>
+      <div class="subtext">— Duke University researcher</div>
+    </div>
+
+    <!-- Option H: Simple & Clean -->
+    <div class="card cream">
+      <div class="hook-text" style="font-size: 22px; color: #333;">
+        Homework has <span class="highlight-dark" style="font-size: 28px;">zero effect</span> on elementary school achievement.
+      </div>
+      <div class="source" style="color: #999;">Meta-analysis of 35 studies</div>
+      <div class="arrow" style="color: #2d5a3d;">→</div>
+    </div>
+
+  </div>
+
+  <!-- ============================================
+       FULL CAROUSEL PREVIEW
+       ============================================ -->
+  <p class="section-label">Full Carousel (scroll right →)</p>
+  <div class="carousel-row">
+
+    <!-- Slide 1: Hook -->
+    <div class="card dark-green">
+      <span class="slide-number">1/9</span>
+      <div class="hook-text" style="font-size: 24px; font-style: italic; line-height: 1.4;">
+        "There is no evidence that any amount of homework improves the academic performance of elementary students."
+      </div>
+      <div class="source">Harris Cooper, Duke University</div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Slide 2: NAEP -->
+    <div class="card cream">
+      <span class="slide-number">2/9</span>
+      <div class="big-number highlight-dark" style="font-size: 72px;">45+</div>
+      <div class="hook-text" style="font-size: 18px; color: #333; margin-top: 15px;">
+        minutes of homework?<br>
+        <strong>Worse scores.</strong>
+      </div>
+      <div class="subtext" style="color: #888; font-size: 13px;">
+        4th graders with NO homework scored the same as those doing 30 min/night
+      </div>
+      <div class="source" style="color: #aaa;">NAEP Math Data</div>
+    </div>
+
+    <!-- Slide 3: Cooper's 4% -->
+    <div class="card black">
+      <span class="slide-number">3/9</span>
+      <div class="big-number" style="font-size: 80px;"><span class="highlight">&lt;4%</span></div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        of test score differences<br>explained by homework
+      </div>
+      <div class="subtext" style="font-size: 13px;">
+        Even the pro-homework researcher admits the effect is tiny
+      </div>
+      <div class="source">Cooper Meta-Analysis</div>
+    </div>
+
+    <!-- Slide 4: 50 Countries -->
+    <div class="card dark-green">
+      <span class="slide-number">4/9</span>
+      <div class="big-number" style="font-size: 80px;">50</div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        countries studied.<br>
+        <span class="highlight">All correlations negative.</span>
+      </div>
+      <div class="subtext" style="font-size: 13px;">
+        More homework = lower achievement
+      </div>
+      <div class="source">TIMSS Study, Baker & LeTendre</div>
+    </div>
+
+    <!-- Slide 5: A+ Teachers -->
+    <div class="card light-green">
+      <span class="slide-number">5/9</span>
+      <div class="hook-text" style="font-size: 24px;">
+        Award-winning teachers give <strong>less</strong> homework.
+      </div>
+      <div class="subtext" style="font-size: 14px;">
+        A study of 300 "A+ teachers" found they assign less homework and give students more choices
+      </div>
+      <div class="source" style="color: #2d5a3d;">Tschudin Study</div>
+    </div>
+
+    <!-- Slide 6: Family Fights -->
+    <div class="card warm">
+      <span class="slide-number">6/9</span>
+      <div class="big-number" style="font-size: 72px; color: #3d2914;">200%</div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        more likely to fight about homework
+      </div>
+      <div class="subtext" style="font-size: 13px; color: #5d3d1d;">
+        When parents don't have a college degree.<br>
+        Kindergarteners get 25 min/night—NEA says zero.
+      </div>
+      <div class="source" style="color: #8b6914;">Pressman et al., 2015</div>
+    </div>
+
+    <!-- Slide 7: 56% Stress -->
+    <div class="card black">
+      <span class="slide-number">7/9</span>
+      <div class="big-number" style="font-size: 80px;"><span class="highlight">56%</span></div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        say homework is their<br>#1 source of stress
+      </div>
+      <div class="subtext" style="font-size: 13px;">
+        More than tests. More than grades.<br>
+        >2 hours = depression, sleep problems
+      </div>
+      <div class="source">Stanford Study, Pope et al.</div>
+    </div>
+
+    <!-- Slide 8: Top Countries -->
+    <div class="card cream">
+      <span class="slide-number">8/9</span>
+      <div class="hook-text" style="font-size: 22px; color: #333;">
+        Japan. Hong Kong. Taiwan.
+      </div>
+      <div class="hook-text highlight-dark" style="font-size: 20px; margin-top: 15px;">
+        Below-average homework.<br>
+        Top math scores.
+      </div>
+      <div class="subtext" style="color: #888; font-size: 13px;">
+        The "rigorous" countries actually assign less
+      </div>
+      <div class="source" style="color: #aaa;">TIMSS Rankings</div>
+    </div>
+
+    <!-- Slide 9: CTA -->
+    <div class="card dark-green">
+      <span class="slide-number">9/9</span>
+      <div class="hook-text" style="font-size: 22px;">
+        Give your kids their evenings back.
+      </div>
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <div style="font-size: 14px; opacity: 0.8;">🌿 Bamboo Valley</div>
+        <div style="font-size: 12px; opacity: 0.6; margin-top: 5px;">Alternative Outdoor School • Phuket</div>
+        <div style="font-size: 12px; opacity: 0.6;">Ages 3-10 • No homework</div>
+      </div>
+      <div style="margin-top: 20px; font-size: 13px; opacity: 0.7;">Full research: link in bio</div>
+    </div>
+
+  </div>
+
+  <!-- ============================================
+       ALTERNATIVE: DARKER VERSION
+       ============================================ -->
+  <p class="section-label">Alternative: All Dark Theme</p>
+  <div class="carousel-row">
+
+    <!-- Slide 1: Hook (dark) -->
+    <div class="card black">
+      <span class="slide-number">1/9</span>
+      <div class="hook-text" style="font-size: 32px;">
+        35 years.<br>
+        35 studies.<br>
+        <span class="highlight">Zero benefit.</span>
+      </div>
+      <div class="subtext">For kids under 10</div>
+      <div class="arrow">→</div>
+    </div>
+
+    <!-- Slide 2 (dark) -->
+    <div class="card black">
+      <span class="slide-number">2/9</span>
+      <div class="big-number" style="font-size: 80px;"><span class="highlight">45+</span></div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        minutes of homework<br><span class="highlight">= worse scores</span>
+      </div>
+      <div class="source">NAEP Math Data</div>
+    </div>
+
+    <!-- Slide 3 (dark) -->
+    <div class="card black">
+      <span class="slide-number">3/9</span>
+      <div class="big-number" style="font-size: 80px;"><span class="highlight">&lt;4%</span></div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        of test scores explained<br>by homework
+      </div>
+      <div class="source">Cooper Meta-Analysis</div>
+    </div>
+
+    <!-- Slide 4 (dark) -->
+    <div class="card black">
+      <span class="slide-number">4/9</span>
+      <div class="big-number" style="font-size: 80px;"><span class="highlight">50</span></div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        countries. All correlations<br><span class="highlight">negative.</span>
+      </div>
+      <div class="source">TIMSS Study</div>
+    </div>
+
+    <!-- Slide 5 (dark) -->
+    <div class="card black">
+      <span class="slide-number">5/9</span>
+      <div class="hook-text" style="font-size: 22px;">
+        Award-winning teachers<br>give <span class="highlight">less</span> homework.
+      </div>
+      <div class="source">Tschudin Study</div>
+    </div>
+
+    <!-- Slide 6 (dark) -->
+    <div class="card black">
+      <span class="slide-number">6/9</span>
+      <div class="big-number" style="font-size: 80px;"><span class="highlight">200%</span></div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        more family fights<br>about homework
+      </div>
+      <div class="source">Pressman et al., 2015</div>
+    </div>
+
+    <!-- Slide 7 (dark) -->
+    <div class="card black">
+      <span class="slide-number">7/9</span>
+      <div class="big-number" style="font-size: 80px;"><span class="highlight">56%</span></div>
+      <div class="hook-text" style="font-size: 18px; margin-top: 15px;">
+        say homework is their<br>#1 stress
+      </div>
+      <div class="source">Stanford Study</div>
+    </div>
+
+    <!-- Slide 8 (dark) -->
+    <div class="card black">
+      <span class="slide-number">8/9</span>
+      <div class="hook-text" style="font-size: 20px;">
+        Japan. Hong Kong. Taiwan.<br>
+        <span class="highlight">Less homework.<br>Top scores.</span>
+      </div>
+      <div class="source">TIMSS Rankings</div>
+    </div>
+
+    <!-- Slide 9 (dark) -->
+    <div class="card" style="background: linear-gradient(135deg, #2d5a3d, #1a3a2a); color: #fff;">
+      <span class="slide-number">9/9</span>
+      <div class="hook-text" style="font-size: 22px;">
+        Give your kids<br>their evenings back.
+      </div>
+      <div style="margin-top: 25px; font-size: 14px; opacity: 0.8;">🌿 Bamboo Valley</div>
+      <div style="font-size: 12px; opacity: 0.6; margin-top: 5px;">Link in bio →</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

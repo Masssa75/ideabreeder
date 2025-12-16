@@ -1,0 +1,575 @@
+<!--
+  BLOG VISUALIZATIONS - Ready to integrate
+
+  Selected components for homework-myth blog post.
+  Uses Lucide icons for the timeline.
+
+  Colors match site palette:
+  - Primary green: #2d5a3d
+  - Light green: #8fb07a
+  - Accent green: #BED7AF
+  - Warning red: #dc3545
+-->
+
+<!-- ============================================
+     1. PULL QUOTE (Cooper Quote)
+     Placement: Section break or after "What 35 Studies Found"
+     ============================================ -->
+
+<div class="quote-highlight">
+  <div class="quote-text">
+    There is no evidence that any amount of homework improves the academic performance of elementary students.
+  </div>
+  <div class="quote-source">— Harris Cooper, Duke University (1989)</div>
+</div>
+
+<style>
+.quote-highlight {
+  background: linear-gradient(135deg, #2d5a3d, #1a3a2a);
+  color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  position: relative;
+  margin: 40px 0;
+}
+
+.quote-highlight::before {
+  content: '"';
+  font-size: 120px;
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  opacity: 0.2;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.quote-highlight .quote-text {
+  font-size: 20px;
+  font-style: italic;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.quote-highlight .quote-source {
+  margin-top: 20px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+  .quote-highlight {
+    padding: 30px 20px;
+  }
+  .quote-highlight .quote-text {
+    font-size: 18px;
+  }
+  .quote-highlight::before {
+    font-size: 80px;
+    left: 10px;
+  }
+}
+</style>
+
+
+<!-- ============================================
+     2. WHAT ACTUALLY WORKS (EEF Research Bars)
+     Placement: "What helps children learn?" section
+     ============================================ -->
+
+<div class="what-works">
+  <div class="works-item">
+    <div class="works-label">Metacognition</div>
+    <div class="works-bar-bg">
+      <div class="works-bar low-cost" style="width: 100%;">+8 months</div>
+    </div>
+    <div class="works-cost"><span class="cost-icon">💰</span> Low</div>
+  </div>
+  <div class="works-item">
+    <div class="works-label">Quality Feedback</div>
+    <div class="works-bar-bg">
+      <div class="works-bar low-cost" style="width: 100%;">+8 months</div>
+    </div>
+    <div class="works-cost"><span class="cost-icon">💰</span> Low</div>
+  </div>
+  <div class="works-item">
+    <div class="works-label">Oral Language</div>
+    <div class="works-bar-bg">
+      <div class="works-bar low-cost" style="width: 75%;">+6 months</div>
+    </div>
+    <div class="works-cost"><span class="cost-icon">💰</span> Low</div>
+  </div>
+  <div class="works-item">
+    <div class="works-label">Homework (HS)</div>
+    <div class="works-bar-bg">
+      <div class="works-bar low-cost" style="width: 62%;">+5 months</div>
+    </div>
+    <div class="works-cost"><span class="cost-icon">💰</span> Low</div>
+  </div>
+  <div class="works-item">
+    <div class="works-label">Smaller Classes</div>
+    <div class="works-bar-bg">
+      <div class="works-bar high-cost" style="width: 37%;">+3 months</div>
+    </div>
+    <div class="works-cost"><span class="cost-icon">💸</span> High</div>
+  </div>
+  <div class="works-item">
+    <div class="works-label">Homework (Elem)</div>
+    <div class="works-bar-bg">
+      <div class="works-bar zero" style="width: 8%;">0</div>
+    </div>
+    <div class="works-cost">—</div>
+  </div>
+</div>
+
+<style>
+.what-works {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.works-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.works-label {
+  width: 140px;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.works-bar-bg {
+  flex: 1;
+  height: 35px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.works-bar {
+  height: 100%;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  transition: width 0.8s ease-out;
+}
+
+.works-bar.low-cost {
+  background: linear-gradient(90deg, #8fb07a, #2d5a3d);
+}
+
+.works-bar.high-cost {
+  background: linear-gradient(90deg, #e07070, #dc3545);
+}
+
+.works-bar.zero {
+  background: #ccc;
+  color: #666;
+  justify-content: center;
+  padding: 0;
+}
+
+.works-cost {
+  width: 70px;
+  text-align: right;
+  font-size: 12px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .works-label {
+    width: 100px;
+    font-size: 12px;
+  }
+  .works-bar {
+    font-size: 11px;
+    padding-right: 8px;
+  }
+  .works-cost {
+    width: 50px;
+    font-size: 11px;
+  }
+}
+</style>
+
+
+<!-- ============================================
+     3. DINNER TABLE VS READING ALOUD
+     Placement: "Eat dinner together" paragraph
+     ============================================ -->
+
+<div class="vocab-comparison">
+  <div class="vocab-item">
+    <div class="vocab-bar large">1,000</div>
+    <div class="vocab-label">words learned at<br><strong>dinner table</strong></div>
+  </div>
+  <div class="vocab-multiplier">7×</div>
+  <div class="vocab-item">
+    <div class="vocab-bar small">143</div>
+    <div class="vocab-label">words learned from<br><strong>reading aloud</strong></div>
+  </div>
+</div>
+
+<style>
+.vocab-comparison {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 40px;
+  padding: 30px 0;
+  margin: 30px 0;
+}
+
+.vocab-item {
+  text-align: center;
+}
+
+.vocab-bar {
+  width: 100px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 24px;
+  margin: 0 auto;
+}
+
+.vocab-bar.large {
+  height: 200px;
+  background: linear-gradient(180deg, #8fb07a, #2d5a3d);
+}
+
+.vocab-bar.small {
+  height: 50px;
+  background: linear-gradient(180deg, #ccc, #999);
+  font-size: 18px;
+}
+
+.vocab-label {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.vocab-multiplier {
+  font-size: 42px;
+  font-weight: 800;
+  color: #2d5a3d;
+  align-self: center;
+  padding-bottom: 40px;
+}
+
+@media (max-width: 500px) {
+  .vocab-comparison {
+    gap: 20px;
+  }
+  .vocab-bar {
+    width: 70px;
+  }
+  .vocab-bar.large {
+    height: 140px;
+    font-size: 20px;
+  }
+  .vocab-bar.small {
+    height: 40px;
+    font-size: 14px;
+  }
+  .vocab-multiplier {
+    font-size: 28px;
+    padding-bottom: 30px;
+  }
+  .vocab-label {
+    font-size: 12px;
+  }
+}
+</style>
+
+
+<!-- ============================================
+     4. SLEEP IMPACT DONUT
+     Placement: "Prioritize sleep" paragraph
+     ============================================ -->
+
+<div class="sleep-viz">
+  <div class="sleep-donut">
+    <div class="sleep-donut-inner">
+      <div class="sleep-percent">25%</div>
+    </div>
+  </div>
+  <div class="sleep-text">
+    <h3>Sleep determines 1/4 of academic performance</h3>
+    <p>Quality, duration, and consistency of sleep account for 25% of the variance in grades. When Seattle pushed school start times later, 34 extra minutes of sleep improved grades by 4.5%.</p>
+  </div>
+</div>
+
+<style>
+.sleep-viz {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px 0;
+  margin: 30px 0;
+}
+
+.sleep-donut {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: conic-gradient(#2d5a3d 0deg 90deg, #e8e8e8 90deg 360deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sleep-donut-inner {
+  width: 100px;
+  height: 100px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sleep-percent {
+  font-size: 28px;
+  font-weight: 800;
+  color: #2d5a3d;
+}
+
+.sleep-text {
+  max-width: 320px;
+}
+
+.sleep-text h3 {
+  font-size: 18px;
+  color: #2d5a3d;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+}
+
+.sleep-text p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .sleep-viz {
+    flex-direction: column;
+    text-align: center;
+  }
+  .sleep-text {
+    max-width: 100%;
+  }
+}
+</style>
+
+
+<!-- ============================================
+     5. WHAT TO DO INSTEAD (Timeline with Lucide Icons)
+     Placement: Section 3 intro or as summary
+
+     LUCIDE ICONS NEEDED:
+     - utensils (dinner)
+     - book-open (read aloud)
+     - gamepad-2 or puzzle (free play)
+     - moon (sleep)
+
+     If using React/Next.js with lucide-react:
+     import { Utensils, BookOpen, Gamepad2, Moon } from 'lucide-react'
+
+     If using CDN, add to <head>:
+     <script src="https://unpkg.com/lucide@latest"></script>
+     Then use: <i data-lucide="utensils"></i>
+     And call: lucide.createIcons()
+     ============================================ -->
+
+<!-- CDN Version (call lucide.createIcons() after DOM loads) -->
+<div class="timeline">
+  <div class="timeline-line"></div>
+  <div class="timeline-item">
+    <div class="timeline-icon">
+      <i data-lucide="utensils"></i>
+    </div>
+    <div class="timeline-title">Dinner & Talk</div>
+    <div class="timeline-desc">1,000 rare words learned</div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-icon">
+      <i data-lucide="book-open"></i>
+    </div>
+    <div class="timeline-title">Read Aloud</div>
+    <div class="timeline-desc">2-3 grades above level</div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-icon">
+      <i data-lucide="puzzle"></i>
+    </div>
+    <div class="timeline-title">Free Play</div>
+    <div class="timeline-desc">Builds executive function</div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-icon">
+      <i data-lucide="moon"></i>
+    </div>
+    <div class="timeline-title">Sleep</div>
+    <div class="timeline-desc">25% of grade impact</div>
+  </div>
+</div>
+
+<!-- Alternative: React/Next.js version with lucide-react
+<div className="timeline">
+  <div className="timeline-line" />
+  <div className="timeline-item">
+    <div className="timeline-icon"><Utensils size={24} /></div>
+    <div className="timeline-title">Dinner & Talk</div>
+    <div className="timeline-desc">1,000 rare words learned</div>
+  </div>
+  <div className="timeline-item">
+    <div className="timeline-icon"><BookOpen size={24} /></div>
+    <div className="timeline-title">Read Aloud</div>
+    <div className="timeline-desc">2-3 grades above level</div>
+  </div>
+  <div className="timeline-item">
+    <div className="timeline-icon"><Puzzle size={24} /></div>
+    <div className="timeline-title">Free Play</div>
+    <div className="timeline-desc">Builds executive function</div>
+  </div>
+  <div className="timeline-item">
+    <div className="timeline-icon"><Moon size={24} /></div>
+    <div className="timeline-title">Sleep</div>
+    <div className="timeline-desc">25% of grade impact</div>
+  </div>
+</div>
+-->
+
+<style>
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 20px 0;
+  margin: 30px 0;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 44px;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: #e0e0e0;
+}
+
+.timeline-item {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.timeline-icon {
+  width: 50px;
+  height: 50px;
+  background: #2d5a3d;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.timeline-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.timeline-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.timeline-desc {
+  font-size: 12px;
+  color: #666;
+}
+
+@media (max-width: 500px) {
+  .timeline {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .timeline-line {
+    display: none;
+  }
+  .timeline-item {
+    flex: 0 0 45%;
+  }
+}
+</style>
+
+
+<!-- ============================================
+     INTEGRATION NOTES
+     ============================================
+
+     1. LUCIDE ICONS SETUP
+        Option A (CDN): Add to <head>:
+          <script src="https://unpkg.com/lucide@latest"></script>
+        Then after DOM loads:
+          lucide.createIcons();
+
+        Option B (npm):
+          npm install lucide-react
+          import { Utensils, BookOpen, Puzzle, Moon } from 'lucide-react'
+
+     2. COLOR VARIABLES (if using CSS variables)
+        --color-primary: #2d5a3d;
+        --color-primary-light: #8fb07a;
+        --color-accent: #BED7AF;
+        --color-warning: #dc3545;
+
+     3. ANIMATIONS (optional)
+        Add scroll-triggered animations for bars:
+        .works-bar { width: 0; }
+        .works-bar.animate { width: var(--target-width); }
+
+     4. ACCESSIBILITY
+        - All charts have text labels
+        - Colors have sufficient contrast
+        - Timeline icons have title text via Lucide
+
+     5. PLACEMENT IN ARTICLE
+        - Pull Quote: After "What 35 Studies Found"
+        - EEF Bars: In "What helps children learn?" section
+        - Vocab Comparison: After "Eat dinner together" paragraph
+        - Sleep Donut: After "Prioritize sleep" paragraph
+        - Timeline: At start of Section 3 or as summary
+-->

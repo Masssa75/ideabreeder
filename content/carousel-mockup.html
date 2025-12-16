@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Carousel Mockup - What Actually Helps Kids Learn</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #fff;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      color: #888;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .carousel-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0;
+      scroll-snap-type: x mandatory;
+    }
+
+    .slide {
+      min-width: 350px;
+      height: 350px;
+      border-radius: 8px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      scroll-snap-align: start;
+      position: relative;
+    }
+
+    .slide-number {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    /* Slide 1 - Hook */
+    .slide-1 {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 100%);
+    }
+
+    .slide-1 .hook {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+
+    .slide-1 .hook span {
+      color: #ffd166;
+    }
+
+    .slide-1 .subtext {
+      color: #8ecae6;
+      font-size: 16px;
+    }
+
+    /* Slide 2 - Metacognition */
+    .slide-2 {
+      background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+    }
+
+    .slide-2 .label {
+      color: #95d5b2;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .slide-2 .method {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .slide-2 .impact {
+      font-size: 48px;
+      font-weight: 800;
+      color: #b7e4c7;
+      margin-bottom: 10px;
+    }
+
+    .slide-2 .details {
+      color: #95d5b2;
+      font-size: 14px;
+    }
+
+    .slide-2 .cost {
+      margin-top: 15px;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .slide-2 .cost span {
+      color: #b7e4c7;
+    }
+
+    /* Slide 3 - Feedback */
+    .slide-3 {
+      background: linear-gradient(135deg, #7b2cbf 0%, #3c096c 100%);
+    }
+
+    .slide-3 .label {
+      color: #e0aaff;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .slide-3 .method {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .slide-3 .impact {
+      font-size: 48px;
+      font-weight: 800;
+      color: #e0aaff;
+      margin-bottom: 10px;
+    }
+
+    .slide-3 .details {
+      color: #c77dff;
+      font-size: 14px;
+    }
+
+    .slide-3 .cost {
+      margin-top: 15px;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .slide-3 .cost span {
+      color: #e0aaff;
+    }
+
+    /* Slide 4 - Class Size (expensive) */
+    .slide-4 {
+      background: linear-gradient(135deg, #9d0208 0%, #370617 100%);
+    }
+
+    .slide-4 .question {
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .slide-4 .method {
+      color: #ffccd5;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .slide-4 .impact {
+      font-size: 48px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .slide-4 .cost {
+      color: #ffccd5;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    .slide-4 .cost span {
+      color: #ffd166;
+    }
+
+    /* Slide 5 - Homework */
+    .slide-5 {
+      background: linear-gradient(135deg, #774936 0%, #3d2314 100%);
+    }
+
+    .slide-5 .question {
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .slide-5 .comparison {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .slide-5 .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .slide-5 .level {
+      color: #ddb892;
+      font-size: 16px;
+    }
+
+    .slide-5 .months {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .slide-5 .note {
+      color: #ddb892;
+      font-size: 13px;
+      margin-top: 15px;
+      font-style: italic;
+    }
+
+    /* Slide 6 - The Pattern */
+    .slide-6 {
+      background: linear-gradient(135deg, #0077b6 0%, #023e8a 100%);
+    }
+
+    .slide-6 .insight {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 25px;
+    }
+
+    .slide-6 .insight span {
+      color: #90e0ef;
+    }
+
+    .slide-6 .list {
+      color: #caf0f8;
+      font-size: 16px;
+      line-height: 2;
+    }
+
+    .slide-6 .list .highlight {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Slide 7 - CTA */
+    .slide-7 {
+      background: linear-gradient(135deg, #40916c 0%, #1b4332 100%);
+      text-align: center;
+    }
+
+    .slide-7 .message {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 25px;
+    }
+
+    .slide-7 .school {
+      color: #b7e4c7;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .slide-7 .cta {
+      display: inline-block;
+      background: #fff;
+      color: #1b4332;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .slide-7 .source {
+      margin-top: 20px;
+      color: #74c69d;
+      font-size: 11px;
+    }
+
+    /* Instructions */
+    .instructions {
+      background: #2a2a4a;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 30px;
+      color: #ccc;
+    }
+
+    .instructions h3 {
+      color: #fff;
+      margin-bottom: 15px;
+    }
+
+    .instructions ul {
+      margin-left: 20px;
+      line-height: 1.8;
+    }
+
+    .instructions code {
+      background: #1a1a2e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📱 Instagram Carousel Mockup</h1>
+    <p class="subtitle">Scroll right to see all slides → (or swipe on mobile)</p>
+
+    <div class="carousel-container">
+
+      <!-- Slide 1: Hook -->
+      <div class="slide slide-1">
+        <span class="slide-number">1/7</span>
+        <p class="hook">
+          We spend <span>$1 trillion</span> on education every year.
+        </p>
+        <p class="hook">
+          Most of it is <span>wasted</span>.
+        </p>
+        <p class="subtext">Here's what actually works ↓</p>
+      </div>
+
+      <!-- Slide 2: Metacognition -->
+      <div class="slide slide-2">
+        <span class="slide-number">2/7</span>
+        <p class="label">The #1 Method</p>
+        <p class="method">Teaching kids to think<br>about their thinking</p>
+        <p class="impact">+8 months</p>
+        <p class="details">Based on 355 studies</p>
+        <p class="cost">Cost: <span>Almost nothing</span></p>
+      </div>
+
+      <!-- Slide 3: Feedback -->
+      <div class="slide slide-3">
+        <span class="slide-number">3/7</span>
+        <p class="label">The #2 Method</p>
+        <p class="method">High-quality feedback</p>
+        <p class="impact">+8 months</p>
+        <p class="details">Based on 155 studies</p>
+        <p class="cost">Cost: <span>Almost nothing</span></p>
+      </div>
+
+      <!-- Slide 4: Class Size -->
+      <div class="slide slide-4">
+        <span class="slide-number">4/7</span>
+        <p class="question">What about reducing class sizes?</p>
+        <p class="method">Smaller Classes</p>
+        <p class="impact">+3 months</p>
+        <p class="cost">Cost: <span>$$$$$</span></p>
+      </div>
+
+      <!-- Slide 5: Homework -->
+      <div class="slide slide-5">
+        <span class="slide-number">5/7</span>
+        <p class="question">What about more homework?</p>
+        <div class="comparison">
+          <div class="row">
+            <span class="level">High School</span>
+            <span class="months">+5 months</span>
+          </div>
+          <div class="row">
+            <span class="level">Primary School</span>
+            <span class="months">+2 months</span>
+          </div>
+        </div>
+        <p class="note">More homework ≠ better results.<br>Quality matters more than quantity.</p>
+      </div>
+
+      <!-- Slide 6: The Pattern -->
+      <div class="slide slide-6">
+        <span class="slide-number">6/7</span>
+        <p class="insight">The most effective methods<br><span>cost almost nothing.</span></p>
+        <div class="list">
+          <span class="highlight">Connection</span> over technology<br>
+          <span class="highlight">Thinking skills</span> over memorization<br>
+          <span class="highlight">Quality feedback</span> over more homework
+        </div>
+      </div>
+
+      <!-- Slide 7: CTA -->
+      <div class="slide slide-7">
+        <span class="slide-number">7/7</span>
+        <p class="message">This is how we teach.</p>
+        <p class="school">[Your School Name]<br>Phuket, Thailand</p>
+        <span class="cta">Link in bio →</span>
+        <p class="source">Data: Education Endowment Foundation</p>
+      </div>
+
+    </div>
+
+    <div class="instructions">
+      <h3>📝 Notes for Production</h3>
+      <ul>
+        <li><strong>Size:</strong> 1080x1080px (square) or 1080x1350px (portrait)</li>
+        <li><strong>Fonts:</strong> Use your brand fonts - suggest bold sans-serif for headlines</li>
+        <li><strong>Colors:</strong> These are placeholders - adjust to your brand palette</li>
+        <li><strong>Images:</strong> Consider adding background photos from your location on some slides</li>
+        <li><strong>Slide 7:</strong> Add your school logo and actual name</li>
+        <li><strong>Caption:</strong> Add engaging caption with hashtags for the post</li>
+      </ul>
+
+      <h3 style="margin-top: 20px;">📋 Suggested Caption</h3>
+      <p style="background: #1a1a2e; padding: 15px; border-radius: 4px; margin-top: 10px; line-height: 1.6;">
+        We looked at what 355 studies say about how kids actually learn.<br><br>
+        The results might surprise you.<br><br>
+        The most powerful teaching methods don't require fancy technology, expensive facilities, or hours of homework.<br><br>
+        They require connection. Reflection. Quality feedback.<br><br>
+        This is why we do things differently at [School Name].<br><br>
+        📍 Phuket, Thailand<br><br>
+        #education #alternativeeducation #outdoorlearning #phuket #forestschool #evidencebasededucation #parenting #homeschool #unschooling #naturallearning #childdevelopment
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

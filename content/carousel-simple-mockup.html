@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Carousel Mockup</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f5f5f5;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 14px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 60px 0 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .card {
+      aspect-ratio: 1;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    /* ============================================
+       STYLE 1: Dark Green, Big Numbers
+       ============================================ */
+    .style-1 {
+      background: #2d5a3d;
+      color: #fff;
+    }
+    .style-1 .big-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 120px;
+      font-weight: 700;
+      line-height: 0.9;
+      margin-bottom: 20px;
+    }
+    .style-1 .main-text {
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.3;
+      opacity: 0.9;
+    }
+    .style-1 .highlight {
+      color: #BED7AF;
+    }
+
+    /* ============================================
+       STYLE 2: Cream/Off-white, Serif
+       ============================================ */
+    .style-2 {
+      background: #f8f5f0;
+      color: #2d5a3d;
+    }
+    .style-2 .main-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .style-2 .highlight {
+      background: linear-gradient(180deg, transparent 50%, #BED7AF 50%);
+      padding: 0 4px;
+    }
+    .style-2 .source {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #888;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ============================================
+       STYLE 3: Light Green, Bold Sans
+       ============================================ */
+    .style-3 {
+      background: #8fb07a;
+      color: #1a3a2a;
+    }
+    .style-3 .main-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+    .style-3 .highlight {
+      color: #fff;
+    }
+    .style-3 .subtext {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    /* ============================================
+       STYLE 4: Black & White, Minimal
+       ============================================ */
+    .style-4 {
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .style-4 .main-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .style-4 .highlight {
+      color: #8fb07a;
+    }
+    .style-4 .arrow {
+      margin-top: 30px;
+      font-size: 24px;
+      opacity: 0.5;
+    }
+
+    /* ============================================
+       STYLE 5: Quote Style
+       ============================================ */
+    .style-5 {
+      background: linear-gradient(135deg, #2d5a3d 0%, #1a3a2a 100%);
+      color: #fff;
+      position: relative;
+    }
+    .style-5::before {
+      content: '"';
+      font-family: Georgia, serif;
+      font-size: 200px;
+      position: absolute;
+      top: -30px;
+      left: 20px;
+      opacity: 0.15;
+      line-height: 1;
+    }
+    .style-5 .main-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 26px;
+      font-weight: 500;
+      line-height: 1.4;
+      font-style: italic;
+    }
+    .style-5 .source {
+      margin-top: 25px;
+      font-size: 14px;
+      opacity: 0.7;
+      font-style: normal;
+    }
+
+    /* ============================================
+       STYLE 6: Split Stats
+       ============================================ */
+    .style-6 {
+      background: #f8f5f0;
+      color: #333;
+      flex-direction: row;
+      justify-content: space-around;
+      gap: 20px;
+    }
+    .style-6 .stat-box {
+      text-align: center;
+    }
+    .style-6 .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      color: #2d5a3d;
+    }
+    .style-6 .stat-number.bad {
+      color: #999;
+    }
+    .style-6 .stat-label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 8px;
+    }
+    .style-6 .vs {
+      font-size: 24px;
+      color: #ccc;
+      align-self: center;
+    }
+
+    /* ============================================
+       STYLE 7: Stacked Words
+       ============================================ */
+    .style-7 {
+      background: #2d5a3d;
+      color: #fff;
+    }
+    .style-7 .stacked {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 0.95;
+    }
+    .style-7 .line1 {
+      font-size: 28px;
+      opacity: 0.6;
+    }
+    .style-7 .line2 {
+      font-size: 28px;
+      opacity: 0.6;
+    }
+    .style-7 .line3 {
+      font-size: 52px;
+      color: #BED7AF;
+    }
+    .style-7 .subtext {
+      margin-top: 25px;
+      font-size: 16px;
+      font-weight: 400;
+      opacity: 0.7;
+    }
+
+    /* ============================================
+       STYLE 8: Warm/Earthy
+       ============================================ */
+    .style-8 {
+      background: #d4a574;
+      color: #3d2914;
+    }
+    .style-8 .main-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .style-8 .highlight {
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    }
+
+    /* ============================================
+       STYLE 9: Centered Number Focus
+       ============================================ */
+    .style-9 {
+      background: #1a3a2a;
+      color: #fff;
+    }
+    .style-9 .prefix {
+      font-size: 18px;
+      opacity: 0.6;
+      margin-bottom: 10px;
+    }
+    .style-9 .big-stat {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 100px;
+      font-weight: 700;
+      color: #8fb07a;
+      line-height: 1;
+    }
+    .style-9 .suffix {
+      font-size: 20px;
+      margin-top: 15px;
+      opacity: 0.8;
+    }
+
+    /* ============================================
+       STYLE 10: Two-tone split
+       ============================================ */
+    .style-10 {
+      background: linear-gradient(180deg, #2d5a3d 50%, #f8f5f0 50%);
+      color: #fff;
+      justify-content: flex-start;
+      padding-top: 60px;
+    }
+    .style-10 .top-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: auto;
+    }
+    .style-10 .bottom-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: #2d5a3d;
+      margin-top: auto;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Carousel Styles</h1>
+  <p class="subtitle">Bold text, solid colors, clean typography</p>
+
+  <p class="section-label">Number-Focused</p>
+  <div class="grid">
+
+    <!-- Style 1: Big Number -->
+    <div class="card style-1">
+      <div class="big-number">45+</div>
+      <div class="main-text">minutes of homework.<br><span class="highlight">Worse scores.</span></div>
+    </div>
+
+    <!-- Style 9: Centered Stat -->
+    <div class="card style-9">
+      <div class="prefix">Homework explains</div>
+      <div class="big-stat">&lt;4%</div>
+      <div class="suffix">of test score differences</div>
+    </div>
+
+    <!-- Style 6: Split comparison -->
+    <div class="card style-6">
+      <div class="stat-box">
+        <div class="stat-number">1,000</div>
+        <div class="stat-label">words at<br>dinner table</div>
+      </div>
+      <div class="vs">vs</div>
+      <div class="stat-box">
+        <div class="stat-number bad">143</div>
+        <div class="stat-label">words from<br>reading aloud</div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Quote Style</p>
+  <div class="grid">
+
+    <!-- Style 5: Quote -->
+    <div class="card style-5">
+      <div class="main-text">No evidence that any amount of homework improves academic performance of elementary students.</div>
+      <div class="source">— Harris Cooper, Duke University</div>
+    </div>
+
+    <!-- Style 2: Serif elegant -->
+    <div class="card style-2">
+      <div class="main-text">The homework effect <span class="highlight">disappeared</span> when Harvard controlled for other variables.</div>
+      <div class="source">Keith study, 1980s</div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Bold Statement</p>
+  <div class="grid">
+
+    <!-- Style 7: Stacked -->
+    <div class="card style-7">
+      <div class="stacked">
+        <div class="line1">More homework.</div>
+        <div class="line2">More stress.</div>
+        <div class="line3">Zero benefit.</div>
+      </div>
+      <div class="subtext">35 years of research →</div>
+    </div>
+
+    <!-- Style 3: Bold uppercase -->
+    <div class="card style-3">
+      <div class="main-text">Award-winning teachers give <span class="highlight">less</span> homework.</div>
+      <div class="subtext">Study of 300 "A+ teachers"</div>
+    </div>
+
+    <!-- Style 4: Black minimal -->
+    <div class="card style-4">
+      <div class="main-text">56% of students say homework is their <span class="highlight">#1 stress.</span></div>
+      <div class="arrow">→</div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Warm / Contrast</p>
+  <div class="grid">
+
+    <!-- Style 8: Earthy -->
+    <div class="card style-8">
+      <div class="main-text">Family fights over homework are <span class="highlight">200% more likely</span> without a college degree.</div>
+    </div>
+
+    <!-- Style 10: Split -->
+    <div class="card style-10">
+      <div class="top-text">Japan. Hong Kong. Taiwan.</div>
+      <div class="bottom-text">Below-average homework.<br>Top math scores.</div>
+    </div>
+
+    <!-- Another Style 1 variant -->
+    <div class="card style-1">
+      <div class="big-number">50</div>
+      <div class="main-text">countries studied.<br><span class="highlight">All correlations negative.</span></div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Hook Slides (Slide 1 Options)</p>
+  <div class="grid">
+
+    <div class="card style-7">
+      <div class="stacked">
+        <div class="line1">35 years.</div>
+        <div class="line2">35 studies.</div>
+        <div class="line3">Zero benefit.</div>
+      </div>
+      <div class="subtext">for kids under 10 →</div>
+    </div>
+
+    <div class="card style-4">
+      <div class="main-text">Everything you know about <span class="highlight">homework</span> is wrong.</div>
+      <div class="arrow">→</div>
+    </div>
+
+    <div class="card style-9">
+      <div class="prefix">Kids doing homework</div>
+      <div class="big-stat">45+</div>
+      <div class="suffix">min scored WORSE</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
