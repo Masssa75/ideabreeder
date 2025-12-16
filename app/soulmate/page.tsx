@@ -10,34 +10,44 @@ interface Message {
   content: string
 }
 
+const STORAGE_KEY = 'soulmate-chat-messages'
+const STORAGE_STARTED = 'soulmate-chat-started'
+
 export default function SoulmateFinder() {
   const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
-  const [showLogin, setShowLogin] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [started, setStarted] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const supabase = createClient()
 
-  // Check auth state on mount
+  // Check auth state and load data on mount
   useEffect(() => {
-    const checkUser = async () => {
+    const init = async () => {
+      // Check if user is authenticated
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
-      setAuthLoading(false)
 
       if (user) {
-        // Load or create session
-        await loadSession(user.id)
+        // Logged in - load from Supabase
+        await loadSupabaseSession(user.id)
+      } else {
+        // Not logged in - load from localStorage
+        loadLocalStorage()
       }
+
+      setAuthLoading(false)
+      setHydrated(true)
     }
 
-    checkUser()
+    init()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -45,18 +55,48 @@ export default function SoulmateFinder() {
       setUser(currentUser)
 
       if (currentUser && event === 'SIGNED_IN') {
-        setShowLogin(false)
-        await loadSession(currentUser.id)
+        setShowSaveModal(false)
+        // Migrate localStorage messages to Supabase
+        await migrateToSupabase(currentUser.id)
       }
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  // Load or create session from Supabase
-  const loadSession = async (userId: string) => {
+  // Load from localStorage (for anonymous users)
+  const loadLocalStorage = () => {
+    const savedMessages = localStorage.getItem(STORAGE_KEY)
+    const savedStarted = localStorage.getItem(STORAGE_STARTED)
+
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages))
+      } catch (e) {
+        console.error('Failed to parse saved messages:', e)
+      }
+    }
+    if (savedStarted === 'true') {
+      setStarted(true)
+    }
+  }
+
+  // Save to localStorage (for anonymous users)
+  useEffect(() => {
+    if (hydrated && !user && messages.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    }
+  }, [messages, hydrated, user])
+
+  useEffect(() => {
+    if (hydrated && !user) {
+      localStorage.setItem(STORAGE_STARTED, String(started))
+    }
+  }, [started, hydrated, user])
+
+  // Load session from Supabase (for logged-in users)
+  const loadSupabaseSession = async (userId: string) => {
     try {
-      // Get or create session
       const { data: existingSession } = await supabase
         .from('soulmate_sessions')
         .select('*')
@@ -66,17 +106,13 @@ export default function SoulmateFinder() {
         .limit(1)
         .single()
 
-      let currentSessionId: string
-
       if (existingSession) {
-        currentSessionId = existingSession.id
-        setSessionId(currentSessionId)
+        setSessionId(existingSession.id)
 
-        // Load existing messages
         const { data: existingMessages } = await supabase
           .from('soulmate_messages')
           .select('*')
-          .eq('session_id', currentSessionId)
+          .eq('session_id', existingSession.id)
           .order('message_index', { ascending: true })
 
         if (existingMessages && existingMessages.length > 0) {
@@ -85,26 +121,87 @@ export default function SoulmateFinder() {
             content: m.content
           })))
           setStarted(true)
+          // Clear localStorage since we have Supabase data
+          localStorage.removeItem(STORAGE_KEY)
+          localStorage.removeItem(STORAGE_STARTED)
         }
       } else {
-        // Create new session
-        const { data: newSession } = await supabase
-          .from('soulmate_sessions')
-          .insert({
-            user_id: userId,
-            status: 'in_progress',
-            message_count: 0,
-          })
-          .select()
-          .single()
-
-        if (newSession) {
-          currentSessionId = newSession.id
-          setSessionId(currentSessionId)
+        // No Supabase session - check localStorage for data to migrate
+        const savedMessages = localStorage.getItem(STORAGE_KEY)
+        if (savedMessages) {
+          // Will be migrated when they interact
+          loadLocalStorage()
         }
       }
     } catch (error) {
-      console.error('Error loading session:', error)
+      console.error('Error loading Supabase session:', error)
+      // Fall back to localStorage
+      loadLocalStorage()
+    }
+  }
+
+  // Migrate localStorage data to Supabase when user logs in
+  const migrateToSupabase = async (userId: string) => {
+    const savedMessages = localStorage.getItem(STORAGE_KEY)
+    if (!savedMessages) {
+      // No local data to migrate, just create a session
+      await createSupabaseSession(userId)
+      return
+    }
+
+    try {
+      const localMessages: Message[] = JSON.parse(savedMessages)
+      if (localMessages.length === 0) {
+        await createSupabaseSession(userId)
+        return
+      }
+
+      // Create new session
+      const { data: newSession } = await supabase
+        .from('soulmate_sessions')
+        .insert({
+          user_id: userId,
+          status: 'in_progress',
+          message_count: localMessages.length,
+        })
+        .select()
+        .single()
+
+      if (newSession) {
+        setSessionId(newSession.id)
+
+        // Save all messages to Supabase
+        const messagesToInsert = localMessages.map((m, i) => ({
+          session_id: newSession.id,
+          role: m.role,
+          content: m.content,
+          message_index: i,
+        }))
+
+        await supabase.from('soulmate_messages').insert(messagesToInsert)
+
+        // Clear localStorage
+        localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem(STORAGE_STARTED)
+      }
+    } catch (error) {
+      console.error('Error migrating to Supabase:', error)
+    }
+  }
+
+  const createSupabaseSession = async (userId: string) => {
+    const { data: newSession } = await supabase
+      .from('soulmate_sessions')
+      .insert({
+        user_id: userId,
+        status: 'in_progress',
+        message_count: 0,
+      })
+      .select()
+      .single()
+
+    if (newSession) {
+      setSessionId(newSession.id)
     }
   }
 
@@ -126,64 +223,46 @@ export default function SoulmateFinder() {
     await supabase.auth.signOut()
     setUser(null)
     setSessionId(null)
-    setMessages([])
-    setStarted(false)
   }
 
-  const handleBeginJourney = () => {
-    if (user && sessionId) {
-      // Already logged in, start the interview
-      startInterview()
-    } else {
-      // Show login prompt
-      setShowLogin(true)
-    }
-  }
-
-  const startNewChat = async () => {
-    if (!user) return
-
-    if (messages.length > 0 && !confirm('Start a new conversation? This will begin a fresh interview.')) {
-      return
-    }
-
-    // Mark current session as abandoned if it exists
-    if (sessionId) {
-      await supabase
-        .from('soulmate_sessions')
-        .update({ status: 'abandoned' })
-        .eq('id', sessionId)
-    }
-
-    // Create new session
-    const { data: newSession } = await supabase
-      .from('soulmate_sessions')
-      .insert({
-        user_id: user.id,
-        status: 'in_progress',
-        message_count: 0,
-      })
-      .select()
-      .single()
-
-    if (newSession) {
-      setSessionId(newSession.id)
+  const clearConversation = () => {
+    if (confirm('Start a new conversation? This will clear your current chat.')) {
       setMessages([])
       setStarted(false)
+      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(STORAGE_STARTED)
+
+      if (user && sessionId) {
+        // Mark old session as abandoned, create new one
+        supabase
+          .from('soulmate_sessions')
+          .update({ status: 'abandoned' })
+          .eq('id', sessionId)
+          .then(() => createSupabaseSession(user.id))
+      }
     }
   }
 
   const startInterview = async () => {
-    if (!sessionId) return
-
     setStarted(true)
     setLoading(true)
 
+    // If user is logged in but has no session, create one
+    if (user && !sessionId) {
+      await createSupabaseSession(user.id)
+    }
+
     try {
+      // For anonymous users, use the old API format
+      // For logged-in users with sessionId, use the new format
+      const body = sessionId
+        ? { sessionId }
+        : { messages: [] }
+
       const res = await fetch('/api/soulmate/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId })
+        body: JSON.stringify(body)
       })
 
       const data = await res.json()
@@ -202,7 +281,7 @@ export default function SoulmateFinder() {
   }
 
   const sendMessage = async () => {
-    if (!input.trim() || loading || !sessionId) return
+    if (!input.trim() || loading) return
 
     const userMessage = input.trim()
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }]
@@ -211,10 +290,16 @@ export default function SoulmateFinder() {
     setLoading(true)
 
     try {
+      // For anonymous users, send all messages
+      // For logged-in users with sessionId, just send the new message
+      const body = sessionId
+        ? { sessionId, userMessage }
+        : { messages: newMessages }
+
       const res = await fetch('/api/soulmate/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, userMessage })
+        body: JSON.stringify(body)
       })
 
       const data = await res.json()
@@ -244,10 +329,11 @@ export default function SoulmateFinder() {
   if (!started) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
-        {/* Small login indicator in top right */}
+        {/* Small status in top right */}
         <div className="absolute top-4 right-4">
           {user ? (
             <div className="flex items-center gap-2 text-sm text-purple-300">
+              <span className="text-green-400">Saved</span>
               <span>{user.email}</span>
               <button
                 onClick={handleSignOut}
@@ -256,52 +342,26 @@ export default function SoulmateFinder() {
                 Sign out
               </button>
             </div>
-          ) : (
-            <button
-              onClick={() => setShowLogin(true)}
-              className="text-purple-300 hover:text-white text-sm"
-            >
-              Sign in
-            </button>
-          )}
+          ) : null}
         </div>
 
         <div className="max-w-lg text-center">
           <div className="text-8xl mb-6">💜</div>
           <h1 className="text-5xl font-bold text-white mb-4">
-            {user && messages.length > 0 ? 'Welcome Back!' : 'Find Your Soulmate'}
+            {messages.length > 0 ? 'Welcome Back!' : 'Find Your Soulmate'}
           </h1>
           <p className="text-xl text-purple-200 mb-8">
-            {user && messages.length > 0
+            {messages.length > 0
               ? 'Ready to continue your interview? Your progress has been saved.'
               : 'An AI will interview you to understand who you truly are — your values, dreams, quirks, and what makes your heart sing. Then we\'ll find someone perfect for you.'
             }
           </p>
 
-          {/* Login modal overlay */}
-          {showLogin && !user && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div className="bg-purple-900/90 border border-purple-500/30 rounded-2xl p-8 max-w-md w-full relative">
-                <button
-                  onClick={() => setShowLogin(false)}
-                  className="absolute top-4 right-4 text-purple-300 hover:text-white text-xl"
-                >
-                  &times;
-                </button>
-                <h2 className="text-2xl font-semibold text-white mb-4">Sign in to save progress</h2>
-                <p className="text-purple-200 text-sm mb-6">
-                  Your answers will be saved so you can continue from any device.
-                </p>
-                <AuthModal onSuccess={() => setShowLogin(false)} />
-              </div>
-            </div>
-          )}
-
           <button
-            onClick={handleBeginJourney}
+            onClick={startInterview}
             className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-xl font-semibold px-8 py-4 rounded-full transition-all transform hover:scale-105 shadow-lg"
           >
-            {user && messages.length > 0 ? 'Continue Interview' : 'Begin Your Journey'} ✨
+            {messages.length > 0 ? 'Continue Interview' : 'Begin Your Journey'} ✨
           </button>
           <p className="text-purple-300 text-sm mt-6">
             Takes about 10-15 minutes • Your answers are private
@@ -324,27 +384,55 @@ export default function SoulmateFinder() {
               <p className="text-sm text-purple-300">Getting to know you...</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <span className="text-purple-300 text-sm">
               {messages.filter(m => m.role === 'user').length} responses
             </span>
+
+            {/* Save progress button - only show if not logged in */}
+            {!user && (
+              <button
+                onClick={() => setShowSaveModal(true)}
+                className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
+              >
+                <span>💾</span> Save Progress
+              </button>
+            )}
+
+            {user && (
+              <span className="text-green-400 text-sm flex items-center gap-1">
+                ✓ Saved
+              </span>
+            )}
+
             <button
-              onClick={startNewChat}
+              onClick={clearConversation}
               className="text-purple-300 hover:text-white text-sm px-3 py-1 rounded border border-purple-500/30 hover:border-purple-400 transition-colors"
             >
               New Chat
             </button>
-            {user && (
-              <button
-                onClick={handleSignOut}
-                className="text-purple-300 hover:text-white text-sm"
-              >
-                Sign out
-              </button>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Save progress modal */}
+      {showSaveModal && !user && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-purple-900/90 border border-purple-500/30 rounded-2xl p-8 max-w-md w-full relative">
+            <button
+              onClick={() => setShowSaveModal(false)}
+              className="absolute top-4 right-4 text-purple-300 hover:text-white text-xl"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-semibold text-white mb-4">Save your progress</h2>
+            <p className="text-purple-200 text-sm mb-6">
+              Enter your email and we'll send you a magic link. You can continue this interview from any device.
+            </p>
+            <AuthModal onSuccess={() => setShowSaveModal(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
@@ -393,7 +481,6 @@ export default function SoulmateFinder() {
             value={input}
             onChange={(e) => {
               setInput(e.target.value)
-              // Auto-resize
               e.target.style.height = 'auto'
               e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px'
             }}
